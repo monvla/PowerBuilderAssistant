@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/screenTrainingDairy">
+
+    <fragment
+        android:id="@+id/screenTrainingDairy"
+        android:name="com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragment"
+        android:label="ScreenTrainingList" >
+        <action
+            android:id="@+id/action_screenTrainingDairy_to_screenDairyCreateRecord"
+            app:destination="@id/screenDairyCreateRecord" />
+    </fragment>
+    <fragment
+        android:id="@+id/screenDairyCreateRecord"
+        android:name="com.monvla.powerbuilderassistant.ui.record.CreateDairyRecordFragment"
+        android:label="ScreenDairyCreateRecord" >
+        <action
+            android:id="@+id/action_screenDairyCreateRecord_to_dairyRecordSelectExercise"
+            app:destination="@id/dairyRecordSelectExercise">
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/dairyRecordSelectExercise"
+        android:name="com.monvla.powerbuilderassistant.ui.exercise.SelectExerciseFragment"
+        android:label="DairyRecordSelectExercise" >
+    </fragment>
+</navigation>

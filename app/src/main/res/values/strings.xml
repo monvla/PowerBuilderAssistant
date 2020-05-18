@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Power Builder Assistant</string>
+    <string-array name="exercises_array">
+        <item>Приседания</item>
+        <item>Сгибания/разгибания ног в тренажере</item>
+        <item>Становая тяга(румынская на согнутых ногах)</item>
+        <item>Тяга сумо</item>
+        <item>Гиперэкстензия</item>
+        <item>Жим штанги на горизонте</item>
+        <item>Жим штанги под углом</item>
+        <item>Жим штанги стоя</item>
+        <item>Разгибания рук с верхнего блока</item>
+        <item>Отжимания от брусьев</item>
+        <item>Жим гантелей под углом</item>
+        <item>Жим штанги из-за головы</item>
+    </string-array>
+</resources>
