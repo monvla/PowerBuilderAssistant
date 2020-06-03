@@ -19,9 +19,9 @@ import kotlinx.coroutines.launch
 class CreateDairyRecordFragment: Screen() {
 
     private lateinit var modelTraining: TrainingViewModel
-    private val modelDairyCreateRecord: DairyCreateRecordViewModel by activityViewModels()
+    private val viewModel: DairyRecordViewModel by activityViewModels()
 
-    private val displayableExercises: ArrayList<DisplayableDairyRecord> = arrayListOf()
+    private lateinit var adapter: DisplayableDairyRecordAdapter
 
     init {
         screenLayout = R.layout.screen_dairy_create_record
@@ -33,7 +33,10 @@ class CreateDairyRecordFragment: Screen() {
             val trainings = modelTraining.getTrainingWithExercises()
             val i = 0
         }
-
+        viewModel.selectedExercises.observe(viewLifecycleOwner) {
+            adapter.setData(it)
+            adapter.notifyDataSetChanged()
+        }
     }
 
     override fun onResume() {
@@ -47,17 +50,14 @@ class CreateDairyRecordFragment: Screen() {
     }
 
     fun setupViews() {
-        val adapter = DisplayableDairyRecordAdapter(requireContext())
-
+        setUpButtonEnabled(true)
         modelTraining = ViewModelProvider(requireActivity()).get(TrainingViewModel::class.java)
-
         modelTraining.selectedDairyExercises.observe(viewLifecycleOwner) {
-
             lifecycleScope.launch {
-                adapter.setData(displayableExercises)
+
             }
         }
-
+        adapter = DisplayableDairyRecordAdapter(requireContext())
         create_dairy_record_exercises_list.adapter = adapter
         create_dairy_record_exercises_list.layoutManager = LinearLayoutManager(requireContext())
 
@@ -76,10 +76,4 @@ class CreateDairyRecordFragment: Screen() {
         }
     }
 
-    class DisplayableDairyRecord(
-        val exerciseId: Int,
-        val exerciseName: String,
-        val weight: Float,
-        val repeats: Int
-    )
 }

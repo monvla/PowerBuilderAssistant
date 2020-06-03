@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.ui.record.CreateDairyRecordFragment
+import com.monvla.powerbuilderassistant.ui.record.DairyRecordViewModel
 import kotlinx.android.synthetic.main.item_exercise.view.*
 
 class DisplayableDairyRecordAdapter internal constructor(context: Context) :
@@ -15,10 +16,10 @@ class DisplayableDairyRecordAdapter internal constructor(context: Context) :
 
     var callback : ItemClick? = null
 
-    private var data = emptyList<CreateDairyRecordFragment.DisplayableDairyRecord>()
+    private var data = emptyList<DairyRecordViewModel.Exercise>()
 
     interface ItemClick {
-        fun onRecordItemClicked(exerciseEntity: CreateDairyRecordFragment.DisplayableDairyRecord)
+        fun onRecordItemClicked(exerciseEntity: DairyRecordViewModel.Exercise)
     }
 
     class RecordViewHolder(val container: LinearLayout) : RecyclerView.ViewHolder(container)
@@ -33,14 +34,14 @@ class DisplayableDairyRecordAdapter internal constructor(context: Context) :
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RecordViewHolder, position: Int) {
         val item = data[position]
-        holder.container.itemName.text = data[position].exerciseName
+        holder.container.itemName.text = data[position].name
         holder.container.itemValue.text = "${item.weight}kg x ${item.repeats}"
         holder.container.setOnClickListener {
             callback?.onRecordItemClicked(data[position])
         }
     }
 
-    internal fun setData(record: List<CreateDairyRecordFragment.DisplayableDairyRecord>) {
+    internal fun setData(record: List<DairyRecordViewModel.Exercise>) {
         this.data = record
         notifyDataSetChanged()
     }
