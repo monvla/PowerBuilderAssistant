@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "exercise")
 data class ExerciseEntity(
     @PrimaryKey(autoGenerate = true) val exerciseId: Int = 0,
-    @ColumnInfo(name = "parent_training_id") val parentTrainingId: Int,
+    @ColumnInfo(name = "training_record_id") val trainingRecordId: Int,
     @ColumnInfo(name = "weight") val weight: Float,
     @ColumnInfo(name = "repeats") val repeats: Int,
     val name: String

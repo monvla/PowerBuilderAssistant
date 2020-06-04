@@ -5,11 +5,11 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
-import com.monvla.powerbuilderassistant.ui.record.DairyRecordViewModel
+import com.monvla.powerbuilderassistant.ui.dairy.TrainingViewModel
 import com.monvla.powerbuilderassistant.vo.TrainingRecord
 import kotlinx.android.synthetic.main.item_dairy_record.view.*
 
-class DairyRecordAdapter(private val dataset: MutableList<DairyRecordViewModel.Exercise>) :
+class DairyRecordAdapter(private val data: List<TrainingRecord>) :
     RecyclerView.Adapter<DairyRecordAdapter.DairyRecordViewHolder>() {
 
     var callback : ItemClick? = null
@@ -28,8 +28,8 @@ class DairyRecordAdapter(private val dataset: MutableList<DairyRecordViewModel.E
     }
 
     override fun onBindViewHolder(holder: DairyRecordViewHolder, position: Int) {
-        holder.container.date.text = "LUPA"
+        holder.container.date.text = "LUPA id: ${data[position].trainingId}"
     }
 
-    override fun getItemCount() = dataset.size
+    override fun getItemCount() = data.size
 }

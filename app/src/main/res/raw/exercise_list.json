@@ -1,14 +1,11 @@
 [
   {
-    "id": 0,
     "name": "bench_press"
   },
   {
-    "id": 1,
     "name": "squats"
   },
   {
-    "id": 2,
     "name": "deadlift"
   }
 ]

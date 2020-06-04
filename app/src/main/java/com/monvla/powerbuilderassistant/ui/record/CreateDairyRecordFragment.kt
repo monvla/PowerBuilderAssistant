@@ -13,6 +13,7 @@ import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.adapters.DisplayableDairyRecordAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
 import com.monvla.powerbuilderassistant.ui.dairy.TrainingViewModel
+import com.monvla.powerbuilderassistant.vo.TrainingRecord
 import kotlinx.android.synthetic.main.screen_dairy_create_record.*
 import kotlinx.coroutines.launch
 
@@ -30,8 +31,7 @@ class CreateDairyRecordFragment: Screen() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupViews()
         lifecycleScope.launch {
-            val trainings = modelTraining.getTrainingWithExercises()
-            val i = 0
+            val trainings = modelTraining.getAllTrainings()
         }
         viewModel.selectedExercises.observe(viewLifecycleOwner) {
             adapter.setData(it)
@@ -52,11 +52,6 @@ class CreateDairyRecordFragment: Screen() {
     fun setupViews() {
         setUpButtonEnabled(true)
         modelTraining = ViewModelProvider(requireActivity()).get(TrainingViewModel::class.java)
-        modelTraining.selectedDairyExercises.observe(viewLifecycleOwner) {
-            lifecycleScope.launch {
-
-            }
-        }
         adapter = DisplayableDairyRecordAdapter(requireContext())
         create_dairy_record_exercises_list.adapter = adapter
         create_dairy_record_exercises_list.layoutManager = LinearLayoutManager(requireContext())
@@ -72,6 +67,7 @@ class CreateDairyRecordFragment: Screen() {
 //                val record = DairyRecord(calendarView.date, it)
 //                modelDairy.select(record)
 //            }
+            viewModel.createRecord()
             requireActivity().onBackPressed()
         }
     }
