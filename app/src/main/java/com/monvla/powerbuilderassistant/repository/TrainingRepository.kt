@@ -1,6 +1,7 @@
 package com.monvla.powerbuilderassistant.repository
 
 import com.monvla.powerbuilderassistant.db.TrainingDao
+import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import com.monvla.powerbuilderassistant.vo.TrainingRecord
 
 class TrainingRepository(private val trainingDao: TrainingDao) {
@@ -9,9 +10,11 @@ class TrainingRepository(private val trainingDao: TrainingDao) {
 
     fun getAllTraining() = trainingDao.getAllTraining()
 
-    suspend fun getExercisesForTraining(trainingId: Int) = trainingDao.getExercisesForTrainingRecord(trainingId)
+    fun getExercisesForTraining(trainingId: Long) = trainingDao.getExercisesForTrainingRecord(trainingId)
 
     suspend fun insertTrainingRecord(trainingRecord: TrainingRecord) = trainingDao.insertTraining(trainingRecord)
+
+    suspend fun insertExercise(exercise: ExerciseEntity) = trainingDao.insertExercise(exercise)
 
     suspend fun clearAll() {
         trainingDao.deleteExercises()

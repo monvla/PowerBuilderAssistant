@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.ui.record.DairyRecordViewModel
+import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import kotlinx.android.synthetic.main.item_exercise.view.*
 
 class ExercisesAdapter internal constructor(context: Context) :
@@ -14,10 +15,10 @@ class ExercisesAdapter internal constructor(context: Context) :
 
     var callback : ItemClick? = null
 
-    private var data = emptyList<DairyRecordViewModel.Exercise>()
+    private var data = emptyList<DairyRecordViewModel.ExerciseJson>()
 
     interface ItemClick {
-        fun onExerciseItemClicked(exerciseEntity: DairyRecordViewModel.Exercise)
+        fun onExerciseItemClicked(exerciseEntity: DairyRecordViewModel.ExerciseJson)
     }
 
     class ExercisesViewHolder(val container: LinearLayout) : RecyclerView.ViewHolder(container)
@@ -36,7 +37,7 @@ class ExercisesAdapter internal constructor(context: Context) :
         }
     }
 
-    internal fun setData(record: List<DairyRecordViewModel.Exercise>) {
+    internal fun setData(record: List<DairyRecordViewModel.ExerciseJson>) {
         this.data = record
         notifyDataSetChanged()
     }

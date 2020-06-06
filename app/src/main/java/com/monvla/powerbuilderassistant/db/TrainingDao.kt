@@ -1,8 +1,9 @@
 package com.monvla.powerbuilderassistant.db
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import com.monvla.powerbuilderassistant.vo.TrainingRecord
 
@@ -16,10 +17,10 @@ interface TrainingDao {
     fun getAllTraining(): LiveData<List<TrainingRecord>>
 
     @Query("SELECT * FROM exercise WHERE training_record_id = :id")
-    suspend fun getExercisesForTrainingRecord(id: Int): List<ExerciseEntity>
+    fun getExercisesForTrainingRecord(id: Long): LiveData<List<ExerciseEntity>>
 
     @Insert
-    suspend fun insertTraining(trainingRecord: TrainingRecord)
+    suspend fun insertTraining(trainingRecord: TrainingRecord): Long
 
     @Insert
     suspend fun insertExercise(exerciseEntity: ExerciseEntity)

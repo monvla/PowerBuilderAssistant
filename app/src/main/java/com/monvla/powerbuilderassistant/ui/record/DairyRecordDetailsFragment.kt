@@ -5,22 +5,26 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.adapters.DisplayableDairyRecordAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
 import com.monvla.powerbuilderassistant.ui.dairy.TrainingViewModel
-import com.monvla.powerbuilderassistant.vo.TrainingRecord
 import kotlinx.android.synthetic.main.screen_dairy_create_record.*
-import kotlinx.coroutines.launch
 
-class CreateDairyRecordFragment: Screen() {
+class DairyRecordDetailsFragment: Screen() {
+
+    companion object {
+        private const val CREATE_NEW_RECORD = -1L
+    }
 
     private lateinit var modelTraining: TrainingViewModel
     private val viewModel: DairyRecordViewModel by activityViewModels()
+
+    val args: DairyRecordDetailsFragmentArgs by navArgs()
 
     private lateinit var adapter: DisplayableDairyRecordAdapter
 
@@ -30,12 +34,13 @@ class CreateDairyRecordFragment: Screen() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupViews()
-        lifecycleScope.launch {
-            val trainings = modelTraining.getAllTrainings()
+        viewModel.getExercisesForTraining(args.trainingId).observe(viewLifecycleOwner) {
+            if (args.trainingId != CREATE_NEW_RECORD) {
+                adapter.setData(it)
+            }
         }
         viewModel.selectedExercises.observe(viewLifecycleOwner) {
             adapter.setData(it)
-            adapter.notifyDataSetChanged()
         }
     }
 
@@ -57,16 +62,11 @@ class CreateDairyRecordFragment: Screen() {
         create_dairy_record_exercises_list.layoutManager = LinearLayoutManager(requireContext())
 
         create_dairy_record_select_exercise_button.setOnClickListener {
-            val action =
-                    CreateDairyRecordFragmentDirections.actionScreenDairyCreateRecordToDairyRecordSelectExercise()
+            val action = DairyRecordDetailsFragmentDirections.actionScreenDairyRecordDetailsToDairyRecordSelectExercise()
             findNavController().navigate(action)
         }
 
         buttonCreateExercise.setOnClickListener {
-//            model.getValues()?.let {
-//                val record = DairyRecord(calendarView.date, it)
-//                modelDairy.select(record)
-//            }
             viewModel.createRecord()
             requireActivity().onBackPressed()
         }

@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "training")
 data class TrainingRecord(
-    @PrimaryKey(autoGenerate = true) val trainingId: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "date_timestamp") val dateTimestamp: Long
 )

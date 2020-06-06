@@ -8,18 +8,24 @@
         android:id="@+id/screenTrainingDairy"
         android:name="com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragment"
         android:label="ScreenTrainingList" >
+
         <action
-            android:id="@+id/action_screenTrainingDairy_to_screenDairyCreateRecord"
-            app:destination="@id/screenDairyCreateRecord" />
+            android:id="@+id/action_screenTrainingDairy_to_screenDairyRecordDetails"
+            app:destination="@id/screenDairyRecordDetails">
+        </action>
+
     </fragment>
     <fragment
-        android:id="@+id/screenDairyCreateRecord"
-        android:name="com.monvla.powerbuilderassistant.ui.record.CreateDairyRecordFragment"
-        android:label="ScreenDairyCreateRecord" >
+        android:id="@+id/screenDairyRecordDetails"
+        android:name="com.monvla.powerbuilderassistant.ui.record.DairyRecordDetailsFragment"
+        android:label="ScreenDairyRecordDetails" >
+        <argument
+            android:name="trainingId"
+            app:argType="long"
+            android:defaultValue="-1L" />
         <action
-            android:id="@+id/action_screenDairyCreateRecord_to_dairyRecordSelectExercise"
-            app:destination="@id/dairyRecordSelectExercise">
-        </action>
+            android:id="@+id/action_screenDairyRecordDetails_to_dairyRecordSelectExercise"
+            app:destination="@id/dairyRecordSelectExercise" />
     </fragment>
     <fragment
         android:id="@+id/dairyRecordSelectExercise"

@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
+import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import com.monvla.powerbuilderassistant.vo.TrainingRecord
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -27,35 +28,44 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
         repository = TrainingRepository(exerciseDao)
     }
 
-    fun getExercisesList(resources: Resources): List<Exercise> {
+    fun getSelectableExercisesList(resources: Resources): List<ExerciseJson> {
         val json = Json(JsonConfiguration.Stable)
         val exerciseJson = BufferedReader(InputStreamReader(resources.openRawResource(R.raw.exercise_list))).readText()
-        return json.parse(Exercise.serializer().list, exerciseJson)
+        return json.parse(ExerciseJson.serializer().list, exerciseJson)
     }
 
-    private val _selectedExercises = MutableLiveData(mutableListOf<Exercise>())
-    val selectedExercises: LiveData<MutableList<Exercise>> = _selectedExercises
+    private val _selectedExercises = MutableLiveData(mutableListOf<ExerciseEntity>())
+    val selectedExercises: LiveData<MutableList<ExerciseEntity>> = _selectedExercises
 
-    fun addExercise(record: Exercise) {
+    fun addExercise(record: ExerciseEntity) {
         _selectedExercises.value?.add(record)
     }
 
-    fun getTrainings() = repository.getAllTraining()
+    fun getExercisesForTraining(trainingId: Long) = repository.getExercisesForTraining(trainingId)
+
+    private fun clearSelectedExercises() {
+        _selectedExercises.value = mutableListOf()
+    }
 
     fun createRecord() {
         viewModelScope.launch {
             val training = TrainingRecord(dateTimestamp = 1586241731)
-            repository.insertTrainingRecord(training)
+            val trainingId = repository.insertTrainingRecord(training)
+            _selectedExercises.value?.let {
+                for (exercise in it) {
+                    exercise.trainingRecordId = trainingId
+                    repository.insertExercise(exercise)
+                }
+            }
+            clearSelectedExercises()
         }
 
     }
 
     @Serializable
-    data class Exercise(
+    data class ExerciseJson(
         val id: Int = -1,
-        val name: String,
-        val weight: Float = 0f,
-        val repeats: Int = 0
+        val name: String
     )
 
 }

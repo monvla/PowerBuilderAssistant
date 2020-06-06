@@ -9,13 +9,13 @@ import com.monvla.powerbuilderassistant.ui.dairy.TrainingViewModel
 import com.monvla.powerbuilderassistant.vo.TrainingRecord
 import kotlinx.android.synthetic.main.item_dairy_record.view.*
 
-class DairyRecordAdapter(private val data: List<TrainingRecord>) :
+class DairyRecordAdapter(private var data: List<TrainingRecord>) :
     RecyclerView.Adapter<DairyRecordAdapter.DairyRecordViewHolder>() {
 
     var callback : ItemClick? = null
 
     interface ItemClick {
-        fun onExerciseItemClicked(exercise: TrainingRecord)
+        fun onItemClicked(exercise: TrainingRecord)
     }
 
     class DairyRecordViewHolder(val container: LinearLayout) : RecyclerView.ViewHolder(container)
@@ -24,12 +24,21 @@ class DairyRecordAdapter(private val data: List<TrainingRecord>) :
                                     viewType: Int): DairyRecordViewHolder {
         val textView = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_dairy_record, parent, false) as LinearLayout
+
         return DairyRecordViewHolder(textView)
     }
 
     override fun onBindViewHolder(holder: DairyRecordViewHolder, position: Int) {
-        holder.container.date.text = "LUPA id: ${data[position].trainingId}"
+        holder.container.date.text = "LUPA id: ${data[position].id}"
+        holder.container.setOnClickListener {
+            callback?.onItemClicked(data[position])
+        }
     }
 
     override fun getItemCount() = data.size
+
+    fun updateData(newData: List<TrainingRecord>) {
+        data = newData
+        notifyDataSetChanged()
+    }
 }

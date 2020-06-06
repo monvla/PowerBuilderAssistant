@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
-import com.monvla.powerbuilderassistant.ui.record.CreateDairyRecordFragment
 import com.monvla.powerbuilderassistant.ui.record.DairyRecordViewModel
+import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import kotlinx.android.synthetic.main.item_exercise.view.*
 
 class DisplayableDairyRecordAdapter internal constructor(context: Context) :
@@ -16,10 +16,10 @@ class DisplayableDairyRecordAdapter internal constructor(context: Context) :
 
     var callback : ItemClick? = null
 
-    private var data = emptyList<DairyRecordViewModel.Exercise>()
+    private var data = emptyList<ExerciseEntity>()
 
     interface ItemClick {
-        fun onRecordItemClicked(exerciseEntity: DairyRecordViewModel.Exercise)
+        fun onRecordItemClicked(exerciseEntity: ExerciseEntity)
     }
 
     class RecordViewHolder(val container: LinearLayout) : RecyclerView.ViewHolder(container)
@@ -41,7 +41,7 @@ class DisplayableDairyRecordAdapter internal constructor(context: Context) :
         }
     }
 
-    internal fun setData(record: List<DairyRecordViewModel.Exercise>) {
+    internal fun setData(record: List<ExerciseEntity>) {
         this.data = record
         notifyDataSetChanged()
     }
