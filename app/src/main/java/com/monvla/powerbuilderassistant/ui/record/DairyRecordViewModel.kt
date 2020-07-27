@@ -37,6 +37,9 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
     private val _selectedExercises = MutableLiveData(mutableListOf<ExerciseEntity>())
     val selectedExercises: LiveData<MutableList<ExerciseEntity>> = _selectedExercises
 
+    private val _deleteTraining: MutableLiveData<Unit> = MutableLiveData()
+    val deleteTraining: LiveData<Unit> = _deleteTraining
+
     fun addExercise(record: ExerciseEntity) {
         _selectedExercises.value?.add(record)
     }
@@ -47,9 +50,16 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
         _selectedExercises.value = mutableListOf()
     }
 
+    fun deleteTrainingPressed(trainingId: Long) {
+        viewModelScope.launch {
+            repository.deleteTraining(trainingId)
+            _deleteTraining.value = Unit
+        }
+    }
+
     fun createRecord() {
         viewModelScope.launch {
-            val training = TrainingRecord(dateTimestamp = 1586241731)
+            val training = TrainingRecord(dateTimestamp = System.currentTimeMillis())
             val trainingId = repository.insertTrainingRecord(training)
             _selectedExercises.value?.let {
                 for (exercise in it) {
@@ -59,7 +69,6 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
             }
             clearSelectedExercises()
         }
-
     }
 
     @Serializable

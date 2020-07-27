@@ -28,6 +28,12 @@ interface TrainingDao {
     @Query("DELETE FROM exercise")
     suspend fun deleteExercises()
 
+    @Query("DELETE FROM training WHERE id = :id")
+    suspend fun deleteTrainingRecord(id: Long): Int
+
+    @Query("DELETE FROM exercise WHERE training_record_id = :trainingId")
+    suspend fun deleteExercisesForTraining(trainingId: Long): Int
+
     @Query("DELETE FROM training")
-    suspend fun deleteTraining()
+    suspend fun deleteAllTrainingRecords()
 }

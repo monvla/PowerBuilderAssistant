@@ -3,7 +3,6 @@ package com.monvla.powerbuilderassistant.ui.dairy
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,7 +11,6 @@ import com.monvla.powerbuilderassistant.adapters.DairyRecordAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
 import com.monvla.powerbuilderassistant.vo.TrainingRecord
 import kotlinx.android.synthetic.main.screen_training_dairy.*
-import kotlinx.coroutines.launch
 
 class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
 
@@ -37,13 +35,6 @@ class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
         add_record_fab.setOnClickListener {
             val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToScreenDairyRecordDetails()
             this.findNavController().navigate(action)
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        lifecycleScope.launch {
-//            viewModel.clearAll()
         }
     }
 

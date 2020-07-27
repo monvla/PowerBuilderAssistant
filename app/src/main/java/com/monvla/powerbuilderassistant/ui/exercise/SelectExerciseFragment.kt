@@ -1,7 +1,6 @@
 package com.monvla.powerbuilderassistant.ui.exercise
 
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,12 +23,10 @@ class SelectExerciseFragment : Screen(), ExercisesAdapter.ItemClick {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val adapter = ExercisesAdapter(requireContext())
 
-//        val data = DairyCreateRecordData.getAllExercisesList()
         adapter.setData(viewModel.getSelectableExercisesList(resources))
         select_exercise_list.adapter = adapter
         select_exercise_list.layoutManager = LinearLayoutManager(requireContext())
         (select_exercise_list.adapter as ExercisesAdapter).callback = this
-//        Log.d("LUPA", model.selectedDairyExercises.value?.size.toString())
     }
 
     override fun onExerciseItemClicked(exerciseEntity: DairyRecordViewModel.ExerciseJson) {
@@ -42,19 +39,4 @@ class SelectExerciseFragment : Screen(), ExercisesAdapter.ItemClick {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.add_exercise_unit -> {
-            if (!lifted_weight.text.isBlank()) {
-                val weight = lifted_weight.text.toString().toFloat()
-                val repeats = repeats.text.toString().toInt()
-                requireActivity().onBackPressed()
-                true
-            } else {
-                false
-            }
-        }
-        else -> {
-            super.onOptionsItemSelected(item)
-        }
-    }
 }

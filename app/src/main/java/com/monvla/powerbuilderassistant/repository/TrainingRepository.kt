@@ -16,9 +16,14 @@ class TrainingRepository(private val trainingDao: TrainingDao) {
 
     suspend fun insertExercise(exercise: ExerciseEntity) = trainingDao.insertExercise(exercise)
 
+    suspend fun deleteTraining(trainingId: Long) {
+        trainingDao.deleteExercisesForTraining(trainingId)
+        trainingDao.deleteTrainingRecord(trainingId)
+    }
+
     suspend fun clearAll() {
         trainingDao.deleteExercises()
-        trainingDao.deleteTraining()
+        trainingDao.deleteAllTrainingRecords()
     }
 
 }

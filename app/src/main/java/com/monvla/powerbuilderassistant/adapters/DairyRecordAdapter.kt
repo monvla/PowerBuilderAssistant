@@ -5,9 +5,10 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
-import com.monvla.powerbuilderassistant.ui.dairy.TrainingViewModel
 import com.monvla.powerbuilderassistant.vo.TrainingRecord
 import kotlinx.android.synthetic.main.item_dairy_record.view.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class DairyRecordAdapter(private var data: List<TrainingRecord>) :
     RecyclerView.Adapter<DairyRecordAdapter.DairyRecordViewHolder>() {
@@ -29,7 +30,14 @@ class DairyRecordAdapter(private var data: List<TrainingRecord>) :
     }
 
     override fun onBindViewHolder(holder: DairyRecordViewHolder, position: Int) {
-        holder.container.date.text = "LUPA id: ${data[position].id}"
+
+        val c = Calendar.getInstance().apply {
+            timeInMillis = data[position].dateTimestamp
+            timeZone = TimeZone.getTimeZone("GMT-3:00")
+        }
+        val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
+
+        holder.container.date.text = "Training ${sdf.format(c.time)}"//"LUPA id: ${data[position].id}"
         holder.container.setOnClickListener {
             callback?.onItemClicked(data[position])
         }

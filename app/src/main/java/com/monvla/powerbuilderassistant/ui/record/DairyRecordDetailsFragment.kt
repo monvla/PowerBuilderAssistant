@@ -2,6 +2,9 @@ package com.monvla.powerbuilderassistant.ui.record
 
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -9,6 +12,7 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.tmurakami.aackt.lifecycle.subscribeChanges
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.adapters.DisplayableDairyRecordAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
@@ -42,6 +46,9 @@ class DairyRecordDetailsFragment: Screen() {
         viewModel.selectedExercises.observe(viewLifecycleOwner) {
             adapter.setData(it)
         }
+        viewModel.deleteTraining.subscribeChanges(viewLifecycleOwner) {
+            requireActivity().onBackPressed()
+        }
     }
 
     override fun onResume() {
@@ -51,7 +58,7 @@ class DairyRecordDetailsFragment: Screen() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        DairyCreateRecordData.clear()
+        setHasOptionsMenu(true)
     }
 
     fun setupViews() {
@@ -66,10 +73,23 @@ class DairyRecordDetailsFragment: Screen() {
             findNavController().navigate(action)
         }
 
-        buttonCreateExercise.setOnClickListener {
-            viewModel.createRecord()
-            requireActivity().onBackPressed()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.training_details_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.save_training -> {
+                viewModel.createRecord()
+                requireActivity().onBackPressed()
+            }
+            R.id.delete_training -> {
+                viewModel.deleteTrainingPressed(args.trainingId)
+            }
         }
+        return super.onOptionsItemSelected(item)
     }
 
 }
