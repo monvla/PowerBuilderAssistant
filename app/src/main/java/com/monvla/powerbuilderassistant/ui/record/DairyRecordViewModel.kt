@@ -40,6 +40,9 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
     private val _deleteTraining: MutableLiveData<Unit> = MutableLiveData()
     val deleteTraining: LiveData<Unit> = _deleteTraining
 
+    private val _saveTraining: MutableLiveData<Unit> = MutableLiveData()
+    val saveTraining: LiveData<Unit> = _saveTraining
+
     fun addExercise(record: ExerciseEntity) {
         _selectedExercises.value?.add(record)
     }
@@ -54,6 +57,13 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
         viewModelScope.launch {
             repository.deleteTraining(trainingId)
             _deleteTraining.value = Unit
+        }
+    }
+
+    fun saveTrainingPressed(trainingId: Long) {
+        viewModelScope.launch {
+            repository.deleteTraining(trainingId)
+            _saveTraining.value = Unit
         }
     }
 

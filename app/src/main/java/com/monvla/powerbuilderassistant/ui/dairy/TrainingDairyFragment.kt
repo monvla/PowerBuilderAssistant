@@ -33,7 +33,8 @@ class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
         training_records_list.layoutManager = LinearLayoutManager(requireContext())
 
         add_record_fab.setOnClickListener {
-            val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToScreenDairyRecordDetails()
+//            val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToScreenDairyRecordDetails()
+            val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToScreenRealTimeTraining()
             this.findNavController().navigate(action)
         }
     }

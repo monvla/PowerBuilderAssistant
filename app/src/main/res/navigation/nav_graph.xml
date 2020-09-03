@@ -11,8 +11,18 @@
 
         <action
             android:id="@+id/action_screenTrainingDairy_to_screenDairyRecordDetails"
-            app:destination="@id/screenDairyRecordDetails">
-        </action>
+            app:destination="@id/screenDairyRecordDetails"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_screenTrainingDairy_to_screenRealTimeTraining"
+            app:destination="@id/screenRealTimeTraining"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"/>
 
     </fragment>
     <fragment
@@ -25,8 +35,20 @@
             android:defaultValue="-1L" />
         <action
             android:id="@+id/action_screenDairyRecordDetails_to_dairyRecordSelectExercise"
-            app:destination="@id/dairyRecordSelectExercise" />
+            app:destination="@id/dairyRecordSelectExercise"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
+
+    <fragment
+        android:id="@+id/screenRealTimeTraining"
+        android:name="com.monvla.powerbuilderassistant.ui.exercise.RealTimeTrainingFragment"
+        android:label="ScreenRealTimeTrainingFragment" >
+
+    </fragment>
+
     <fragment
         android:id="@+id/dairyRecordSelectExercise"
         android:name="com.monvla.powerbuilderassistant.ui.exercise.SelectExerciseFragment"

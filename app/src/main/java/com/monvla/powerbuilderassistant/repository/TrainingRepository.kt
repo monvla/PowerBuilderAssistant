@@ -21,6 +21,10 @@ class TrainingRepository(private val trainingDao: TrainingDao) {
         trainingDao.deleteTrainingRecord(trainingId)
     }
 
+    suspend fun updateTraining(trainingId: Long) {
+
+    }
+
     suspend fun clearAll() {
         trainingDao.deleteExercises()
         trainingDao.deleteAllTrainingRecords()

@@ -19,6 +19,7 @@ import com.monvla.powerbuilderassistant.ui.Screen
 import com.monvla.powerbuilderassistant.ui.dairy.TrainingViewModel
 import kotlinx.android.synthetic.main.screen_dairy_create_record.*
 
+
 class DairyRecordDetailsFragment: Screen() {
 
     companion object {
@@ -77,6 +78,8 @@ class DairyRecordDetailsFragment: Screen() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.training_details_menu, menu)
+        menu.findItem(R.id.save_training).isVisible = args.trainingId == CREATE_NEW_RECORD
+        menu.findItem(R.id.delete_training).isVisible = args.trainingId != CREATE_NEW_RECORD
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
