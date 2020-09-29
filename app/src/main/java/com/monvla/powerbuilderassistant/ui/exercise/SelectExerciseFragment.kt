@@ -23,7 +23,7 @@ class SelectExerciseFragment : Screen(), ExercisesAdapter.ItemClick {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val adapter = ExercisesAdapter(requireContext())
 
-        adapter.setData(viewModel.getSelectableExercisesList(resources))
+        adapter.setData(DairyRecordViewModel.getSelectableExercisesList(resources))
         select_exercise_list.adapter = adapter
         select_exercise_list.layoutManager = LinearLayoutManager(requireContext())
         (select_exercise_list.adapter as ExercisesAdapter).callback = this

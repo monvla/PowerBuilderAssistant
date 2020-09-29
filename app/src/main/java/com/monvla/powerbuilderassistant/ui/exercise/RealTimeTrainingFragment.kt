@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,7 +43,7 @@ import java.util.concurrent.TimeUnit
 //}
 
 
-class RealTimeTrainingFragment : Screen() {
+class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDialogListener {
 
     companion object {
         const val NOTIFICATION_ID = 1337
@@ -110,6 +111,11 @@ class RealTimeTrainingFragment : Screen() {
         }
         increase_counter_button.setOnClickListener {
             viewModel.addSet()
+            activity?.let {
+                val fragment = SetResultDialogFragment()
+                fragment.listener = this
+                fragment.show(it.supportFragmentManager, "lupa")
+            }
         }
         button_start.setOnClickListener {
             real_timer_training_flipper.displayedChild = 1
@@ -207,5 +213,9 @@ class RealTimeTrainingFragment : Screen() {
                 viewModel.updateTimer(time)
             }
         }
+    }
+
+    override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.SetData>) {
+
     }
 }

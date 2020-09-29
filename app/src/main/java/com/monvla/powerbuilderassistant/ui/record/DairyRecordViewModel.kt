@@ -21,17 +21,19 @@ import java.io.InputStreamReader
 
 class DairyRecordViewModel(application: Application) : AndroidViewModel(application) {
 
+    companion object {
+        fun getSelectableExercisesList(resources: Resources): List<ExerciseJson> {
+            val json = Json(JsonConfiguration.Stable)
+            val exerciseJson = BufferedReader(InputStreamReader(resources.openRawResource(R.raw.exercise_list))).readText()
+            return json.parse(ExerciseJson.serializer().list, exerciseJson)
+        }
+    }
+
     private val repository: TrainingRepository
 
     init {
         val exerciseDao = TrainingRoomDb.getDatabase(application, viewModelScope).trainingDao()
         repository = TrainingRepository(exerciseDao)
-    }
-
-    fun getSelectableExercisesList(resources: Resources): List<ExerciseJson> {
-        val json = Json(JsonConfiguration.Stable)
-        val exerciseJson = BufferedReader(InputStreamReader(resources.openRawResource(R.raw.exercise_list))).readText()
-        return json.parse(ExerciseJson.serializer().list, exerciseJson)
     }
 
     private val _selectedExercises = MutableLiveData(mutableListOf<ExerciseEntity>())
