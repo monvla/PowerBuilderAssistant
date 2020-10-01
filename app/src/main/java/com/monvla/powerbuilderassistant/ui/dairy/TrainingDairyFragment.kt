@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.adapters.DairyRecordAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
-import com.monvla.powerbuilderassistant.vo.TrainingRecord
+import com.monvla.powerbuilderassistant.vo.TrainingRecordEntity
 import kotlinx.android.synthetic.main.screen_training_dairy.*
 
 class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
@@ -39,7 +39,7 @@ class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
         }
     }
 
-    override fun onItemClicked(training: TrainingRecord) {
+    override fun onItemClicked(training: TrainingRecordEntity) {
         val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToScreenDairyRecordDetails(training.id)
         this.findNavController().navigate(action)
     }

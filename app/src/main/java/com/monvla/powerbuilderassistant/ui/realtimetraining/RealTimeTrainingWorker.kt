@@ -1,4 +1,4 @@
-package com.monvla.powerbuilderassistant.ui.exercise
+package com.monvla.powerbuilderassistant.ui.realtimetraining
 
 import android.content.Context
 import androidx.work.Worker

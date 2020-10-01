@@ -1,4 +1,4 @@
-package com.monvla.powerbuilderassistant.ui.exercise
+package com.monvla.powerbuilderassistant.ui.realtimetraining
 
 import android.content.BroadcastReceiver
 import android.content.ComponentName
@@ -11,7 +11,6 @@ import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
@@ -21,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.ui.Screen
+import com.monvla.powerbuilderassistant.ui.exercise.SetResultDialogFragment
 import kotlinx.android.synthetic.main.screen_real_time_training.*
 import kotlinx.android.synthetic.main.time_item.view.*
 import java.text.DateFormat
@@ -87,6 +87,9 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val fragment = SetResultDialogFragment()
+        fragment.listener = this
+
         viewManager = LinearLayoutManager(context)
         viewAdapter = MyAdapter(this)
 
@@ -109,11 +112,14 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         viewModel._myDataset.observe(viewLifecycleOwner) {
             val i = 0
         }
+
+        viewModel.exercises.observe(this) {
+            fragment.exercisesList = it
+        }
+
         increase_counter_button.setOnClickListener {
             viewModel.addSet()
             activity?.let {
-                val fragment = SetResultDialogFragment()
-                fragment.listener = this
                 fragment.show(it.supportFragmentManager, "lupa")
             }
         }
@@ -126,10 +132,12 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
             real_timer_training_flipper.displayedChild = 2
             viewModel.stopTimer()
             trainingService.stopService()
+            viewModel.saveTraining()
         }
 
         val receiver = TimeReceiver(viewModel)
         context?.registerReceiver(receiver, IntentFilter("GET_CURRENT_TIME")) //<----Register
+        viewModel.initialize()
     }
 
     fun startTrainingService() {
@@ -216,6 +224,6 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
     }
 
     override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.SetData>) {
-
+        viewModel.saveSet(data)
     }
 }

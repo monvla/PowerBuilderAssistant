@@ -10,7 +10,6 @@ import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
-import com.monvla.powerbuilderassistant.vo.TrainingRecord
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.list
@@ -21,14 +20,6 @@ import java.io.InputStreamReader
 
 class DairyRecordViewModel(application: Application) : AndroidViewModel(application) {
 
-    companion object {
-        fun getSelectableExercisesList(resources: Resources): List<ExerciseJson> {
-            val json = Json(JsonConfiguration.Stable)
-            val exerciseJson = BufferedReader(InputStreamReader(resources.openRawResource(R.raw.exercise_list))).readText()
-            return json.parse(ExerciseJson.serializer().list, exerciseJson)
-        }
-    }
-
     private val repository: TrainingRepository
 
     init {
@@ -36,57 +27,43 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
         repository = TrainingRepository(exerciseDao)
     }
 
-    private val _selectedExercises = MutableLiveData(mutableListOf<ExerciseEntity>())
-    val selectedExercises: LiveData<MutableList<ExerciseEntity>> = _selectedExercises
+    val training = MutableLiveData<Training>()
 
-    private val _deleteTraining: MutableLiveData<Unit> = MutableLiveData()
-    val deleteTraining: LiveData<Unit> = _deleteTraining
-
-    private val _saveTraining: MutableLiveData<Unit> = MutableLiveData()
-    val saveTraining: LiveData<Unit> = _saveTraining
-
-    fun addExercise(record: ExerciseEntity) {
-        _selectedExercises.value?.add(record)
-    }
-
-    fun getExercisesForTraining(trainingId: Long) = repository.getExercisesForTraining(trainingId)
-
-    private fun clearSelectedExercises() {
-        _selectedExercises.value = mutableListOf()
-    }
-
-    fun deleteTrainingPressed(trainingId: Long) {
+    fun getTrainingData() {
         viewModelScope.launch {
-            repository.deleteTraining(trainingId)
-            _deleteTraining.value = Unit
-        }
-    }
-
-    fun saveTrainingPressed(trainingId: Long) {
-        viewModelScope.launch {
-            repository.deleteTraining(trainingId)
-            _saveTraining.value = Unit
-        }
-    }
-
-    fun createRecord() {
-        viewModelScope.launch {
-            val training = TrainingRecord(dateTimestamp = System.currentTimeMillis())
-            val trainingId = repository.insertTrainingRecord(training)
-            _selectedExercises.value?.let {
-                for (exercise in it) {
-                    exercise.trainingRecordId = trainingId
-                    repository.insertExercise(exercise)
+            val trainingEntity = repository.getTrainingById(1)
+            trainingEntity?.let{
+                val trainingTemp = Training(date = trainingEntity.date, length = trainingEntity.length)
+                val sets = repository.getSetsByTrainingId(1)
+                sets.forEach {setEntity ->
+                    val set = TrainingSet2()
+                    val exercises = repository.getSetExercisesBySetId(setEntity.id)
+                    exercises.forEach {exerciseEntity ->
+                        val exerciseName = repository.getExerciseById(exerciseEntity.exerciseId).name
+                        val exercise = Exercise(exerciseName, exerciseEntity.repeats, exerciseEntity.weight)
+                        set.exercises?.add(exercise)
+                    }
+                    trainingTemp.trainingSets?.add(set)
                 }
+                training.value = trainingTemp
             }
-            clearSelectedExercises()
         }
     }
 
-    @Serializable
-    data class ExerciseJson(
-        val id: Int = -1,
-        val name: String
+    data class Training(
+        val date: Long,
+        val length: Long,
+        val trainingSets: MutableList<TrainingSet2> = mutableListOf()
+    )
+
+    data class TrainingSet2(
+        val exercises: MutableList<Exercise> = mutableListOf()
+    )
+
+    data class Exercise(
+        val name: String,
+        val repeats: Int,
+        val weight: Float
     )
 
 }

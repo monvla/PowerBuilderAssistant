@@ -5,18 +5,18 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
-import com.monvla.powerbuilderassistant.vo.TrainingRecord
+import com.monvla.powerbuilderassistant.vo.TrainingRecordEntity
 import kotlinx.android.synthetic.main.item_dairy_record.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DairyRecordAdapter(private var data: List<TrainingRecord>) :
+class DairyRecordAdapter(private var data: List<TrainingRecordEntity>) :
     RecyclerView.Adapter<DairyRecordAdapter.DairyRecordViewHolder>() {
 
     var callback : ItemClick? = null
 
     interface ItemClick {
-        fun onItemClicked(exercise: TrainingRecord)
+        fun onItemClicked(exercise: TrainingRecordEntity)
     }
 
     class DairyRecordViewHolder(val container: LinearLayout) : RecyclerView.ViewHolder(container)
@@ -32,7 +32,7 @@ class DairyRecordAdapter(private var data: List<TrainingRecord>) :
     override fun onBindViewHolder(holder: DairyRecordViewHolder, position: Int) {
 
         val c = Calendar.getInstance().apply {
-            timeInMillis = data[position].dateTimestamp
+            timeInMillis = data[position].date
             timeZone = TimeZone.getTimeZone("GMT-3:00")
         }
         val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
@@ -45,7 +45,7 @@ class DairyRecordAdapter(private var data: List<TrainingRecord>) :
 
     override fun getItemCount() = data.size
 
-    fun updateData(newData: List<TrainingRecord>) {
+    fun updateData(newData: List<TrainingRecordEntity>) {
         data = newData
         notifyDataSetChanged()
     }

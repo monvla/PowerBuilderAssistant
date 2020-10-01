@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
@@ -39,17 +40,11 @@ class DairyRecordDetailsFragment: Screen() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupViews()
-        viewModel.getExercisesForTraining(args.trainingId).observe(viewLifecycleOwner) {
-            if (args.trainingId != CREATE_NEW_RECORD) {
-                adapter.setData(it)
-            }
+        viewModel.training.observe(viewLifecycleOwner) {
+            val i = 0
+            Toast.makeText(context, "LUPA: $it", Toast.LENGTH_LONG).show()
         }
-        viewModel.selectedExercises.observe(viewLifecycleOwner) {
-            adapter.setData(it)
-        }
-        viewModel.deleteTraining.subscribeChanges(viewLifecycleOwner) {
-            requireActivity().onBackPressed()
-        }
+        viewModel.getTrainingData()
     }
 
     override fun onResume() {
@@ -85,11 +80,9 @@ class DairyRecordDetailsFragment: Screen() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.save_training -> {
-                viewModel.createRecord()
                 requireActivity().onBackPressed()
             }
             R.id.delete_training -> {
-                viewModel.deleteTrainingPressed(args.trainingId)
             }
         }
         return super.onOptionsItemSelected(item)

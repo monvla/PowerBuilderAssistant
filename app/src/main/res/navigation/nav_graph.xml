@@ -44,7 +44,7 @@
 
     <fragment
         android:id="@+id/screenRealTimeTraining"
-        android:name="com.monvla.powerbuilderassistant.ui.exercise.RealTimeTrainingFragment"
+        android:name="com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingFragment"
         android:label="ScreenRealTimeTrainingFragment" >
 
     </fragment>

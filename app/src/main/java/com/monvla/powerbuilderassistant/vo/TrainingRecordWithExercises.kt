@@ -4,7 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Relation
 
 data class TrainingRecordWithExercises(
-    @Embedded val training: TrainingRecord,
+    @Embedded val training: TrainingRecordEntity,
     @Relation(
         parentColumn = "trainingId",
         entityColumn = "parent_training_id"

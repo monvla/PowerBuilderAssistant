@@ -35,7 +35,6 @@ class DisplayableDairyRecordAdapter internal constructor(context: Context) :
     override fun onBindViewHolder(holder: RecordViewHolder, position: Int) {
         val item = data[position]
         holder.container.itemName.text = data[position].name
-        holder.container.itemValue.text = "${item.weight}kg x ${item.repeats}"
         holder.container.setOnClickListener {
             callback?.onRecordItemClicked(data[position])
         }

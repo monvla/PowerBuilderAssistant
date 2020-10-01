@@ -1,4 +1,4 @@
-package com.monvla.powerbuilderassistant.ui.exercise
+package com.monvla.powerbuilderassistant.ui.realtimetraining
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -14,7 +14,6 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.Message
 import android.os.Process
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.monvla.powerbuilderassistant.MainActivity
 import com.monvla.powerbuilderassistant.R

@@ -12,7 +12,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
+import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.ui.record.DairyRecordViewModel
+import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import kotlinx.android.synthetic.main.add_set_list_item.view.*
 import kotlinx.android.synthetic.main.layout_dialog_add_set.view.*
 import java.lang.IllegalStateException
@@ -25,37 +27,36 @@ class SetResultDialogFragment : DialogFragment() {
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
 
+    var exercisesList: List<ExerciseEntity>? = null
+    var nextTrainingId: Long? = null
+
     interface SetResultDialogListener {
         fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetData>)
     }
 
     val adapterValues = mutableListOf("1")
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = activity?.let {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = activity?.let { activity ->
 
-        viewManager = LinearLayoutManager(it)
-        viewAdapter = MyAdapter(adapterValues)
+        viewManager = LinearLayoutManager(activity)
+        exercisesList?.let {
+            viewAdapter = MyAdapter(adapterValues, it)
+        }
 
-        val view = it.layoutInflater.inflate(R.layout.layout_dialog_add_set, null) as ViewGroup
+        val view = activity.layoutInflater.inflate(R.layout.layout_dialog_add_set, null) as ViewGroup
 
         recyclerView = view.add_set_recycler_view.apply {
-
-            // use a linear layout manager
             layoutManager = viewManager
-
-            // specify an viewAdapter (see also next example)
             adapter = viewAdapter
-
         }
         view.addSetButton.setOnClickListener {button ->
-            Toast.makeText(it, "LUPA", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity, "LUPA", Toast.LENGTH_SHORT).show()
             adapterValues.add("2")
             viewAdapter.notifyDataSetChanged()
         }
 
-        val builder = AlertDialog.Builder(it)
+        val builder = AlertDialog.Builder(activity)
         isCancelable = false
-
 
         builder.apply {
             setView(view)
@@ -68,15 +69,15 @@ class SetResultDialogFragment : DialogFragment() {
                     val count = viewGroup.editTextNumberDecimal.text.toString().toInt()
                     setArray.add(SetData(name, count))
                 }
-                val i = recyclerView
-                val i2 = 0
                 listener.onDialogPositiveClick(this@SetResultDialogFragment, setArray)
+
+                val i = nextTrainingId
             }
         }
         builder.create()
     } ?: throw IllegalStateException("Activity cannot be null")
 
-    class MyAdapter(private val myDataset: MutableList<String>) :
+    class MyAdapter(private val myDataset: MutableList<String>, val exercisesList: List<ExerciseEntity>) :
         RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
         var adapter: ArrayAdapter<String>? = null
@@ -85,26 +86,22 @@ class SetResultDialogFragment : DialogFragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup,
                                         viewType: Int): MyAdapter.MyViewHolder {
-            // create a new view
             val viewGroup = LayoutInflater.from(parent.context)
                     .inflate(R.layout.add_set_list_item, parent, false) as ViewGroup
             return MyViewHolder(viewGroup)
         }
 
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-            holder.viewGroup.context?.let {
+            holder.viewGroup.context?.let {context ->
                 if (adapter == null) {
-                    val values = DairyRecordViewModel.getSelectableExercisesList(it.resources).map { it.name }
-                    adapter = ArrayAdapter(it, android.R.layout.simple_spinner_item, values)
+                    val values = exercisesList.map { it.name }
+                    adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, values)
                     adapter?.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 }
-
                 val spinner = holder.viewGroup.findViewById<Spinner>(R.id.spinner)
                 spinner.adapter = adapter
             }
-
         }
-
         override fun getItemCount() = myDataset.size
     }
 

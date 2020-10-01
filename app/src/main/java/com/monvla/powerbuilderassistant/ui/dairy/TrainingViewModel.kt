@@ -10,18 +10,24 @@ import androidx.lifecycle.viewModelScope
 import androidx.room.Entity
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
-import com.monvla.powerbuilderassistant.vo.TrainingRecord
+import com.monvla.powerbuilderassistant.vo.TrainingRecordEntity
+import kotlinx.coroutines.launch
 
 class TrainingViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: TrainingRepository
 
+    var trainingRecords = MutableLiveData<List<TrainingRecordEntity>>()
+
     init {
         val exerciseDao = TrainingRoomDb.getDatabase(application, viewModelScope).trainingDao()
         repository = TrainingRepository(exerciseDao)
+        viewModelScope.launch {
+            trainingRecords.value = repository.getAllTraining()
+        }
     }
 
-    val trainingRecords = repository.getAllTraining()
+
 
     suspend fun clearAll() {
         repository.clearAll()
