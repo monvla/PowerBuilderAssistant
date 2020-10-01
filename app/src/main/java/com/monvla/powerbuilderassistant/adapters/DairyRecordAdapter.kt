@@ -37,7 +37,7 @@ class DairyRecordAdapter(private var data: List<TrainingRecordEntity>) :
         }
         val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US)
 
-        holder.container.date.text = "Training ${sdf.format(c.time)}"//"LUPA id: ${data[position].id}"
+        holder.container.date.text = "Тренировка ${sdf.format(c.time)}"//"LUPA id: ${data[position].id}"
         holder.container.setOnClickListener {
             callback?.onItemClicked(data[position])
         }

@@ -1,35 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_margin="4dp">
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Dairy create record" />
+        android:text="Название упражнения, количество повторов и вес в упражнении за подход"
+        android:layout_marginBottom="12dp"/>
 
     <CalendarView
         android:id="@+id/calendarView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Exercises" />
-
-    <Button
-        android:id="@+id/create_dairy_record_select_exercise_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Add" />
+        android:visibility="gone"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/create_dairy_record_exercises_list"
+        android:id="@+id/recyclerTrainingInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>

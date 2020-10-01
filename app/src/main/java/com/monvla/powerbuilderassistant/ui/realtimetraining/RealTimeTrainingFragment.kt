@@ -20,27 +20,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.ui.Screen
-import com.monvla.powerbuilderassistant.ui.exercise.SetResultDialogFragment
 import kotlinx.android.synthetic.main.screen_real_time_training.*
 import kotlinx.android.synthetic.main.time_item.view.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
-
-
-//class RealTimeTrainingWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
-//
-//    override suspend fun doWork(): Result = coroutineScope {
-////        viewModel.timerTick()
-//        val viewModel = inputData.get
-//        while (!isStopped) {
-//            Log.d("LUPA", "TICK")
-//            Thread.sleep(1000L)
-//        }
-//        Result.success()
-//    }
-//}
 
 
 class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDialogListener {
@@ -54,28 +39,15 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
             val date = Date(timestamp);
             val formatter = SimpleDateFormat("HH:mm:ss");
             formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-            // Pass date object
             return formatter.format(date)
         }
     }
-
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var viewAdapter: MyAdapter
-    private lateinit var viewManager: RecyclerView.LayoutManager
 
     private val viewModel: RealTimeTrainingViewModel by activityViewModels()
     private lateinit var trainingService: RealTimeTrainingService
 
     init {
         screenLayout = R.layout.screen_real_time_training
-    }
-
-    fun addSet() {
-
-//        if (startTime == null) {
-//            startTime = System.currentTimeMillis()
-//        }
-
     }
 
     fun updateTimer(currentTime: Long) {
@@ -87,15 +59,11 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val fragment = SetResultDialogFragment()
-        fragment.listener = this
+        val viewAdapter = FinishedSetsAdapter(this)
 
-        viewManager = LinearLayoutManager(context)
-        viewAdapter = MyAdapter(this)
-
-        recyclerView = recycler_view_times.apply {
+        recyclerSets.apply {
             setHasFixedSize(true)
-            layoutManager = viewManager
+            layoutManager = LinearLayoutManager(context)
             adapter = viewAdapter
         }
 
@@ -109,30 +77,24 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
             }
             total_sets.text = it.toString()
         }
-        viewModel._myDataset.observe(viewLifecycleOwner) {
-            val i = 0
-        }
-
-        viewModel.exercises.observe(this) {
-            fragment.exercisesList = it
-        }
 
         increase_counter_button.setOnClickListener {
             viewModel.addSet()
-            activity?.let {
-                fragment.show(it.supportFragmentManager, "lupa")
-            }
+            showSetExercisesDialog()
         }
         button_start.setOnClickListener {
             real_timer_training_flipper.displayedChild = 1
             viewModel.start()
             startTrainingService()
+            viewModel.trainingFinished = false
         }
         stop_counter_button.setOnClickListener {
             real_timer_training_flipper.displayedChild = 2
             viewModel.stopTimer()
             trainingService.stopService()
-            viewModel.saveTraining()
+            showSetExercisesDialog()
+            viewModel.addSet()
+            viewModel.trainingFinished = true
         }
 
         val receiver = TimeReceiver(viewModel)
@@ -140,11 +102,18 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         viewModel.initialize()
     }
 
+    fun showSetExercisesDialog() {
+        activity?.let {
+            val fragment = SetResultDialogFragment(viewModel.getLoadedExercises())
+            fragment.listener = this
+            fragment.show(it.supportFragmentManager, "lupa")
+        }
+    }
+
     fun startTrainingService() {
         val sConn = object : ServiceConnection {
 
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-//                Toast.makeText(this@RealTimeTrainingFragment.context, "onServiceConnected", Toast.LENGTH_SHORT).show()
 
                 val binder = service as RealTimeTrainingService.LocalBinder
                 trainingService = binder.getService()
@@ -157,49 +126,36 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
             }
 
             override fun onServiceDisconnected(name: ComponentName?) {
-//                Toast.makeText(this@RealTimeTrainingFragment.context, "onServiceDisconnected", Toast.LENGTH_SHORT).show()
             }
         }
 
         Intent(context, RealTimeTrainingService::class.java).also { intent ->
-//            context?.startService(intent)
             ContextCompat.startForegroundService(context!!, intent)
             activity!!.bindService(intent, sConn, 0)
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-//        viewModel.dropData()
-    }
-
-    override fun onStop() {
-        super.onStop()
-//        viewModel.stopTimer()
-    }
-
-    class MyAdapter(private val context: RealTimeTrainingFragment) :
-        RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
+    class FinishedSetsAdapter(private val context: RealTimeTrainingFragment) :
+        RecyclerView.Adapter<FinishedSetsAdapter.FinishedSetsHolder>() {
 
         var myDataset = mutableListOf<RealTimeTrainingViewModel.TrainingSet>()
 
-        class MyViewHolder(val layout: ConstraintLayout) : RecyclerView.ViewHolder(layout)
+        class FinishedSetsHolder(val layout: ConstraintLayout) : RecyclerView.ViewHolder(layout)
 
         fun setData(data: MutableList<RealTimeTrainingViewModel.TrainingSet>) {
             myDataset = data
         }
 
-        // Create new views (invoked by the layout manager)
         override fun onCreateViewHolder(
             parent: ViewGroup,
             viewType: Int
-        ): MyViewHolder {
+        ): FinishedSetsHolder {
             val layout = LayoutInflater.from(parent.context)
                     .inflate(R.layout.time_item, parent, false) as ConstraintLayout
-            return MyViewHolder(layout)
+            return FinishedSetsHolder(layout)
         }
 
-        override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        override fun onBindViewHolder(holder: FinishedSetsHolder, position: Int) {
 
             val timestamp = TimeUnit.SECONDS.toMillis(myDataset[position]!!.time)
             val date = Date(timestamp)
@@ -223,7 +179,10 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         }
     }
 
-    override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.SetData>) {
+    override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.TrainingSetData>) {
         viewModel.saveSet(data)
+        if (viewModel.trainingFinished) {
+            viewModel.saveTraining()
+        }
     }
 }

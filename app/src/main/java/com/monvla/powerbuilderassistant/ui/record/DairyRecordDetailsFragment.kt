@@ -8,16 +8,13 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.tmurakami.aackt.lifecycle.subscribeChanges
+import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
-import com.monvla.powerbuilderassistant.adapters.DisplayableDairyRecordAdapter
+import com.monvla.powerbuilderassistant.adapters.TrainingDetailsAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
-import com.monvla.powerbuilderassistant.ui.dairy.TrainingViewModel
 import kotlinx.android.synthetic.main.screen_dairy_create_record.*
 
 
@@ -27,12 +24,14 @@ class DairyRecordDetailsFragment: Screen() {
         private const val CREATE_NEW_RECORD = -1L
     }
 
-    private lateinit var modelTraining: TrainingViewModel
+    private lateinit var trainingDetailsRecyclerView: RecyclerView
+    private lateinit var trainingDetailsAdapter: RecyclerView.Adapter<*>
+    private lateinit var viewManager: RecyclerView.LayoutManager
+
     private val viewModel: DairyRecordViewModel by activityViewModels()
 
     val args: DairyRecordDetailsFragmentArgs by navArgs()
 
-    private lateinit var adapter: DisplayableDairyRecordAdapter
 
     init {
         screenLayout = R.layout.screen_dairy_create_record
@@ -41,10 +40,9 @@ class DairyRecordDetailsFragment: Screen() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupViews()
         viewModel.training.observe(viewLifecycleOwner) {
-            val i = 0
-            Toast.makeText(context, "LUPA: $it", Toast.LENGTH_LONG).show()
+            setupTrainingView(it)
         }
-        viewModel.getTrainingData()
+        viewModel.getTrainingData(args.trainingId)
     }
 
     override fun onResume() {
@@ -57,17 +55,24 @@ class DairyRecordDetailsFragment: Screen() {
         setHasOptionsMenu(true)
     }
 
+    fun setupTrainingView(training: DairyRecordViewModel.Training) {
+        trainingDetailsAdapter = TrainingDetailsAdapter(training.trainingSets)
+        recyclerTrainingInfo.apply {
+            setHasFixedSize(true)
+            layoutManager = viewManager
+            adapter = trainingDetailsAdapter
+        }
+    }
+
     fun setupViews() {
         setUpButtonEnabled(true)
-        modelTraining = ViewModelProvider(requireActivity()).get(TrainingViewModel::class.java)
-        adapter = DisplayableDairyRecordAdapter(requireContext())
-        create_dairy_record_exercises_list.adapter = adapter
-        create_dairy_record_exercises_list.layoutManager = LinearLayoutManager(requireContext())
+        viewManager = LinearLayoutManager(requireContext())
 
-        create_dairy_record_select_exercise_button.setOnClickListener {
-            val action = DairyRecordDetailsFragmentDirections.actionScreenDairyRecordDetailsToDairyRecordSelectExercise()
-            findNavController().navigate(action)
-        }
+//        create_dairy_record_select_exercise_button.setOnClickListener {
+//            val action = DairyRecordDetailsFragmentDirections.actionScreenDairyRecordDetailsToDairyRecordSelectExercise()
+//            findNavController().navigate(action)
+//        }
+
 
     }
 

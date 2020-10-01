@@ -39,6 +39,11 @@ class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.updateTrainingData()
+    }
+
     override fun onItemClicked(training: TrainingRecordEntity) {
         val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToScreenDairyRecordDetails(training.id)
         this.findNavController().navigate(action)

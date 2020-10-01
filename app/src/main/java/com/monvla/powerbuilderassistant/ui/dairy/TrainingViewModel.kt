@@ -22,25 +22,15 @@ class TrainingViewModel(application: Application) : AndroidViewModel(application
     init {
         val exerciseDao = TrainingRoomDb.getDatabase(application, viewModelScope).trainingDao()
         repository = TrainingRepository(exerciseDao)
-        viewModelScope.launch {
-            trainingRecords.value = repository.getAllTraining()
-        }
     }
-
-
 
     suspend fun clearAll() {
         repository.clearAll()
     }
 
-    suspend fun getAllTrainings() = repository.getAllTraining()
-
-    suspend fun getAllExercises() = repository.getAllExercises()
-
-//    suspend fun getExerciseByDairyExercise(trainingExercise: TrainingRecordWithExercises): ExerciseEntity? {
-//        return repository.getExerciseById(trainingExercise.exerciseId)
-//    }
-
-    fun selectExercise() {
+    fun updateTrainingData() {
+        viewModelScope.launch {
+            trainingRecords.value = repository.getAllTraining()
+        }
     }
 }

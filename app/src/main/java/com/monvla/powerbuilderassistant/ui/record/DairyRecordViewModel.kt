@@ -29,14 +29,14 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
 
     val training = MutableLiveData<Training>()
 
-    fun getTrainingData() {
+    fun getTrainingData(trainingId: Long) {
         viewModelScope.launch {
-            val trainingEntity = repository.getTrainingById(1)
+            val trainingEntity = repository.getTrainingById(trainingId)
             trainingEntity?.let{
                 val trainingTemp = Training(date = trainingEntity.date, length = trainingEntity.length)
-                val sets = repository.getSetsByTrainingId(1)
+                val sets = repository.getSetsByTrainingId(trainingId)
                 sets.forEach {setEntity ->
-                    val set = TrainingSet2()
+                    val set = TrainingSet2(setEntity.number)
                     val exercises = repository.getSetExercisesBySetId(setEntity.id)
                     exercises.forEach {exerciseEntity ->
                         val exerciseName = repository.getExerciseById(exerciseEntity.exerciseId).name
@@ -57,6 +57,7 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
     )
 
     data class TrainingSet2(
+        val number: Int,
         val exercises: MutableList<Exercise> = mutableListOf()
     )
 

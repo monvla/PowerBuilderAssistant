@@ -32,7 +32,6 @@ class ExercisesAdapter internal constructor(context: Context) :
     }
 
     override fun onBindViewHolder(holder: ExercisesViewHolder, position: Int) {
-        holder.container.itemName.text = data[position].name
         holder.container.setOnClickListener {
             callback?.onExerciseItemClicked(data[position])
         }

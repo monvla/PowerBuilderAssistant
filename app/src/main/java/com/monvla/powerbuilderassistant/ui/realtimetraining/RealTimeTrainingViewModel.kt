@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
-import com.monvla.powerbuilderassistant.ui.exercise.SetResultDialogFragment
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import com.monvla.powerbuilderassistant.vo.SetEntity
 import com.monvla.powerbuilderassistant.vo.SetExerciseEntity
@@ -26,6 +25,8 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
         val dao = TrainingRoomDb.getDatabase(application, viewModelScope).trainingDao()
         repository = TrainingRepository(dao)
     }
+
+    var trainingFinished: Boolean = false
 
     private var mytimer: Timer? = null
     private val workManager = WorkManager.getInstance()
@@ -85,10 +86,10 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
         }
     }
 
-    fun saveSet(data: List<SetResultDialogFragment.SetData>) {
+    fun saveSet(data: List<SetResultDialogFragment.TrainingSetData>) {
         viewModelScope.launch {
             nextTrainingId?.let {trainingId ->
-                val setId = repository.insertSet(SetEntity(trainingRecordId = trainingId))
+                val setId = repository.insertSet(SetEntity(trainingRecordId = trainingId, number = _setsCounter.value!! - 1))
                 data.forEach {
                     val exercise = repository.getExerciseByName(it.name)
                     repository.insertSetExercise(SetExerciseEntity(setId = setId, weight = 0f, repeats = it.repeats, exerciseId = exercise.id))
@@ -96,6 +97,8 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
             }
         }
     }
+
+    fun getLoadedExercises() = _exercises.value!!
 
 
 }
