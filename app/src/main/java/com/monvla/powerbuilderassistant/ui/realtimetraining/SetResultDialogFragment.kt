@@ -20,28 +20,27 @@ class SetResultDialogFragment(var exercisesList: List<ExerciseEntity>) : DialogF
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
-    private lateinit var viewManager: RecyclerView.LayoutManager
 
     interface SetResultDialogListener {
         fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<TrainingSetData>)
     }
 
-    val adapterValues = mutableListOf<TrainingSetData>()
+    private val trainingSetData = mutableListOf<TrainingSetData>()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = activity?.let { activity ->
 
-        viewManager = LinearLayoutManager(activity)
-        viewAdapter = SetResultDialogAdapter(adapterValues, exercisesList)
+        viewAdapter = SetResultDialogAdapter(trainingSetData, exercisesList)
 
         val view = activity.layoutInflater.inflate(R.layout.layout_dialog_add_set, null) as ViewGroup
 
         recyclerView = view.add_set_recycler_view.apply {
-            layoutManager = viewManager
+            layoutManager = LinearLayoutManager(activity)
             adapter = viewAdapter
         }
         view.addSetButton.setOnClickListener {button ->
-            adapterValues.add(
+            trainingSetData.add(
                 TrainingSetData(exercisesList[0].name, 0))
+            updateTrainingSetData()
             viewAdapter.notifyDataSetChanged()
         }
 
@@ -51,21 +50,22 @@ class SetResultDialogFragment(var exercisesList: List<ExerciseEntity>) : DialogF
         builder.apply {
             setView(view)
             setPositiveButton(R.string.ok
-            ) { dialog, id ->
-                val setArray = mutableListOf<TrainingSetData>()
-                adapterValues.forEachIndexed { index, _ ->
-                    val viewGroup = recyclerView.getChildAt(index)
-//                    val name = viewGroup.spinner.selectedItem as String
-//                    val count = viewGroup.editTextNumberDecimal.text.toString().toInt()
-//                    setArray.add(TrainingSetData(name, count))
-                }
-                listener.onDialogPositiveClick(this@SetResultDialogFragment, setArray)
-
+            ) { _, _ ->
+                updateTrainingSetData()
+                listener.onDialogPositiveClick(this@SetResultDialogFragment, trainingSetData)
             }
         }
         builder.create()
     } ?: throw IllegalStateException("Activity cannot be null")
 
-    data class TrainingSetData(val name: String, val repeats: Int)
+    private fun updateTrainingSetData() {
+        for (i in 0 until recyclerView.childCount) {
+            val viewGroup = recyclerView.getChildAt(i)
+            trainingSetData[i].name = viewGroup.exercisesSpinner.selectedItem as String
+            trainingSetData[i].repeats = viewGroup.repeatsNumber.text.toString().toInt()
+        }
+    }
+
+    data class TrainingSetData(var name: String, var repeats: Int)
 
 }

@@ -1,5 +1,7 @@
 package com.monvla.powerbuilderassistant.adapters
 
+import android.text.Editable
+import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -37,6 +39,7 @@ class SetResultDialogAdapter(private val trainingSetData: MutableList<SetResultD
                 adapter = spinnerAdapter
                 setSelectionByName(trainingSetData[position].name)
             }
+            holder.viewGroup.repeatsNumber.text = SpannableStringBuilder(trainingSetData[position].repeats.toString())
         }
     }
     override fun getItemCount() = trainingSetData.size
