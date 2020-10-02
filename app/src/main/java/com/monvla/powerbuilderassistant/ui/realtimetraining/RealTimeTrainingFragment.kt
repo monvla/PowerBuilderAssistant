@@ -23,10 +23,6 @@ import com.monvla.powerbuilderassistant.Utils.Companion.getFormattedTimeFromSeco
 import com.monvla.powerbuilderassistant.ui.Screen
 import kotlinx.android.synthetic.main.screen_real_time_training.*
 import kotlinx.android.synthetic.main.time_item.view.*
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDialogListener {
