@@ -19,6 +19,7 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
+import com.monvla.powerbuilderassistant.Utils.Companion.getFormattedTimeFromSeconds
 import com.monvla.powerbuilderassistant.ui.Screen
 import kotlinx.android.synthetic.main.screen_real_time_training.*
 import kotlinx.android.synthetic.main.time_item.view.*
@@ -34,24 +35,18 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         const val NOTIFICATION_ID = 1337
         const val CHANNEL_ID = "channel"
 
-        fun getFormattedTime(time: Long): String {
-            val timestamp = TimeUnit.SECONDS.toMillis(time)
-            val date = Date(timestamp);
-            val formatter = SimpleDateFormat("HH:mm:ss");
-            formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-            return formatter.format(date)
-        }
     }
 
     private val viewModel: RealTimeTrainingViewModel by activityViewModels()
     private lateinit var trainingService: RealTimeTrainingService
+    lateinit var receiver: TimeReceiver
 
     init {
         screenLayout = R.layout.screen_real_time_training
     }
 
     fun updateTimer(currentTime: Long) {
-        val formatted = getFormattedTime(currentTime)
+        val formatted = getFormattedTimeFromSeconds(currentTime)
         total_time_counter.text = formatted
         total_time.text = formatted
     }
@@ -79,7 +74,6 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         }
 
         increase_counter_button.setOnClickListener {
-            viewModel.addSet()
             showSetExercisesDialog()
             trainingService.pause()
         }
@@ -94,20 +88,24 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
             viewModel.stopTimer()
             trainingService.stopService()
             showSetExercisesDialog()
-            viewModel.addSet()
             viewModel.trainingFinished = true
         }
 
-        val receiver = TimeReceiver(viewModel)
+        receiver = TimeReceiver(viewModel)
         context?.registerReceiver(receiver, IntentFilter("GET_CURRENT_TIME")) //<----Register
         viewModel.initialize()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        context?.unregisterReceiver(receiver)
     }
 
     fun showSetExercisesDialog() {
         activity?.let {
             val fragment = SetResultDialogFragment(viewModel.getLoadedExercises())
             fragment.listener = this
-            fragment.show(it.supportFragmentManager, "lupa")
+            fragment.show(it.supportFragmentManager, fragment.javaClass.simpleName)
         }
     }
 
@@ -157,15 +155,8 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         }
 
         override fun onBindViewHolder(holder: FinishedSetsHolder, position: Int) {
-
-            val timestamp = TimeUnit.SECONDS.toMillis(myDataset[position]!!.time)
-            val date = Date(timestamp)
-            val formatter: DateFormat = SimpleDateFormat("HH:mm:ss")
-            formatter.setTimeZone(TimeZone.getTimeZone("UTC"))
-            val dateFormatted: String = formatter.format(date)
-
             holder.layout.set_num.text = myDataset[position]?.number.toString()
-            holder.layout.set_time.text = dateFormatted
+            holder.layout.set_time.text = getFormattedTimeFromSeconds(myDataset[position].time)
         }
 
         override fun getItemCount() = myDataset.size
@@ -185,6 +176,8 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         trainingService.unpause()
         if (viewModel.trainingFinished) {
             viewModel.saveTraining()
+        } else {
+            viewModel.addSet()
         }
     }
 }

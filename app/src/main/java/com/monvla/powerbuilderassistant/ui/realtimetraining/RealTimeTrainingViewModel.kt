@@ -89,10 +89,10 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
     fun saveSet(data: List<SetResultDialogFragment.TrainingSetData>) {
         viewModelScope.launch {
             nextTrainingId?.let {trainingId ->
-                val setId = repository.insertSet(SetEntity(trainingRecordId = trainingId, number = _setsCounter.value!! - 1))
+                val setId = repository.insertSet(SetEntity(trainingRecordId = trainingId, number = _setsCounter.value!!))
                 data.forEach {
                     val exercise = repository.getExerciseByName(it.name)
-                    repository.insertSetExercise(SetExerciseEntity(setId = setId, weight = 0f, repeats = it.repeats, exerciseId = exercise.id))
+                    repository.insertSetExercise(SetExerciseEntity(setId = setId, weight = it.weight, repeats = it.repeats, exerciseId = exercise.id))
                 }
             }
         }

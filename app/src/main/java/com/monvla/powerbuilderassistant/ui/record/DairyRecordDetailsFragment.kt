@@ -1,21 +1,20 @@
 package com.monvla.powerbuilderassistant.ui.record
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
+import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.adapters.TrainingDetailsAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
-import kotlinx.android.synthetic.main.screen_dairy_create_record.*
+import kotlinx.android.synthetic.main.screen_dairy_record_details.*
 
 
 class DairyRecordDetailsFragment: Screen() {
@@ -34,7 +33,7 @@ class DairyRecordDetailsFragment: Screen() {
 
 
     init {
-        screenLayout = R.layout.screen_dairy_create_record
+        screenLayout = R.layout.screen_dairy_record_details
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -47,7 +46,6 @@ class DairyRecordDetailsFragment: Screen() {
 
     override fun onResume() {
         super.onResume()
-        Log.d("BLA", "BLA")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +54,7 @@ class DairyRecordDetailsFragment: Screen() {
     }
 
     fun setupTrainingView(training: DairyRecordViewModel.Training) {
+        trainingLength.text = "Длительность тренировки: ${Utils.getFormattedTimeFromSeconds(training.length)}"
         trainingDetailsAdapter = TrainingDetailsAdapter(training.trainingSets)
         recyclerTrainingInfo.apply {
             setHasFixedSize(true)
@@ -67,13 +66,6 @@ class DairyRecordDetailsFragment: Screen() {
     fun setupViews() {
         setUpButtonEnabled(true)
         viewManager = LinearLayoutManager(requireContext())
-
-//        create_dairy_record_select_exercise_button.setOnClickListener {
-//            val action = DairyRecordDetailsFragmentDirections.actionScreenDairyRecordDetailsToDairyRecordSelectExercise()
-//            findNavController().navigate(action)
-//        }
-
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

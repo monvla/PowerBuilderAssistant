@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_gravity="center"
-        android:text="START"/>
+        android:text="НАЧАТЬ"/>
 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:orientation="vertical"
@@ -63,7 +63,7 @@
         android:id="@+id/increase_counter_button"
         android:layout_width="393dp"
         android:layout_height="56dp"
-        android:text="Increase"
+        android:text="Новый подход"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/sets_counter" />
@@ -80,7 +80,7 @@
         android:id="@+id/stop_counter_button"
         android:layout_width="393dp"
         android:layout_height="56dp"
-        android:text="Stop"
+        android:text="ЗАВЕРШИТЬ"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/recyclerSets" />
@@ -138,7 +138,7 @@
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:text="0"
+            android:text=""
             android:layout_marginStart="@dimen/margin_small"/>
 
     </LinearLayout>

@@ -40,6 +40,7 @@ class SetResultDialogAdapter(private val trainingSetData: MutableList<SetResultD
                 setSelectionByName(trainingSetData[position].name)
             }
             holder.viewGroup.repeatsNumber.text = SpannableStringBuilder(trainingSetData[position].repeats.toString())
+            holder.viewGroup.weight.text = SpannableStringBuilder(trainingSetData[position].weight.toString())
         }
     }
     override fun getItemCount() = trainingSetData.size

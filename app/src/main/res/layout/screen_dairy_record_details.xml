@@ -6,11 +6,18 @@
     android:layout_margin="4dp">
 
     <TextView
-        android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Название упражнения, количество повторов и вес в упражнении за подход"
+        android:text="Название упражнения, количество повторов и вес снаряда в упражнении за подход."
         android:layout_marginBottom="12dp"/>
+
+    <TextView
+        android:id="@+id/trainingLength"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Длительность тренировки:"
+        android:layout_marginBottom="12dp"
+        />
 
     <CalendarView
         android:id="@+id/calendarView"

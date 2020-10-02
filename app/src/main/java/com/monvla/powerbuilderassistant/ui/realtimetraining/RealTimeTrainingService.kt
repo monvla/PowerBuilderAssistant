@@ -14,10 +14,10 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.Message
 import android.os.Process
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.monvla.powerbuilderassistant.MainActivity
 import com.monvla.powerbuilderassistant.R
+import com.monvla.powerbuilderassistant.Utils
 
 class RealTimeTrainingService : Service() {
 
@@ -87,7 +87,7 @@ class RealTimeTrainingService : Service() {
             intent, PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        val formattedTime = RealTimeTrainingFragment.getFormattedTime(time)
+        val formattedTime = Utils.getFormattedTimeFromSeconds(time)
         val notification = getNotification(formattedTime, pendingIntent)
 
         startForeground(RealTimeTrainingFragment.NOTIFICATION_ID, notification)

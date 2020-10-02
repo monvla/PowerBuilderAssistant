@@ -25,7 +25,7 @@ class SetResultDialogFragment(var exercisesList: List<ExerciseEntity>) : DialogF
         fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<TrainingSetData>)
     }
 
-    private val trainingSetData = mutableListOf<TrainingSetData>()
+    private val trainingSetData = mutableListOf(TrainingSetData(exercisesList[0].name, 0, 0.0f))
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = activity?.let { activity ->
 
@@ -39,7 +39,7 @@ class SetResultDialogFragment(var exercisesList: List<ExerciseEntity>) : DialogF
         }
         view.addSetButton.setOnClickListener {button ->
             trainingSetData.add(
-                TrainingSetData(exercisesList[0].name, 0))
+                TrainingSetData(exercisesList[0].name, 0, 0.0f))
             updateTrainingSetData()
             viewAdapter.notifyDataSetChanged()
         }
@@ -63,9 +63,10 @@ class SetResultDialogFragment(var exercisesList: List<ExerciseEntity>) : DialogF
             val viewGroup = recyclerView.getChildAt(i)
             trainingSetData[i].name = viewGroup.exercisesSpinner.selectedItem as String
             trainingSetData[i].repeats = viewGroup.repeatsNumber.text.toString().toInt()
+            trainingSetData[i].weight = viewGroup.weight.text.toString().toFloat()
         }
     }
 
-    data class TrainingSetData(var name: String, var repeats: Int)
+    data class TrainingSetData(var name: String, var repeats: Int, var weight: Float)
 
 }
