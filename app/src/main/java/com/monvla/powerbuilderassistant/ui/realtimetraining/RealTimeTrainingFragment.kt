@@ -81,6 +81,7 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         increase_counter_button.setOnClickListener {
             viewModel.addSet()
             showSetExercisesDialog()
+            trainingService.pause()
         }
         button_start.setOnClickListener {
             real_timer_training_flipper.displayedChild = 1
@@ -181,6 +182,7 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
 
     override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.TrainingSetData>) {
         viewModel.saveSet(data)
+        trainingService.unpause()
         if (viewModel.trainingFinished) {
             viewModel.saveTraining()
         }

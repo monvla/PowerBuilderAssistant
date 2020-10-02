@@ -14,6 +14,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.Message
 import android.os.Process
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.monvla.powerbuilderassistant.MainActivity
 import com.monvla.powerbuilderassistant.R
@@ -25,6 +26,7 @@ class RealTimeTrainingService : Service() {
     private lateinit var notificationManager: NotificationManager
 
     private var isRunning = false
+    private var isPaused = false
     private var time = 0L
 
     private fun sendDataToActivity() {
@@ -34,26 +36,27 @@ class RealTimeTrainingService : Service() {
         sendBroadcast(sendTime)
     }
 
-    // Handler that receives messages from the thread
     private inner class ServiceHandler(looper: Looper) : Handler(looper) {
 
+        var waitingTimestamp = 0L
+
+        fun needsUpdate() = (System.currentTimeMillis() - waitingTimestamp) > 1000
+
         override fun handleMessage(msg: Message) {
-            // Normally we would do some work here, like download a file.
-            // For our sample, we just sleep for 5 seconds.
             try {
+                waitingTimestamp = System.currentTimeMillis()
                 while (isRunning) {
-                    Thread.sleep(1000)
-                    time++
-                    updateNotifactionTime(time)
-                    sendDataToActivity()
+                    if (isPaused) continue
+                    if (needsUpdate()) {
+                        time++
+                        updateNotifactionTime(time)
+                        sendDataToActivity()
+                        waitingTimestamp = System.currentTimeMillis()
+                    }
                 }
             } catch (e: InterruptedException) {
-                // Restore interrupt status.
                 Thread.currentThread().interrupt()
             }
-
-            // Stop the service using the startId, so that we don't stop
-            // the service in the middle of handling another job
             stopSelf(msg.arg1)
         }
     }
@@ -122,6 +125,14 @@ class RealTimeTrainingService : Service() {
 
     fun stopService() {
         isRunning = false
+    }
+
+    fun pause() {
+        isPaused = true
+    }
+
+    fun unpause() {
+        isPaused = false
     }
 
     override fun onDestroy() {
