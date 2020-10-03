@@ -5,17 +5,29 @@
     android:layout_height="match_parent"
     android:layout_margin="4dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Название упражнения, количество повторов и вес снаряда в упражнении за подход."
-        android:layout_marginBottom="12dp"/>
+
 
     <TextView
         android:id="@+id/trainingLength"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Длительность тренировки:"
+        android:layout_marginBottom="4dp"
+        />
+
+    <TextView
+        android:id="@+id/trainingSetAverageLength"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Среднее время на подход:"
+        android:layout_marginBottom="4dp"
+        />
+
+    <TextView
+        android:id="@+id/trainingTotalWeight"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Общий поднятый вес:"
         android:layout_marginBottom="12dp"
         />
 
@@ -24,6 +36,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Название упражнения, количество повторов и вес снаряда в упражнении за подход."
+        android:layout_marginBottom="12dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerTrainingInfo"

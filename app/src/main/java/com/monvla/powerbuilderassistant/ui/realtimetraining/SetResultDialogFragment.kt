@@ -51,6 +51,7 @@ class SetResultDialogFragment(var exercisesList: List<ExerciseEntity>) : DialogF
             viewAdapter.notifyDataSetChanged()
         }
 
+        retainInstance = true
         isCancelable = false
 
         builder.apply {

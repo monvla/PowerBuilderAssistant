@@ -16,6 +16,8 @@ import android.os.Message
 import android.os.Process
 import androidx.core.app.NotificationCompat
 import com.monvla.powerbuilderassistant.MainActivity
+import com.monvla.powerbuilderassistant.MainActivity.Companion.SOURCE
+import com.monvla.powerbuilderassistant.MainActivity.Companion.SERVICE
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
 
@@ -81,7 +83,7 @@ class RealTimeTrainingService : Service() {
 
     fun updateNotifactionTime(time: Long) {
         val intent = Intent(applicationContext, MainActivity::class.java)
-        intent.putExtra("destination", "RealTimeTrainingFragment")
+        intent.putExtra(SOURCE, SERVICE)
         val pendingIntent = PendingIntent.getActivity(
             applicationContext, 0,
             intent, PendingIntent.FLAG_UPDATE_CURRENT

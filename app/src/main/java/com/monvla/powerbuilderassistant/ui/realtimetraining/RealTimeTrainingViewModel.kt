@@ -1,6 +1,7 @@
 package com.monvla.powerbuilderassistant.ui.realtimetraining
 
 import android.app.Application
+import android.os.Parcelable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,7 +18,18 @@ import java.util.*
 
 class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(application) {
 
+    companion object {
+        const val OPEN_FROM_SERVICE = 0L
+        const val OPEN_FROM_FRAGMENT = 1L
+    }
+
     data class TrainingSet(val number: Int, val time: Long)
+
+    sealed class State {
+        object Ready : State()
+        object InProgress : State()
+        object Finished : State()
+    }
 
     private val repository: TrainingRepository
 
@@ -39,7 +51,6 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
     val _myDataset = MutableLiveData(mutableListOf<TrainingSet>())
     val myDataset: LiveData<MutableList<TrainingSet>> = _myDataset
 
-    var service: RealTimeTrainingService? = null
     private val _exercises = MutableLiveData<List<ExerciseEntity>>()
     val exercises = _exercises as LiveData<List<ExerciseEntity>>
     var nextTrainingId: Long? = null

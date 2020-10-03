@@ -55,6 +55,8 @@ class DairyRecordDetailsFragment: Screen() {
 
     fun setupTrainingView(training: DairyRecordViewModel.Training) {
         trainingLength.text = "Длительность тренировки: ${Utils.getFormattedTimeFromSeconds(training.length)}"
+        trainingSetAverageLength.text = "Среднее время на подход: ${Utils.getFormattedTimeFromSeconds(training.getAverageSetLength())}"
+        trainingTotalWeight.text = "Общий поднятый вес: ${if (training.getTotalWeight() > 0) training.getTotalWeight() else "нет"}"
         trainingDetailsAdapter = TrainingDetailsAdapter(training.trainingSets)
         recyclerTrainingInfo.apply {
             setHasFixedSize(true)

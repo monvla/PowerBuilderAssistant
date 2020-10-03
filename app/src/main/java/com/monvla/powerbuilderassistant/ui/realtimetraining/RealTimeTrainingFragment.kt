@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.IBinder
 import android.view.LayoutInflater
@@ -16,11 +17,15 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils.Companion.getFormattedTimeFromSeconds
+import com.monvla.powerbuilderassistant.adapters.RTTFinishedSetsAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
+import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingViewModel.Companion.OPEN_FROM_FRAGMENT
+import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingViewModel.Companion.OPEN_FROM_SERVICE
 import kotlinx.android.synthetic.main.screen_real_time_training.*
 import kotlinx.android.synthetic.main.time_item.view.*
 
@@ -37,6 +42,8 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
     private lateinit var trainingService: RealTimeTrainingService
     lateinit var receiver: TimeReceiver
 
+    val args: RealTimeTrainingFragmentArgs by navArgs()
+
     init {
         screenLayout = R.layout.screen_real_time_training
     }
@@ -47,10 +54,15 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         total_time.text = formatted
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        real_timer_training_flipper.displayedChild = 1
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewAdapter = FinishedSetsAdapter(this)
+        val viewAdapter = RTTFinishedSetsAdapter(this)
 
         recyclerSets.apply {
             setHasFixedSize(true)
@@ -89,7 +101,15 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
 
         receiver = TimeReceiver(viewModel)
         context?.registerReceiver(receiver, IntentFilter("GET_CURRENT_TIME")) //<----Register
-        viewModel.initialize()
+
+        when(args.launchSourceId) {
+            OPEN_FROM_SERVICE -> {
+                real_timer_training_flipper.displayedChild = 1
+            }
+            OPEN_FROM_FRAGMENT -> {
+                viewModel.initialize()
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -117,7 +137,6 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
                     updateTimer(it)
                     trainingService.updateNotifactionTime(it)
                 }
-                viewModel.service = binder.getService()
             }
 
             override fun onServiceDisconnected(name: ComponentName?) {
@@ -128,34 +147,6 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
             ContextCompat.startForegroundService(context!!, intent)
             activity!!.bindService(intent, sConn, 0)
         }
-    }
-
-    class FinishedSetsAdapter(private val context: RealTimeTrainingFragment) :
-        RecyclerView.Adapter<FinishedSetsAdapter.FinishedSetsHolder>() {
-
-        var myDataset = mutableListOf<RealTimeTrainingViewModel.TrainingSet>()
-
-        class FinishedSetsHolder(val layout: ConstraintLayout) : RecyclerView.ViewHolder(layout)
-
-        fun setData(data: MutableList<RealTimeTrainingViewModel.TrainingSet>) {
-            myDataset = data
-        }
-
-        override fun onCreateViewHolder(
-            parent: ViewGroup,
-            viewType: Int
-        ): FinishedSetsHolder {
-            val layout = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.time_item, parent, false) as ConstraintLayout
-            return FinishedSetsHolder(layout)
-        }
-
-        override fun onBindViewHolder(holder: FinishedSetsHolder, position: Int) {
-            holder.layout.set_num.text = myDataset[position]?.number.toString()
-            holder.layout.set_time.text = getFormattedTimeFromSeconds(myDataset[position].time)
-        }
-
-        override fun getItemCount() = myDataset.size
     }
 
     class TimeReceiver(val viewModel: RealTimeTrainingViewModel) : BroadcastReceiver() {
