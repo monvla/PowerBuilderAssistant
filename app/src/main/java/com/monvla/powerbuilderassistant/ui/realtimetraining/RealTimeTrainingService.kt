@@ -23,6 +23,11 @@ import com.monvla.powerbuilderassistant.Utils
 
 class RealTimeTrainingService : Service() {
 
+    companion object {
+        const val TRAINING_STATUS = "GET_CURRENT_TIME"
+        const val TIME_ARG = "TIME"
+    }
+
     private var serviceLooper: Looper? = null
     private var serviceHandler: ServiceHandler? = null
     private lateinit var notificationManager: NotificationManager
@@ -33,8 +38,8 @@ class RealTimeTrainingService : Service() {
 
     private fun sendDataToActivity() {
         val sendTime = Intent()
-        sendTime.action = "GET_CURRENT_TIME"
-        sendTime.putExtra("TIME", time)
+        sendTime.action = TRAINING_STATUS
+        sendTime.putExtra(TIME_ARG, time)
         sendBroadcast(sendTime)
     }
 
@@ -64,14 +69,9 @@ class RealTimeTrainingService : Service() {
     }
 
     override fun onCreate() {
-        // Start up the thread running the service.  Note that we create a
-        // separate thread because the service normally runs in the process's
-        // main thread, which we don't want to block.  We also make it
-        // background priority so CPU-intensive work will not disrupt our UI.
         HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND).apply {
             start()
 
-            // Get the HandlerThread's Looper and use it for our Handler
             serviceLooper = looper
             serviceHandler = ServiceHandler(looper)
         }
@@ -98,26 +98,16 @@ class RealTimeTrainingService : Service() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         isRunning = true
-//        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show()
-
-        // For each start request, send a message to start a job and deliver the
-        // start ID so we know which request we're stopping when we finish the job
         serviceHandler?.obtainMessage()?.also { msg ->
             msg.arg1 = startId
             serviceHandler?.sendMessage(msg)
         }
-        // If we get killed, after returning from here, restart
         return START_STICKY
     }
 
     override fun onBind(intent: Intent?): IBinder {
         return LocalBinder()
     }
-
-//    override fun onBind(intent: Intent): IBinder? {
-//        // We don't provide binding, so return null
-//        return null
-//    }
 
     inner class LocalBinder : Binder() {
 
@@ -137,13 +127,7 @@ class RealTimeTrainingService : Service() {
         isPaused = false
     }
 
-    override fun onDestroy() {
-//        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show()
-    }
-
     private fun createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "chan"
             val descriptionText = "desc"
@@ -151,7 +135,6 @@ class RealTimeTrainingService : Service() {
             val channel = NotificationChannel(RealTimeTrainingFragment.CHANNEL_ID, name, importance).apply {
                 description = descriptionText
             }
-            // Register the channel with the system
             notificationManager.createNotificationChannel(channel)
         }
     }

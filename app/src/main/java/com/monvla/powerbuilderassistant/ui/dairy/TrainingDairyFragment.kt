@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.adapters.DairyRecordAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
-import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingViewModel.Companion.OPEN_FROM_FRAGMENT
 import com.monvla.powerbuilderassistant.vo.TrainingRecordEntity
 import kotlinx.android.synthetic.main.screen_training_dairy.*
 
@@ -35,7 +34,7 @@ class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
 
         add_record_fab.setOnClickListener {
 //            val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToScreenDairyRecordDetails()
-            val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToScreenRealTimeTraining(OPEN_FROM_FRAGMENT)
+            val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToScreenRealTimeTraining()
             this.findNavController().navigate(action)
         }
     }
