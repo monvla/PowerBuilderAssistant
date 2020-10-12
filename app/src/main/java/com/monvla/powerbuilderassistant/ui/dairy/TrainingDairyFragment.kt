@@ -1,6 +1,9 @@
 package com.monvla.powerbuilderassistant.ui.dairy
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
@@ -39,6 +42,11 @@ class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onStart() {
         super.onStart()
         viewModel.updateTrainingData()
@@ -47,5 +55,21 @@ class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
     override fun onItemClicked(training: TrainingRecordEntity) {
         val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToScreenDairyRecordDetails(training.id)
         this.findNavController().navigate(action)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.main_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.settings -> {
+                val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToExercisesListFragment()
+                this.findNavController().navigate(action)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+
     }
 }

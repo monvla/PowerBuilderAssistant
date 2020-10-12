@@ -23,6 +23,7 @@ class TrainingRepository(private val trainingDao: TrainingDao) {
     suspend fun insertTrainingRecord(trainingRecord: TrainingRecordEntity) = trainingDao.insertTraining(trainingRecord)
 
     suspend fun insertExercise(exercise: ExerciseEntity) = trainingDao.insertExercise(exercise)
+    suspend fun updateExercise(exercise: ExerciseEntity) = trainingDao.updateExercise(exercise)
     suspend fun insertSetExercise(exercise: SetExerciseEntity) = trainingDao.insertSetExercise(exercise)
     suspend fun insertSet(set: SetEntity) = trainingDao.insertSet(set)
 

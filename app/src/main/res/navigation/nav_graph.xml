@@ -23,6 +23,9 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"/>
+        <action
+            android:id="@+id/action_screenTrainingDairy_to_exercisesListFragment"
+            app:destination="@id/exercisesListFragment" />
 
     </fragment>
     <fragment
@@ -52,5 +55,22 @@
         android:id="@+id/dairyRecordSelectExercise"
         android:name="com.monvla.powerbuilderassistant.ui.exercise.SelectExerciseFragment"
         android:label="DairyRecordSelectExercise" >
+    </fragment>
+    <fragment
+        android:id="@+id/exercisesListFragment"
+        android:name="com.monvla.powerbuilderassistant.ui.settings.ExercisesListFragment"
+        android:label="ExercisesListFragment" >
+        <action
+            android:id="@+id/action_exercisesListFragment_to_exerciseEditFragment"
+            app:destination="@id/exerciseEditFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/exerciseEditFragment"
+        android:name="com.monvla.powerbuilderassistant.ui.settings.ExerciseEditFragment"
+        android:label="ExerciseEditFragment" >
+        <argument
+            android:name="exerciseId"
+            app:argType="long"
+            android:defaultValue="-1L" />
     </fragment>
 </navigation>

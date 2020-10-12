@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
@@ -18,12 +19,18 @@ import kotlinx.coroutines.launch
     SetEntity::class,
     SetExerciseEntity::class,
     TrainingRecordEntity::class
-], version = 1, exportSchema = false)
+], version = 2, exportSchema = false)
 abstract class TrainingRoomDb : RoomDatabase() {
 
     abstract fun trainingDao(): TrainingDao
 
     companion object {
+
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE exercise ADD COLUMN default_weight REAL DEFAULT 0.0 NOT NULL;")
+            }
+        }
 
         @Volatile
         private var INSTANCE: TrainingRoomDb? = null
@@ -40,6 +47,7 @@ abstract class TrainingRoomDb : RoomDatabase() {
                     TrainingRoomDb::class.java,
                     "training_database"
                     )
+                    .addMigrations(MIGRATION_1_2)
                     .addCallback(
                         TrainingRoomCallback(
                             scope,
@@ -64,7 +72,7 @@ abstract class TrainingRoomDb : RoomDatabase() {
                 scope.launch {
                     val dao = database.trainingDao()
                     Utils.getDefaultExercisesList(context.resources).forEach {
-                        dao.insertExercise(ExerciseEntity(name = it.name))
+                        dao.insertExercise(ExerciseEntity(name = it.name, defaultWeight = 0f))
                     }
                 }
             }

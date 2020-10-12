@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import com.monvla.powerbuilderassistant.vo.SetEntity
 import com.monvla.powerbuilderassistant.vo.SetExerciseEntity
@@ -41,6 +42,9 @@ interface TrainingDao {
 
     @Insert
     suspend fun insertExercise(exerciseEntity: ExerciseEntity)
+
+    @Update
+    suspend fun updateExercise(exerciseEntity: ExerciseEntity): Int
 
     @Insert
     suspend fun insertSet(setEntity: SetEntity): Long

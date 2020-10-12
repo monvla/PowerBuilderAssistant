@@ -2,6 +2,7 @@
     <string name="app_name">Power Builder Assistant</string>
     <string name="screen_training_dairy_name">Training dairy</string>
     <string name="add_record">Add record</string>
+    <string name="settings">Settings</string>
     <string-array name="exercises_array">
         <item>Приседания</item>
         <item>Сгибания/разгибания ног в тренажере</item>
