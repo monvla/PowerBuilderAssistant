@@ -39,6 +39,10 @@ class ExercisesListFragment : Screen() {
             exercisesAdapter.notifyDataSetChanged()
         }
         viewModel.loadExercises()
+        button_add_exercise.setOnClickListener {
+            val action = ExercisesListFragmentDirections.actionExercisesListFragmentToExerciseEditFragment(-1)
+            it.findNavController().navigate(action)
+        }
     }
 
     override fun onResume() {

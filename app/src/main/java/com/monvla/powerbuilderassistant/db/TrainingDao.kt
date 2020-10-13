@@ -2,6 +2,7 @@ package com.monvla.powerbuilderassistant.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -64,6 +65,12 @@ interface TrainingDao {
     @Query("DELETE FROM training WHERE id = :id")
     suspend fun deleteTrainingRecord(id: Long): Int
 
+    @Delete
+    suspend fun deleteExercise(exercise: ExerciseEntity)
+
     @Query("DELETE FROM training")
     suspend fun deleteAllTrainingRecords()
+
+    @Query("DELETE FROM set_exercise WHERE exercise_id = :id")
+    suspend fun deleteExerciseSetsByExerciseId(id: Long)
 }
