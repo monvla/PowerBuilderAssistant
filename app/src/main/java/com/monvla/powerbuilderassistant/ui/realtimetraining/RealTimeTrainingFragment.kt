@@ -145,13 +145,12 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         }
     }
 
-    override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.TrainingSetData>) {
-        viewModel.saveSet(data)
+    override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.SetExercise>) {
         if (viewModel.isTimerStopped) {
-            viewModel.finishTraining()
+            viewModel.trainingDone(data)
         } else {
             trainingService?.unpause()
-            viewModel.addSet()
+            viewModel.trainingSetDone(data)
         }
     }
 }

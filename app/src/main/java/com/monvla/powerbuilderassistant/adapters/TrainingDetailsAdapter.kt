@@ -8,9 +8,8 @@ import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.ui.record.DairyRecordViewModel
 import kotlinx.android.synthetic.main.item_exercise.view.*
 import kotlinx.android.synthetic.main.item_set_exercises.view.*
-import kotlinx.android.synthetic.main.screen_dairy_record_details.view.*
 
-class TrainingDetailsAdapter (private val setsList: List<DairyRecordViewModel.TrainingSet2>) :
+class TrainingDetailsAdapter (private val setsList: List<DairyRecordViewModel.TrainingSet>) :
     RecyclerView.Adapter<TrainingDetailsAdapter.TrainingDetailsViewHolder>() {
 
     class TrainingDetailsViewHolder(val viewGroup: ViewGroup) : RecyclerView.ViewHolder(viewGroup)

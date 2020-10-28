@@ -2,20 +2,14 @@ package com.monvla.powerbuilderassistant.ui.realtimetraining
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.adapters.SetResultDialogAdapter
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
-import kotlinx.android.synthetic.main.add_set_list_item.*
 import kotlinx.android.synthetic.main.add_set_list_item.view.*
 import kotlinx.android.synthetic.main.layout_dialog_add_set.view.*
 
@@ -27,10 +21,10 @@ class SetResultDialogFragment(var exercisesList: List<ExerciseEntity>) : DialogF
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
 
     interface SetResultDialogListener {
-        fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<TrainingSetData>)
+        fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetExercise>)
     }
 
-    private val trainingSetData = mutableListOf(TrainingSetData(exercisesList[0].name, 0, 0.0f))
+    private val trainingSetData = mutableListOf(SetExercise(exercisesList[0].name, 0, 0.0f))
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(activity)
@@ -45,7 +39,7 @@ class SetResultDialogFragment(var exercisesList: List<ExerciseEntity>) : DialogF
 
         view.addSetButton.setOnClickListener { button ->
             trainingSetData.add(
-                TrainingSetData(exercisesList[0].name, 0, 0.0f)
+                SetExercise(exercisesList[0].name, 0, 0.0f)
             )
             updateTrainingSetData()
             viewAdapter.notifyDataSetChanged()
@@ -77,6 +71,6 @@ class SetResultDialogFragment(var exercisesList: List<ExerciseEntity>) : DialogF
         }
     }
 
-    data class TrainingSetData(var name: String, var repeats: Int, var weight: Float)
+    data class SetExercise(var name: String, var repeats: Int, var weight: Float)
 
 }

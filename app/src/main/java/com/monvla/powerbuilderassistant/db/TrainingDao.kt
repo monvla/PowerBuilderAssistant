@@ -66,6 +66,12 @@ interface TrainingDao {
     suspend fun deleteTrainingRecord(id: Long): Int
 
     @Delete
+    suspend fun deleteSetExercise(exercise: SetExerciseEntity)
+
+    @Delete
+    suspend fun deleteSet(setEntity: SetEntity)
+
+    @Delete
     suspend fun deleteExercise(exercise: ExerciseEntity)
 
     @Query("DELETE FROM training")

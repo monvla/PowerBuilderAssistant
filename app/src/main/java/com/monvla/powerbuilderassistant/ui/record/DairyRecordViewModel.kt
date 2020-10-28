@@ -27,6 +27,9 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
         repository = TrainingRepository(exerciseDao)
     }
 
+    private val _recordDeleted = MutableLiveData(Unit)
+    val recordDeleted = _recordDeleted as LiveData<Unit>
+
     val training = MutableLiveData<Training>()
 
     fun getTrainingData(trainingId: Long) {
@@ -36,7 +39,7 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
                 val trainingTemp = Training(date = trainingEntity.date, length = trainingEntity.length)
                 val sets = repository.getSetsByTrainingId(trainingId)
                 sets.forEach {setEntity ->
-                    val set = TrainingSet2(setEntity.number)
+                    val set = TrainingSet(setEntity.number)
                     val exercises = repository.getSetExercisesBySetId(setEntity.id)
                     exercises.forEach {exerciseEntity ->
                         val exerciseName = repository.getExerciseById(exerciseEntity.exerciseId).name
@@ -50,10 +53,26 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
+    fun deleteRecord(trainingId: Long) {
+        viewModelScope.launch {
+            val sets = repository.getSetsByTrainingId(trainingId)
+            sets.forEach { setEntity ->
+                val exercises = repository.getSetExercisesBySetId(setEntity.id)
+                exercises.forEach { exercise ->
+                    repository.deleteSetExercise(exercise)
+                }
+                repository.deleteSet(setEntity)
+            }
+            repository.deleteTraining(trainingId)
+            _recordDeleted.value = Unit
+        }
+
+    }
+
     data class Training(
         val date: Long,
         val length: Long,
-        val trainingSets: MutableList<TrainingSet2> = mutableListOf()
+        val trainingSets: MutableList<TrainingSet> = mutableListOf()
     ) {
 
         fun getAverageSetLength() = length / trainingSets.size
@@ -67,7 +86,7 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    data class TrainingSet2(
+    data class TrainingSet(
         val number: Int,
         val exercises: MutableList<Exercise> = mutableListOf()
     )

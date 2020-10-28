@@ -5,11 +5,13 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.github.tmurakami.aackt.lifecycle.subscribeChanges
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.adapters.TrainingDetailsAdapter
@@ -40,6 +42,10 @@ class DairyRecordDetailsFragment: Screen() {
         setupViews()
         viewModel.training.observe(viewLifecycleOwner) {
             setupTrainingView(it)
+        }
+        viewModel.recordDeleted.subscribeChanges(viewLifecycleOwner) {
+            Toast.makeText(context, "Тренировка удалена", Toast.LENGTH_SHORT).show()
+            requireActivity().onBackPressed()
         }
         viewModel.getTrainingData(args.trainingId)
     }
@@ -82,6 +88,7 @@ class DairyRecordDetailsFragment: Screen() {
                 requireActivity().onBackPressed()
             }
             R.id.delete -> {
+                viewModel.deleteRecord(args.trainingId)
             }
         }
         return super.onOptionsItemSelected(item)

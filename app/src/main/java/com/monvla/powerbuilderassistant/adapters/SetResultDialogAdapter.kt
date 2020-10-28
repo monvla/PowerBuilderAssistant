@@ -1,15 +1,11 @@
 package com.monvla.powerbuilderassistant.adapters
 
-import android.content.Context
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.Spinner
-import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.ui.realtimetraining.SetResultDialogFragment
@@ -17,7 +13,7 @@ import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import kotlinx.android.synthetic.main.add_set_list_item.view.*
 
 class SetResultDialogAdapter(
-    private val trainingSetData: MutableList<SetResultDialogFragment.TrainingSetData>,
+    private val setData: MutableList<SetResultDialogFragment.SetExercise>,
     val exercisesList: List<ExerciseEntity>,
     val dialogFragment: SetResultDialogFragment?
 ) :
@@ -45,17 +41,17 @@ class SetResultDialogAdapter(
             }
             holder.viewGroup.exercisesSpinner.apply {
                 adapter = spinnerAdapter
-                setSelectionByName(trainingSetData[position].name)
+                setSelectionByName(setData[position].name)
             }
-            holder.viewGroup.repeatsNumber.text = SpannableStringBuilder(trainingSetData[position].repeats.toString())
-            holder.viewGroup.weight.text = SpannableStringBuilder(trainingSetData[position].weight.toString())
+            holder.viewGroup.repeatsNumber.text = SpannableStringBuilder(setData[position].repeats.toString())
+            holder.viewGroup.weight.text = SpannableStringBuilder(setData[position].weight.toString())
             // keyboard show kostyl
             dialogFragment?.dialog?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
             dialogFragment?.dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         }
     }
 
-    override fun getItemCount() = trainingSetData.size
+    override fun getItemCount() = setData.size
 
     fun Spinner.setSelectionByName(name: String) {
         for (i in 0 until adapter.count) {
