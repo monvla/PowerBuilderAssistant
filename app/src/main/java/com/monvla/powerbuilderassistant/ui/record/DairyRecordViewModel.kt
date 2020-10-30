@@ -75,7 +75,7 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
         val trainingSets: MutableList<TrainingSet> = mutableListOf()
     ) {
 
-        fun getAverageSetLength() = length / trainingSets.size
+        fun getAverageSetLength() = if (trainingSets.size > 0) length / trainingSets.size else 0
 
         fun getTotalWeight(): Float {
             var totalWeight = 0f

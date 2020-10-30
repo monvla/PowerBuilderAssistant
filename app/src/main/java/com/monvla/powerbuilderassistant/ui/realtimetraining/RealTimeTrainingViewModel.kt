@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
 import com.monvla.powerbuilderassistant.ui.record.DairyRecordViewModel
@@ -42,7 +43,7 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
 
     var setsCounter = 0
     var totalTime = 0L
-    var startTime = 0L
+    var startTimestamp = 0L
 
     val trainingSets = mutableListOf<TrainingSet>()
     val trainingExercises = mutableListOf<DairyRecordViewModel.TrainingSet>()
@@ -50,13 +51,15 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
 
     private val _exercises = MutableLiveData<List<ExerciseEntity>>()
 
-    fun timerTick(time: Long) {
-        totalTime = time
+    fun timerTick() {
+        totalTime = Utils.currentTimeSeconds() - startTimestamp / 1000
         _state.value = State.Update(totalTime, setsCounter, trainingSets)
     }
 
     fun dropData() {
         trainingSets.clear()
+        startTimestamp = System.currentTimeMillis()
+        totalTime = 0
         setsCounter = 0
     }
 
@@ -69,7 +72,6 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
     fun start() {
         dropData()
         addSet()
-        startTime = System.currentTimeMillis()
         _state.value = State.InProgress
         _state.value = State.Update(totalTime, setsCounter, trainingSets)
     }
@@ -98,10 +100,16 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
         isTimerStopped = true
     }
 
+    fun viewCreated() {
+        if (_state.value == State.Finished) {
+            _state.value = State.Ready
+        }
+    }
+
     private fun saveTraining() {
         viewModelScope.launch {
             val trainingId = repository.insertTrainingRecord(
-                TrainingRecordEntity(date = startTime, length = totalTime)
+                TrainingRecordEntity(date = startTimestamp, length = totalTime)
             )
             trainingSets.forEach { data ->
                 val setId = repository.insertSet(SetEntity(trainingRecordId = trainingId, number = data.number))

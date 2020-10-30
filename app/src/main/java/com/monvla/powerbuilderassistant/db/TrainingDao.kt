@@ -17,7 +17,7 @@ interface TrainingDao {
     @Query("SELECT * FROM exercise")
     suspend fun getAllExercises(): List<ExerciseEntity>
 
-    @Query("SELECT * FROM training")
+    @Query("SELECT * FROM training ORDER BY id DESC")
     suspend fun getAllTraining(): List<TrainingRecordEntity>
 
     @Query("SELECT * FROM set_exercise")

@@ -32,7 +32,7 @@ class RealTimeTrainingService : Service() {
     private var serviceHandler: ServiceHandler? = null
     private lateinit var notificationManager: NotificationManager
 
-    private var isRunning = false
+    private var isRunning = true
     private var isPaused = false
     private var time = 0L
 
@@ -56,7 +56,7 @@ class RealTimeTrainingService : Service() {
                     if (isPaused) continue
                     if (needsUpdate()) {
                         time++
-                        updateNotifactionTime(time)
+                        updateNotifactionTime()
                         sendDataToActivity()
                         waitingTimestamp = System.currentTimeMillis()
                     }
@@ -81,7 +81,7 @@ class RealTimeTrainingService : Service() {
 
     }
 
-    fun updateNotifactionTime(time: Long) {
+    fun updateNotifactionTime() {
         val intent = Intent(applicationContext, MainActivity::class.java)
         intent.putExtra(SOURCE, SERVICE)
         val pendingIntent = PendingIntent.getActivity(
@@ -97,7 +97,6 @@ class RealTimeTrainingService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        isRunning = true
         serviceHandler?.obtainMessage()?.also { msg ->
             msg.arg1 = startId
             serviceHandler?.sendMessage(msg)

@@ -35,6 +35,8 @@ class Utils {
             formatter.setTimeZone(TimeZone.getDefault());
             return formatter.format(date)
         }
+
+        fun currentTimeSeconds() = System.currentTimeMillis() / 1000
     }
 
     @Serializable

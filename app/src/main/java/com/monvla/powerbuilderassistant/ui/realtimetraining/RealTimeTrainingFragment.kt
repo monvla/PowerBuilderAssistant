@@ -25,32 +25,23 @@ import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingView
 import kotlinx.android.synthetic.main.screen_real_time_training.*
 
 
-class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDialogListener {
+class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDialogListener, TrainingServiceListener {
 
     companion object {
         const val NOTIFICATION_ID = 1337
         const val CHANNEL_ID = "channel"
 
+        const val DISPLAYED_CHILD_FINISHED = 2
+        const val DISPLAYED_CHILD_IN_PROGRESS = 1
+        const val DISPLAYED_CHILD_READY = 0
     }
 
     private val viewModel: RealTimeTrainingViewModel by activityViewModels()
-    private var trainingService: RealTimeTrainingService? = null
+    var trainingService: RealTimeTrainingService? = null
     lateinit var receiver: TrainingStatusReceiver
 
     init {
         screenLayout = R.layout.screen_real_time_training
-    }
-
-    fun updateTimer(currentTime: Long) {
-        val formatted = getFormattedTimeFromSeconds(currentTime)
-        total_time_counter.text = formatted
-        total_time.text = formatted
-    }
-
-    fun showTimer() {
-        if (real_timer_training_flipper.displayedChild != 1) {
-            real_timer_training_flipper.displayedChild = 1
-        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -75,6 +66,7 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         button_start.setOnClickListener {
             showTimer()
             viewModel.start()
+            trainingService?.unpause()
             startTrainingService()
         }
         stop_counter_button.setOnClickListener {
@@ -83,12 +75,12 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
             viewModel.timerStopped()
         }
 
-        receiver = TrainingStatusReceiver(viewModel)
+        receiver = TrainingStatusReceiver(this)
         context?.registerReceiver(receiver, IntentFilter(TRAINING_STATUS))
 
         viewModel.state.observe(viewLifecycleOwner) {
             when(it) {
-                is State.Ready -> viewModel.initialize()
+                is State.Ready -> initialize()
                 is State.InProgress -> showTimer()
                 is State.Update -> {
                     updateTimer(it.time)
@@ -99,10 +91,12 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
                     showTimer()
                 }
                 is State.Finished -> {
-                    real_timer_training_flipper.displayedChild = 2
+                    real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_FINISHED
                 }
             }
         }
+        viewModel.viewCreated()
+        connectToService()
     }
 
     override fun onDestroy() {
@@ -110,15 +104,20 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         context?.unregisterReceiver(receiver)
     }
 
-    fun showSetExercisesDialog() {
-        activity?.let {
-            val fragment = SetResultDialogFragment(viewModel.getLoadedExercises())
-            fragment.listener = this
-            fragment.show(it.supportFragmentManager, fragment.javaClass.simpleName)
+    override fun onTick() {
+        viewModel.timerTick()
+    }
+
+    override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.SetExercise>) {
+        if (viewModel.isTimerStopped) {
+            viewModel.trainingDone(data)
+        } else {
+            trainingService?.unpause()
+            viewModel.trainingSetDone(data)
         }
     }
 
-    fun startTrainingService() {
+    private fun connectToService() {
         val sConn = object : ServiceConnection {
 
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -130,27 +129,46 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
             }
         }
 
-        Intent(context, RealTimeTrainingService::class.java).also { intent ->
-            ContextCompat.startForegroundService(context!!, intent)
-            activity!!.bindService(intent, sConn, 0)
+        val intent = Intent(context, RealTimeTrainingService::class.java)
+        requireActivity().bindService(intent, sConn, 0)
+    }
+
+    private fun startTrainingService() {
+        val intent = Intent(context, RealTimeTrainingService::class.java)
+        ContextCompat.startForegroundService(requireContext(), intent)
+    }
+
+    private fun updateTimer(currentTime: Long) {
+        val formatted = getFormattedTimeFromSeconds(currentTime)
+        total_time_counter.text = formatted
+        total_time.text = formatted
+    }
+
+    private fun showTimer() {
+        if (real_timer_training_flipper.displayedChild != DISPLAYED_CHILD_IN_PROGRESS) {
+            real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_IN_PROGRESS
         }
     }
 
-    class TrainingStatusReceiver(val viewModel: RealTimeTrainingViewModel) : BroadcastReceiver() {
+    private fun showSetExercisesDialog() {
+        activity?.let {
+            val fragment = SetResultDialogFragment(viewModel.getLoadedExercises())
+            fragment.listener = this
+            fragment.show(it.supportFragmentManager, fragment.javaClass.simpleName)
+        }
+    }
+
+    private fun initialize() {
+        viewModel.initialize()
+        real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_READY
+    }
+
+    class TrainingStatusReceiver(private val listener: TrainingServiceListener) : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             if (intent.action == TRAINING_STATUS) {
-                val time = intent.getLongExtra(TIME_ARG, 0)
-                viewModel.timerTick(time)
+                listener.onTick()
             }
         }
     }
 
-    override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.SetExercise>) {
-        if (viewModel.isTimerStopped) {
-            viewModel.trainingDone(data)
-        } else {
-            trainingService?.unpause()
-            viewModel.trainingSetDone(data)
-        }
-    }
 }
