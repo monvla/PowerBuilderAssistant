@@ -19,7 +19,6 @@ import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils.Companion.getFormattedTimeFromSeconds
 import com.monvla.powerbuilderassistant.adapters.RTTFinishedSetsAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
-import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingService.Companion.TIME_ARG
 import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingService.Companion.TRAINING_STATUS
 import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingViewModel.State
 import kotlinx.android.synthetic.main.screen_real_time_training.*
@@ -104,8 +103,8 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         context?.unregisterReceiver(receiver)
     }
 
-    override fun onTick() {
-        viewModel.timerTick()
+    override fun onTick(time: Long) {
+        viewModel.timerTick(time)
     }
 
     override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.SetExercise>) {
@@ -166,9 +165,9 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
     class TrainingStatusReceiver(private val listener: TrainingServiceListener) : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             if (intent.action == TRAINING_STATUS) {
-                listener.onTick()
+                val time = intent.getLongExtra(RealTimeTrainingService.TIME_ARG, 0)
+                listener.onTick(time)
             }
         }
     }
-
 }

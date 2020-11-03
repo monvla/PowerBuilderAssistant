@@ -6,6 +6,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
@@ -25,14 +26,12 @@ class DairyRecordDetailsFragment: Screen() {
         private const val CREATE_NEW_RECORD = -1L
     }
 
-    private lateinit var trainingDetailsRecyclerView: RecyclerView
     private lateinit var trainingDetailsAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
 
     private val viewModel: DairyRecordViewModel by activityViewModels()
 
     val args: DairyRecordDetailsFragmentArgs by navArgs()
-
 
     init {
         screenLayout = R.layout.screen_dairy_record_details
@@ -88,10 +87,18 @@ class DairyRecordDetailsFragment: Screen() {
                 requireActivity().onBackPressed()
             }
             R.id.delete -> {
-                viewModel.deleteRecord(args.trainingId)
+                showDeleteDialog()
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
+    private fun showDeleteDialog() = context?.let { AlertDialog.Builder(it).apply {
+            setTitle("Удалить тренировку?")
+            setPositiveButton(R.string.delete) { _, _ ->
+                viewModel.deleteRecord(args.trainingId)
+            }
+            setNegativeButton(android.R.string.cancel, null)
+        }.show()
+    }
 }

@@ -117,13 +117,13 @@ class ExerciseEditFragment : Screen() {
     }
 
     fun showDeleteDialog() = context?.let { AlertDialog.Builder(it).apply {
-        setTitle("Удаление")
-        setMessage("Удалить упражнение? Оно будет также удалено из истории тренировок.")
-        setPositiveButton(android.R.string.ok) { dialog, id ->
-            deleteExercise()
-        }
-        setNegativeButton(android.R.string.cancel, null)
-    }.show()
+            setTitle("Удаление")
+            setMessage("Удалить упражнение? Оно будет также удалено из истории тренировок.")
+            setPositiveButton(android.R.string.ok) { dialog, id ->
+                deleteExercise()
+            }
+            setNegativeButton(android.R.string.cancel, null)
+        }.show()
     }
 
     fun showEditDialog() = context?.let { AlertDialog.Builder(it).apply {

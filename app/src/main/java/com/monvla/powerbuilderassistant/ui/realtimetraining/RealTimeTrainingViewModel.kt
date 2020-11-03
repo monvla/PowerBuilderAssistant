@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
 import com.monvla.powerbuilderassistant.ui.record.DairyRecordViewModel
@@ -41,8 +40,7 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
     val state = _state as LiveData<State>
 
 
-    var setsCounter = 0
-    var totalTime = 0L
+    private var totalTime = 0L
     var startTimestamp = 0L
 
     val trainingSets = mutableListOf<TrainingSet>()
@@ -51,16 +49,16 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
 
     private val _exercises = MutableLiveData<List<ExerciseEntity>>()
 
-    fun timerTick() {
-        totalTime = Utils.currentTimeSeconds() - startTimestamp / 1000
-        _state.value = State.Update(totalTime, setsCounter, trainingSets)
+    fun timerTick(time: Long) {
+        totalTime = time//Utils.currentTimeSeconds() - startTimestamp / 1000
+        _state.value = State.Update(totalTime, trainingSets.size, trainingSets)
     }
 
     fun dropData() {
         trainingSets.clear()
         startTimestamp = System.currentTimeMillis()
         totalTime = 0
-        setsCounter = 0
+        isTimerStopped = false
     }
 
     fun initialize() {
@@ -73,11 +71,11 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
         dropData()
         addSet()
         _state.value = State.InProgress
-        _state.value = State.Update(totalTime, setsCounter, trainingSets)
+        _state.value = State.Update(totalTime, trainingSets.size, trainingSets)
     }
 
     private fun fillSet(setExercises: MutableList<SetResultDialogFragment.SetExercise>) =
-            trainingSets.filter { it.number == setsCounter }.map { it.exercises = setExercises }
+            trainingSets.filter { it.number == trainingSets.size }.map { it.exercises = setExercises }
 
     fun trainingSetDone(setExercises: MutableList<SetResultDialogFragment.SetExercise>) {
         fillSet(setExercises)
@@ -85,9 +83,8 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
     }
 
     fun addSet() {
-        setsCounter++
-        trainingSets.add(TrainingSet(setsCounter, totalTime))
-        _state.value = State.Update(totalTime, setsCounter, trainingSets)
+        trainingSets.add(TrainingSet(trainingSets.size + 1, totalTime))
+        _state.value = State.Update(totalTime, trainingSets.size, trainingSets)
     }
 
     fun trainingDone(setExercises: MutableList<SetResultDialogFragment.SetExercise>) {

@@ -56,7 +56,7 @@ class RealTimeTrainingService : Service() {
                     if (isPaused) continue
                     if (needsUpdate()) {
                         time++
-                        updateNotifactionTime()
+                        updateNotificationTime()
                         sendDataToActivity()
                         waitingTimestamp = System.currentTimeMillis()
                     }
@@ -81,7 +81,7 @@ class RealTimeTrainingService : Service() {
 
     }
 
-    fun updateNotifactionTime() {
+    fun updateNotificationTime() {
         val intent = Intent(applicationContext, MainActivity::class.java)
         intent.putExtra(SOURCE, SERVICE)
         val pendingIntent = PendingIntent.getActivity(
@@ -108,14 +108,9 @@ class RealTimeTrainingService : Service() {
         return LocalBinder()
     }
 
-    inner class LocalBinder : Binder() {
-
-        fun getService() = this@RealTimeTrainingService
-
-    }
-
     fun stopService() {
         isRunning = false
+        notificationManager.cancel(RealTimeTrainingFragment.NOTIFICATION_ID)
     }
 
     fun pause() {
@@ -149,4 +144,8 @@ class RealTimeTrainingService : Service() {
         setShowWhen(false)
         setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
     }.build()
+
+    inner class LocalBinder : Binder() {
+        fun getService() = this@RealTimeTrainingService
+    }
 }
