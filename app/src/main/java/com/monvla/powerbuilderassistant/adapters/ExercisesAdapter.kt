@@ -7,9 +7,6 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
-import com.monvla.powerbuilderassistant.ui.record.DairyRecordViewModel
-import com.monvla.powerbuilderassistant.vo.ExerciseEntity
-import kotlinx.android.synthetic.main.item_exercise.view.*
 
 class ExercisesAdapter internal constructor(context: Context) :
     RecyclerView.Adapter<ExercisesAdapter.ExercisesViewHolder>() {

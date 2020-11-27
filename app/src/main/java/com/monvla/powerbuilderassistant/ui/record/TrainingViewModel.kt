@@ -18,7 +18,7 @@ import kotlinx.serialization.json.JsonConfiguration
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
-class DairyRecordViewModel(application: Application) : AndroidViewModel(application) {
+class TrainingViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: TrainingRepository
 
@@ -30,6 +30,8 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
     private val _recordDeleted = MutableLiveData(Unit)
     val recordDeleted = _recordDeleted as LiveData<Unit>
 
+    val exercises = repository.getAllExercises()
+
     val training = MutableLiveData<Training>()
 
     fun getTrainingData(trainingId: Long) {
@@ -39,7 +41,7 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
                 val trainingTemp = Training(date = trainingEntity.date, length = trainingEntity.length)
                 val sets = repository.getSetsByTrainingId(trainingId)
                 sets.forEach {setEntity ->
-                    val set = TrainingSet(setEntity.number)
+                    val set = TrainingSet(setEntity.id, setEntity.number)
                     val exercises = repository.getSetExercisesBySetId(setEntity.id)
                     exercises.forEach {exerciseEntity ->
                         val exerciseName = repository.getExerciseById(exerciseEntity.exerciseId).name
@@ -87,6 +89,7 @@ class DairyRecordViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     data class TrainingSet(
+        val id: Long,
         val number: Int,
         val exercises: MutableList<Exercise> = mutableListOf()
     )

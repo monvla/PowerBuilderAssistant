@@ -9,5 +9,4 @@ class SetEntity (
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "training_record_id") var trainingRecordId: Long,
     @ColumnInfo(name = "number") var number: Int
-
 )

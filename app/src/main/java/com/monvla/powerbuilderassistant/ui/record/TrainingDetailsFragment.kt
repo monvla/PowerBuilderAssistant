@@ -1,14 +1,17 @@
 package com.monvla.powerbuilderassistant.ui.record
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,10 +20,12 @@ import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.adapters.TrainingDetailsAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
+import com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragmentDirections
+import com.monvla.powerbuilderassistant.ui.realtimetraining.SetResultDialogFragment
 import kotlinx.android.synthetic.main.screen_dairy_record_details.*
 
 
-class DairyRecordDetailsFragment: Screen() {
+class TrainingDetailsFragment: Screen(), TrainingSetClickListener {
 
     companion object {
         private const val CREATE_NEW_RECORD = -1L
@@ -29,9 +34,9 @@ class DairyRecordDetailsFragment: Screen() {
     private lateinit var trainingDetailsAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
 
-    private val viewModel: DairyRecordViewModel by activityViewModels()
+    private val viewModel: TrainingViewModel by activityViewModels()
 
-    val args: DairyRecordDetailsFragmentArgs by navArgs()
+    val args: TrainingDetailsFragmentArgs by navArgs()
 
     init {
         screenLayout = R.layout.screen_dairy_record_details
@@ -58,11 +63,11 @@ class DairyRecordDetailsFragment: Screen() {
         setHasOptionsMenu(true)
     }
 
-    fun setupTrainingView(training: DairyRecordViewModel.Training) {
+    fun setupTrainingView(training: TrainingViewModel.Training) {
         trainingLength.text = "Длительность тренировки: ${Utils.getFormattedTimeFromSeconds(training.length)}"
         trainingSetAverageLength.text = "Среднее время на подход: ${Utils.getFormattedTimeFromSeconds(training.getAverageSetLength())}"
         trainingTotalWeight.text = "Общий поднятый вес: ${if (training.getTotalWeight() > 0) training.getTotalWeight() else "нет"}"
-        trainingDetailsAdapter = TrainingDetailsAdapter(training.trainingSets)
+        trainingDetailsAdapter = TrainingDetailsAdapter(training.trainingSets, this)
         recyclerTrainingInfo.apply {
             setHasFixedSize(true)
             layoutManager = viewManager
@@ -101,4 +106,21 @@ class DairyRecordDetailsFragment: Screen() {
             setNegativeButton(android.R.string.cancel, null)
         }.show()
     }
+
+    override fun onSetClick(setNumber: Int, setId: Long) {
+        val action = TrainingDetailsFragmentDirections.actionScreenDairyRecordDetailsToExerciseSetResultFragment(setId = setId)
+        this.findNavController().navigate(action)
+    }
+
+//    private fun showSetExercisesDialog() {
+//        activity?.let {
+//            val fragment = SetResultDialogFragment(viewModel.getLoadedExercises())
+//            fragment.listener = this
+//            fragment.show(it.supportFragmentManager, fragment.javaClass.simpleName)
+//        }
+//    }
+
+//    override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.SetExercise>) {
+//        Log.d("LUPA", "dialog positive")
+//    }
 }

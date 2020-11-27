@@ -11,9 +11,9 @@ import android.os.Bundle
 import android.os.IBinder
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils.Companion.getFormattedTimeFromSeconds
@@ -24,7 +24,7 @@ import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingView
 import kotlinx.android.synthetic.main.screen_real_time_training.*
 
 
-class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDialogListener, TrainingServiceListener {
+class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
 
     companion object {
         const val NOTIFICATION_ID = 1337
@@ -59,7 +59,8 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
             adapter = viewAdapter
         }
         increase_counter_button.setOnClickListener {
-            showSetExercisesDialog()
+//            showSetExercisesDialog()
+            viewModel.addSet()
             trainingService?.pause()
         }
         button_start.setOnClickListener {
@@ -69,25 +70,38 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
             startTrainingService()
         }
         stop_counter_button.setOnClickListener {
-            showSetExercisesDialog()
             trainingService?.stopService()
             viewModel.timerStopped()
+            viewModel.addSet()
+//            val action = RealTimeTrainingFragmentDirections.actionScreenRealTimeTrainingToExerciseSetResultFragment(trainingId = viewModel.trainingId)
+//            this.findNavController().navigate(action)
+//            showSetExercisesDialog()
         }
 
         receiver = TrainingStatusReceiver(this)
         context?.registerReceiver(receiver, IntentFilter(TRAINING_STATUS))
+
+        viewModel.resumed()
 
         viewModel.state.observe(viewLifecycleOwner) {
             when(it) {
                 is State.Ready -> initialize()
                 is State.InProgress -> showTimer()
                 is State.Update -> {
+                    trainingService?.unpause()
                     updateTimer(it.time)
                     sets_counter.text = it.sets.toString()
                     total_sets.text = it.sets.toString()
                     viewAdapter.setData(it.trainingSets)
                     viewAdapter.notifyDataSetChanged()
                     showTimer()
+                }
+                is State.FillSet -> {
+                    val action = RealTimeTrainingFragmentDirections.actionScreenRealTimeTrainingToExerciseSetResultFragment(
+                        trainingId = it.trainingId,
+                        setId = it.setId
+                    )
+                    this.findNavController().navigate(action)
                 }
                 is State.Finished -> {
                     real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_FINISHED
@@ -107,14 +121,14 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         viewModel.timerTick(time)
     }
 
-    override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.SetExercise>) {
-        if (viewModel.isTimerStopped) {
-            viewModel.trainingDone(data)
-        } else {
-            trainingService?.unpause()
-            viewModel.trainingSetDone(data)
-        }
-    }
+//    override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.SetExercise>) {
+//        if (viewModel.isTimerStopped) {
+//            viewModel.trainingDone(data)
+//        } else {
+//            trainingService?.unpause()
+//            viewModel.trainingSetDone(data)
+//        }
+//    }
 
     private fun connectToService() {
         val sConn = object : ServiceConnection {
@@ -149,16 +163,15 @@ class RealTimeTrainingFragment : Screen(), SetResultDialogFragment.SetResultDial
         }
     }
 
-    private fun showSetExercisesDialog() {
-        activity?.let {
-            val fragment = SetResultDialogFragment(viewModel.getLoadedExercises())
-            fragment.listener = this
-            fragment.show(it.supportFragmentManager, fragment.javaClass.simpleName)
-        }
-    }
+//    private fun showSetExercisesDialog() {
+//        activity?.let {
+//            val fragment = SetResultDialogFragment(viewModel.exercises)
+//            fragment.listener = this
+//            fragment.show(it.supportFragmentManager, fragment.javaClass.simpleName)
+//        }
+//    }
 
     private fun initialize() {
-        viewModel.initialize()
         real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_READY
     }
 

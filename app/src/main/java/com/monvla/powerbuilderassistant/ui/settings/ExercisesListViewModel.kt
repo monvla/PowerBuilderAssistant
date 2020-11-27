@@ -15,17 +15,11 @@ class ExercisesListViewModel(application: Application) : AndroidViewModel(applic
 
     private val repository: TrainingRepository
 
-    private val _exercises = MutableLiveData<List<ExerciseEntity>>()
-    val exercises = _exercises as LiveData<List<ExerciseEntity>>
-
     init {
         val dao = TrainingRoomDb.getDatabase(application, viewModelScope).trainingDao()
         repository = TrainingRepository(dao)
     }
 
-    fun loadExercises() {
-        viewModelScope.launch {
-            _exercises.value = repository.getAllExercises()
-        }
-    }
+    val exercises = repository.getAllExercises()
+
 }

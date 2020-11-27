@@ -30,7 +30,7 @@
     </fragment>
     <fragment
         android:id="@+id/screenDairyRecordDetails"
-        android:name="com.monvla.powerbuilderassistant.ui.record.DairyRecordDetailsFragment"
+        android:name="com.monvla.powerbuilderassistant.ui.record.TrainingDetailsFragment"
         android:label="ScreenDairyRecordDetails" >
         <argument
             android:name="trainingId"
@@ -43,12 +43,18 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_screenDairyRecordDetails_to_exerciseSetResultFragment"
+            app:destination="@id/exerciseSetResultFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/screenRealTimeTraining"
         android:name="com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingFragment"
         android:label="ScreenRealTimeTrainingFragment" >
+        <action
+            android:id="@+id/action_screenRealTimeTraining_to_exerciseSetResultFragment"
+            app:destination="@id/exerciseSetResultFragment" />
     </fragment>
 
     <fragment
@@ -70,6 +76,19 @@
         android:label="ExerciseEditFragment" >
         <argument
             android:name="exerciseId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </fragment>
+    <fragment
+        android:id="@+id/exerciseSetResultFragment"
+        android:name="com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultFragment"
+        android:label="ExerciseSetResultFragment">
+        <argument
+            android:name="setId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+        <argument
+            android:name="trainingId"
             app:argType="long"
             android:defaultValue="-1L" />
     </fragment>

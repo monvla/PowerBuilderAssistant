@@ -10,10 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.ui.realtimetraining.SetResultDialogFragment
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
+import com.monvla.powerbuilderassistant.vo.SetExercise
 import kotlinx.android.synthetic.main.add_set_list_item.view.*
 
 class SetResultDialogAdapter(
-    private val setData: MutableList<SetResultDialogFragment.SetExercise>,
+    private val setData: MutableList<SetExercise>,
     val exercisesList: List<ExerciseEntity>,
     val dialogFragment: SetResultDialogFragment?
 ) :

@@ -1,7 +1,7 @@
 package com.monvla.powerbuilderassistant
 
 import android.content.res.Resources
-import com.monvla.powerbuilderassistant.ui.record.DairyRecordViewModel
+import android.widget.Spinner
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
@@ -44,4 +44,5 @@ class Utils {
         val id: Int = -1,
         val name: String
     )
+
 }

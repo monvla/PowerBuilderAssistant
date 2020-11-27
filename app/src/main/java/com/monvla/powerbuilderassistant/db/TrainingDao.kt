@@ -15,7 +15,7 @@ import com.monvla.powerbuilderassistant.vo.TrainingRecordEntity
 interface TrainingDao {
 
     @Query("SELECT * FROM exercise")
-    suspend fun getAllExercises(): List<ExerciseEntity>
+    fun getAllExercises(): LiveData<List<ExerciseEntity>>
 
     @Query("SELECT * FROM training ORDER BY id DESC")
     suspend fun getAllTraining(): List<TrainingRecordEntity>
@@ -31,6 +31,9 @@ interface TrainingDao {
 
     @Query("SELECT * FROM set_table WHERE training_record_id = :id")
     suspend fun getSetsByTrainingId(id: Long): List<SetEntity>
+
+    @Query("SELECT * FROM set_table WHERE id = :id")
+    suspend fun getSetById(id: Long): SetEntity
 
     @Query("SELECT * FROM set_exercise WHERE set_id = :id")
     suspend fun getSetExercisesBySetId(id: Long): List<SetExerciseEntity>
@@ -53,6 +56,9 @@ interface TrainingDao {
     @Insert
     suspend fun insertSetExercise(setExerciseEntity: SetExerciseEntity)
 
+    @Update
+    suspend fun updateSetExercise(setExerciseEntity: SetExerciseEntity): Int
+
     @Query("SELECT MAX(id) FROM training;")
     suspend fun getLastTrainingRowId(): Long?
 
@@ -66,7 +72,7 @@ interface TrainingDao {
     suspend fun deleteTrainingRecord(id: Long): Int
 
     @Delete
-    suspend fun deleteSetExercise(exercise: SetExerciseEntity)
+    suspend fun deleteSetExercise(exercise: SetExerciseEntity): Int
 
     @Delete
     suspend fun deleteSet(setEntity: SetEntity)

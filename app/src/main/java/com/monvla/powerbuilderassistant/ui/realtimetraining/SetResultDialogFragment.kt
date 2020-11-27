@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.adapters.SetResultDialogAdapter
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
+import com.monvla.powerbuilderassistant.vo.SetExercise
 import kotlinx.android.synthetic.main.add_set_list_item.view.*
 import kotlinx.android.synthetic.main.layout_dialog_add_set.view.*
 
@@ -70,7 +71,5 @@ class SetResultDialogFragment(var exercisesList: List<ExerciseEntity>) : DialogF
             trainingSetData[i].weight = if (weightContent.isNotBlank()) weightContent.toFloat() else 0f
         }
     }
-
-    data class SetExercise(var name: String, var repeats: Int, var weight: Float)
 
 }

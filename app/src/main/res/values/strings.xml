@@ -4,6 +4,15 @@
     <string name="add_record">Add record</string>
     <string name="settings">Settings</string>
     <string name="delete">Delete</string>
+    <string name="empty">empty</string>
+    <string name="set_result_header">Подход %1$d</string>
+    <string name="repeats">Повторы</string>
+    <string name="weight">Вес снаряда</string>
+    <string name="done_exercise_title">Выполненное упражнение</string>
+    <string name="save_set_dialog_error">Не указано количество повторов</string>
+    <string name="menu_delete">Удалить</string>
+    <string name="dialog_delete_exercise">Удалить упражнение %1$s из тренировки?</string>
+    <string name="exercise_deleted">Упражнение удалено</string>
     <string-array name="exercises_array">
         <item>Приседания</item>
         <item>Сгибания/разгибания ног в тренажере</item>

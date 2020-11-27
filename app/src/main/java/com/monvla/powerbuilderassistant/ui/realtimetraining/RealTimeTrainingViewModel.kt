@@ -7,9 +7,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
-import com.monvla.powerbuilderassistant.ui.record.DairyRecordViewModel
-import com.monvla.powerbuilderassistant.vo.ExerciseEntity
+import com.monvla.powerbuilderassistant.ui.record.TrainingViewModel
 import com.monvla.powerbuilderassistant.vo.SetEntity
+import com.monvla.powerbuilderassistant.vo.SetExercise
 import com.monvla.powerbuilderassistant.vo.SetExerciseEntity
 import com.monvla.powerbuilderassistant.vo.TrainingRecordEntity
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
     data class TrainingSet(
         val number: Int,
         val time: Long,
-        var exercises: MutableList<SetResultDialogFragment.SetExercise> = mutableListOf()
+        var exercises: MutableList<SetExercise> = mutableListOf()
     )
 
     sealed class State {
@@ -27,6 +27,7 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
         object InProgress : State()
         object Finished : State()
         data class Update(val time: Long, val sets: Int, val trainingSets: MutableList<TrainingSet>) : State()
+        data class FillSet(val trainingId: Long, val setId: Long) : State()
     }
 
     private val repository: TrainingRepository
@@ -44,10 +45,11 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
     var startTimestamp = 0L
 
     val trainingSets = mutableListOf<TrainingSet>()
-    val trainingExercises = mutableListOf<DairyRecordViewModel.TrainingSet>()
+    val trainingExercises = mutableListOf<TrainingViewModel.TrainingSet>()
     var isTimerStopped = false
+    var trainingId: Long = -1L
 
-    private val _exercises = MutableLiveData<List<ExerciseEntity>>()
+    val exercises = repository.getAllExercises()
 
     fun timerTick(time: Long) {
         totalTime = time//Utils.currentTimeSeconds() - startTimestamp / 1000
@@ -61,36 +63,43 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
         isTimerStopped = false
     }
 
-    fun initialize() {
-        viewModelScope.launch {
-            _exercises.value = repository.getAllExercises()
-        }
-    }
-
     fun start() {
+        viewModelScope.launch {
+            trainingId = repository.insertTrainingRecord(
+                TrainingRecordEntity(date = startTimestamp, length = totalTime)
+            )
+        }
         dropData()
-        addSet()
         _state.value = State.InProgress
         _state.value = State.Update(totalTime, trainingSets.size, trainingSets)
     }
 
-    private fun fillSet(setExercises: MutableList<SetResultDialogFragment.SetExercise>) =
+    private fun fillSet(setExercises: MutableList<SetExercise>) =
             trainingSets.filter { it.number == trainingSets.size }.map { it.exercises = setExercises }
 
-    fun trainingSetDone(setExercises: MutableList<SetResultDialogFragment.SetExercise>) {
+    fun trainingSetDone(setExercises: MutableList<SetExercise>) {
         fillSet(setExercises)
         addSet()
     }
 
-    fun addSet() {
-        trainingSets.add(TrainingSet(trainingSets.size + 1, totalTime))
-        _state.value = State.Update(totalTime, trainingSets.size, trainingSets)
+    fun resumed() {
+
     }
 
-    fun trainingDone(setExercises: MutableList<SetResultDialogFragment.SetExercise>) {
-        fillSet(setExercises)
+    fun addSet() {
+        viewModelScope.launch {
+            val setNumber = trainingSets.size + 1
+            trainingSets.add(TrainingSet(setNumber, totalTime))
+            val setId = repository.insertSet(SetEntity(trainingRecordId = trainingId, number = setNumber))
+            _state.value = State.FillSet(trainingId, setId)
+        }
+//        _state.value = State.Update(totalTime, trainingSets.size, trainingSets)
+    }
+
+    fun trainingDone(setExercises: MutableList<SetExercise>) {
+//        fillSet(setExercises)
         _state.value = State.Finished
-        saveTraining()
+//        saveTraining()
     }
 
     fun timerStopped() {
@@ -98,16 +107,19 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
     }
 
     fun viewCreated() {
-        if (_state.value == State.Finished) {
-            _state.value = State.Ready
+        when (_state.value) {
+            is State.Finished -> _state.value = State.Ready
+            is State.FillSet ->
+                if (isTimerStopped) {
+                    _state.value = State.Finished
+                } else {
+                    _state.value = State.Update(totalTime, trainingSets.size, trainingSets)
+                }
         }
     }
 
     private fun saveTraining() {
         viewModelScope.launch {
-            val trainingId = repository.insertTrainingRecord(
-                TrainingRecordEntity(date = startTimestamp, length = totalTime)
-            )
             trainingSets.forEach { data ->
                 val setId = repository.insertSet(SetEntity(trainingRecordId = trainingId, number = data.number))
                 data.exercises.forEach {
@@ -118,5 +130,5 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
         }
     }
 
-    fun getLoadedExercises() = _exercises.value!!
+//    fun getLoadedExercises() = _exercises.value!!
 }

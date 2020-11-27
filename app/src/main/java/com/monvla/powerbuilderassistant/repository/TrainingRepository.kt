@@ -8,7 +8,7 @@ import com.monvla.powerbuilderassistant.vo.TrainingRecordEntity
 
 class TrainingRepository(private val trainingDao: TrainingDao) {
 
-    suspend fun getAllExercises() = trainingDao.getAllExercises()
+    fun getAllExercises() = trainingDao.getAllExercises()
 
     suspend fun getAllTraining() = trainingDao.getAllTraining()
     suspend fun getAllSetExercises() = trainingDao.getAllSetExercises()
@@ -16,6 +16,7 @@ class TrainingRepository(private val trainingDao: TrainingDao) {
 
     suspend fun getTrainingById(id: Long) = trainingDao.getTrainingById(id)
     suspend fun getSetsByTrainingId(id: Long) = trainingDao.getSetsByTrainingId(id)
+    suspend fun getSetById(id: Long) = trainingDao.getSetById(id)
     suspend fun getSetExercisesBySetId(id: Long) = trainingDao.getSetExercisesBySetId(id)
     suspend fun getExerciseById(id: Long) = trainingDao.getExerciseById(id)
     suspend fun getExerciseByName(name: String) = trainingDao.getExerciseByName(name)
@@ -25,21 +26,16 @@ class TrainingRepository(private val trainingDao: TrainingDao) {
     suspend fun insertExercise(exercise: ExerciseEntity) = trainingDao.insertExercise(exercise)
     suspend fun updateExercise(exercise: ExerciseEntity) = trainingDao.updateExercise(exercise)
     suspend fun insertSetExercise(exercise: SetExerciseEntity) = trainingDao.insertSetExercise(exercise)
+    suspend fun updateSetExercise(exercise: SetExerciseEntity) = trainingDao.updateSetExercise(exercise)
     suspend fun insertSet(set: SetEntity) = trainingDao.insertSet(set)
 
     suspend fun deleteExercise(exercise: ExerciseEntity) = trainingDao.deleteExercise(exercise)
-    suspend fun deleteSetExercise(exercise: SetExerciseEntity) = trainingDao.deleteSetExercise(exercise)
+    suspend fun deleteSetExercise(exercise: SetExerciseEntity): Int = trainingDao.deleteSetExercise(exercise)
     suspend fun deleteSet(set: SetEntity) = trainingDao.deleteSet(set)
     suspend fun deleteExerciseSetsByExerciseId(exerciseId: Long) = trainingDao.deleteExerciseSetsByExerciseId(exerciseId)
 
     suspend fun deleteTraining(trainingId: Long) {
         trainingDao.deleteTrainingRecord(trainingId)
-    }
-
-    suspend fun getLastTrainingRowId() = trainingDao.getLastTrainingRowId()
-
-    suspend fun updateTraining(trainingId: Long) {
-
     }
 
     suspend fun clearAll() {

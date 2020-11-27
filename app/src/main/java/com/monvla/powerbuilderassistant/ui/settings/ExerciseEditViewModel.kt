@@ -14,22 +14,19 @@ class ExerciseEditViewModel(application: Application) : AndroidViewModel(applica
 
     private val repository: TrainingRepository
 
-    private val _exercises = MutableLiveData<List<ExerciseEntity>>()
-    val exercises = _exercises as LiveData<List<ExerciseEntity>>
+
+    init {
+        val dao = TrainingRoomDb.getDatabase(application, viewModelScope).trainingDao()
+        repository = TrainingRepository(dao)
+    }
+
+    val exercises = repository.getAllExercises()
 
     private val _exercise = MutableLiveData<ExerciseEntity?>()
     val exercise = _exercise as LiveData<ExerciseEntity?>
 
     private val _changed = MutableLiveData(Unit)
     val changed = _changed as LiveData<Unit>
-
-    init {
-        val dao = TrainingRoomDb.getDatabase(application, viewModelScope).trainingDao()
-        repository = TrainingRepository(dao)
-        viewModelScope.launch {
-            _exercises.value = repository.getAllExercises()
-        }
-    }
 
     fun addExercise(exercise: ExerciseEntity) {
         viewModelScope.launch {
