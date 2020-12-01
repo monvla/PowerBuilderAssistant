@@ -11,6 +11,7 @@
     <string name="done_exercise_title">Выполненное упражнение</string>
     <string name="save_set_dialog_error">Не указано количество повторов</string>
     <string name="menu_delete">Удалить</string>
+    <string name="menu_apply">Сохранить</string>
     <string name="dialog_delete_exercise">Удалить упражнение %1$s из тренировки?</string>
     <string name="exercise_deleted">Упражнение удалено</string>
     <string-array name="exercises_array">

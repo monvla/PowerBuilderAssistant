@@ -59,7 +59,6 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
             adapter = viewAdapter
         }
         increase_counter_button.setOnClickListener {
-//            showSetExercisesDialog()
             viewModel.addSet()
             trainingService?.pause()
         }
@@ -73,16 +72,10 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
             trainingService?.stopService()
             viewModel.timerStopped()
             viewModel.addSet()
-//            val action = RealTimeTrainingFragmentDirections.actionScreenRealTimeTrainingToExerciseSetResultFragment(trainingId = viewModel.trainingId)
-//            this.findNavController().navigate(action)
-//            showSetExercisesDialog()
         }
 
         receiver = TrainingStatusReceiver(this)
         context?.registerReceiver(receiver, IntentFilter(TRAINING_STATUS))
-
-        viewModel.resumed()
-
         viewModel.state.observe(viewLifecycleOwner) {
             when(it) {
                 is State.Ready -> initialize()
@@ -99,11 +92,14 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
                 is State.FillSet -> {
                     val action = RealTimeTrainingFragmentDirections.actionScreenRealTimeTrainingToExerciseSetResultFragment(
                         trainingId = it.trainingId,
-                        setId = it.setId
+                        setId = it.setId,
+                        isNewSet = true
                     )
                     this.findNavController().navigate(action)
                 }
                 is State.Finished -> {
+                    updateTimer(it.totalTime)
+                    total_sets.text = it.setsCounter.toString()
                     real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_FINISHED
                 }
             }
@@ -120,15 +116,6 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
     override fun onTick(time: Long) {
         viewModel.timerTick(time)
     }
-
-//    override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.SetExercise>) {
-//        if (viewModel.isTimerStopped) {
-//            viewModel.trainingDone(data)
-//        } else {
-//            trainingService?.unpause()
-//            viewModel.trainingSetDone(data)
-//        }
-//    }
 
     private fun connectToService() {
         val sConn = object : ServiceConnection {
@@ -162,14 +149,6 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
             real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_IN_PROGRESS
         }
     }
-
-//    private fun showSetExercisesDialog() {
-//        activity?.let {
-//            val fragment = SetResultDialogFragment(viewModel.exercises)
-//            fragment.listener = this
-//            fragment.show(it.supportFragmentManager, fragment.javaClass.simpleName)
-//        }
-//    }
 
     private fun initialize() {
         real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_READY

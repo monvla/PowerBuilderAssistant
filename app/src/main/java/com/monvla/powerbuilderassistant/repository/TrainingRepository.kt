@@ -22,6 +22,7 @@ class TrainingRepository(private val trainingDao: TrainingDao) {
     suspend fun getExerciseByName(name: String) = trainingDao.getExerciseByName(name)
 
     suspend fun insertTrainingRecord(trainingRecord: TrainingRecordEntity) = trainingDao.insertTraining(trainingRecord)
+    suspend fun updateTrainingRecord(trainingRecord: TrainingRecordEntity) = trainingDao.updateTraining(trainingRecord)
 
     suspend fun insertExercise(exercise: ExerciseEntity) = trainingDao.insertExercise(exercise)
     suspend fun updateExercise(exercise: ExerciseEntity) = trainingDao.updateExercise(exercise)

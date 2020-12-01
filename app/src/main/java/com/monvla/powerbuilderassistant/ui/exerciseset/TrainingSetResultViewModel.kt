@@ -3,10 +3,13 @@ package com.monvla.powerbuilderassistant.ui.exerciseset
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
+import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import com.monvla.powerbuilderassistant.vo.SetExercise
 import com.monvla.powerbuilderassistant.vo.SetExerciseEntity
 import kotlinx.coroutines.launch
@@ -20,7 +23,11 @@ class TrainingSetResultViewModel(application: Application) : AndroidViewModel(ap
         repository = TrainingRepository(dao)
     }
 
-    val exercises = repository.getAllExercises()
+    data class DialogData(val exercisesList: List<ExerciseEntity>, val currentExercise: SetExercise?)
+
+    private var exercises: List<ExerciseEntity>? = null
+    val mediatorLiveData = MediatorLiveData<DialogData>()
+
 
     private val _setExercises = MutableLiveData<List<SetExercise>>()
     val setExercises = _setExercises as LiveData<List<SetExercise>>
@@ -35,7 +42,7 @@ class TrainingSetResultViewModel(application: Application) : AndroidViewModel(ap
 
     fun exerciseUpdated(updatedExercise: SetExercise) {
         val oldExercise = _setExercises.value?.find { it.id == updatedExercise.id }
-        val exerciseEntityId = exercises.value?.firstOrNull { it.name == updatedExercise.name }?.id
+        val exerciseEntityId = exercises?.firstOrNull { it.name == updatedExercise.name }?.id
         val setExerciseEntity = SetExerciseEntity.fromSetExercise(
             updatedExercise, requireNotNull(exerciseEntityId)
         )
@@ -62,16 +69,29 @@ class TrainingSetResultViewModel(application: Application) : AndroidViewModel(ap
         _setExercises.value = setExercises
     }
 
-    fun loadSetExercises(setId: Long) {
+    fun prepareNewExerciseDialog(exercise: SetExercise?) {
+        mediatorLiveData.addSource(repository.getAllExercises()) {
+            mediatorLiveData.value = DialogData(
+                it,
+                exercise
+            )
+            exercises = it
+        }
+    }
+
+    fun loadSetExercises(setId: Long, isNewSet: Boolean) {
         viewModelScope.launch {
             this@TrainingSetResultViewModel.setId = setId
             _setNumber.value = repository.getSetById(setId).number
             updateSetExercises()
         }
+        if (isNewSet) {
+            prepareNewExerciseDialog(null)
+        }
     }
 
     fun deleteSetExercise(exercise: SetExercise) {
-        val exerciseEntityId = exercises.value?.firstOrNull { it.name == exercise.name }?.id
+        val exerciseEntityId = exercises?.firstOrNull { it.name == exercise.name }?.id
         val setExerciseEntity = SetExerciseEntity.fromSetExercise(
             exercise, requireNotNull(exerciseEntityId)
         )

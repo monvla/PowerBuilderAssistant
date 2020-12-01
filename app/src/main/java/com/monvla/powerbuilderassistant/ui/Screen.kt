@@ -20,6 +20,11 @@ open class Screen : Fragment() {
         (requireContext() as MainActivity).supportActionBar?.setDisplayShowHomeEnabled(state);
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setUpButtonEnabled(true)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

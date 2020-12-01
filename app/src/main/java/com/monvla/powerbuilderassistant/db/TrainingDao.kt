@@ -17,6 +17,8 @@ interface TrainingDao {
     @Query("SELECT * FROM exercise")
     fun getAllExercises(): LiveData<List<ExerciseEntity>>
 
+
+
     @Query("SELECT * FROM training ORDER BY id DESC")
     suspend fun getAllTraining(): List<TrainingRecordEntity>
 
@@ -43,6 +45,9 @@ interface TrainingDao {
 
     @Insert
     suspend fun insertTraining(trainingRecord: TrainingRecordEntity): Long
+
+    @Update
+    suspend fun updateTraining(trainingRecord: TrainingRecordEntity): Int
 
     @Insert
     suspend fun insertExercise(exerciseEntity: ExerciseEntity)

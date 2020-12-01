@@ -14,7 +14,11 @@ import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import com.monvla.powerbuilderassistant.vo.SetExercise
 import kotlinx.android.synthetic.main.training_set_result_dialog.view.*
 
-class TrainingSetResultDialog(var exercise: SetExercise?, private val callback: TrainingSetDialogListener) : DialogFragment() {
+class TrainingSetResultDialog(
+    var exercise: SetExercise?,
+    var exercisesList: List<ExerciseEntity>?,
+    private val callback: TrainingSetDialogListener
+) : DialogFragment() {
 
     companion object {
         const val DIALOG_TAG = "training_set_result_dialog"
@@ -25,7 +29,6 @@ class TrainingSetResultDialog(var exercise: SetExercise?, private val callback: 
     }
 
     var setId: Long? = null
-    var exercisesList: List<ExerciseEntity>? = null
     var spinnerAdapter: ArrayAdapter<String>? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

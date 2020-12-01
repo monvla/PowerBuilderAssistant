@@ -2,10 +2,14 @@ package com.monvla.powerbuilderassistant.ui.exerciseset
 
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
@@ -21,7 +25,7 @@ import kotlinx.android.synthetic.main.screen_set_result.*
 
 class TrainingSetResultFragment : Screen(), TrainingSetResultDialog.TrainingSetDialogListener {
 
-    private val viewModelTraining: TrainingSetResultViewModel by activityViewModels()
+    private val viewModel: TrainingSetResultViewModel by activityViewModels()
     private val args: TrainingSetResultFragmentArgs by navArgs()
 
     private var trainingSetResultAdapter: TrainingSetResultAdapter? = null
@@ -30,29 +34,51 @@ class TrainingSetResultFragment : Screen(), TrainingSetResultDialog.TrainingSetD
         screenLayout = R.layout.screen_set_result
     }
 
-    private var exercisesList: List<ExerciseEntity>? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+        if (args.isNewSet) {
+            Log.d("LUPA", "AB: ${(requireActivity() as AppCompatActivity).supportActionBar}")
+            setUpButtonEnabled(false)
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModelTraining.exercises.observe(viewLifecycleOwner) {
-            exercisesList = it
-        }
-        viewModelTraining.setExercises.observe(viewLifecycleOwner) {
+        viewModel.setExercises.observe(viewLifecycleOwner) {
             setupRecyclerView(it)
             trainingSetResultAdapter?.notifyDataSetChanged()
         }
-        viewModelTraining.setNumber.observe(viewLifecycleOwner) {
+        viewModel.mediatorLiveData.subscribeChanges(viewLifecycleOwner) {
+            Log.d("LUPA", "MEDIATOR LUPA!!! ${it.currentExercise}")
+            showDialog(it.currentExercise, it.exercisesList)
+        }
+        viewModel.setNumber.observe(viewLifecycleOwner) {
             setResultsHeader.text = resources.getString(R.string.set_result_header, it)
         }
-        viewModelTraining.deleteTrigger.subscribeChanges(viewLifecycleOwner) {
+        viewModel.deleteTrigger.subscribeChanges(viewLifecycleOwner) {
             Toast.makeText(requireContext(), getString(R.string.exercise_deleted), Toast.LENGTH_SHORT).show()
             trainingSetResultAdapter?.notifyDataSetChanged()
         }
-        if (args.setId != -1L) {
-            viewModelTraining.loadSetExercises(args.setId)
-        }
+        viewModel.loadSetExercises(args.setId, args.isNewSet)
         fabAddTrainingSet.setOnClickListener {
-            showDialog(null)
+            viewModel.prepareNewExerciseDialog(null)
         }
+
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.new_set_exercises_menu, menu)
+        Log.d("LUPA", "IsNewSet: ${args.isNewSet}")
+        if (args.isNewSet) {
+            menu.findItem(R.id.apply).isVisible = true
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.apply -> requireActivity().onBackPressed()
+        }
+        return true
     }
 
     private fun applyMenu(exercise: SetExercise, view: View) {
@@ -63,7 +89,7 @@ class TrainingSetResultFragment : Screen(), TrainingSetResultDialog.TrainingSetD
                 AlertDialog.Builder(requireContext())
                         .setTitle(getString(R.string.dialog_delete_exercise, exercise.name))
                         .setPositiveButton(android.R.string.yes) { _, _ ->
-                            viewModelTraining.deleteSetExercise(exercise)
+                            viewModel.deleteSetExercise(exercise)
                         }
                         .setNegativeButton(android.R.string.no, null)
                         .show();
@@ -74,13 +100,13 @@ class TrainingSetResultFragment : Screen(), TrainingSetResultDialog.TrainingSetD
     }
 
     override fun onSaveSetExerciseClick(setExercise: SetExercise) {
-        viewModelTraining.exerciseUpdated(setExercise)
+        viewModel.exerciseUpdated(setExercise)
     }
 
     private fun setupRecyclerView(exercisesList: List<SetExercise>) {
         trainingSetResultAdapter = TrainingSetResultAdapter(exercisesList)
         trainingSetResultAdapter?.setOnExerciseClicked { exercise ->
-            showDialog(exercise)
+            viewModel.prepareNewExerciseDialog(exercise)
         }
         trainingSetResultAdapter?.setOnLongExerciseClick { exercise, view ->
             applyMenu(exercise, view)
@@ -91,10 +117,8 @@ class TrainingSetResultFragment : Screen(), TrainingSetResultDialog.TrainingSetD
         }
     }
 
-    private fun showDialog(exercise: SetExercise?) {
-        val dialog = TrainingSetResultDialog(exercise, this).apply {
-            exercisesList = this@TrainingSetResultFragment.exercisesList
-        }
+    private fun showDialog(exercise: SetExercise?, exercisesList: List<ExerciseEntity>) {
+        val dialog = TrainingSetResultDialog(exercise, exercisesList, this)
         dialog.setId = args.setId
         dialog.show(requireActivity().supportFragmentManager, DIALOG_TAG)
     }

@@ -91,5 +91,9 @@
             android:name="trainingId"
             app:argType="long"
             android:defaultValue="-1L" />
+        <argument
+            android:name="isNewSet"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
 </navigation>
