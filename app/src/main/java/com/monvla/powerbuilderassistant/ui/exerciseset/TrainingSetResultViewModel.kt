@@ -13,8 +13,9 @@ import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import com.monvla.powerbuilderassistant.vo.SetExercise
 import com.monvla.powerbuilderassistant.vo.SetExerciseEntity
 import kotlinx.coroutines.launch
+import kotlin.properties.Delegates
 
-class TrainingSetResultViewModel(application: Application) : AndroidViewModel(application) {
+class TrainingSetResultViewModel(application: Application, val setId: Long) : AndroidViewModel(application) {
 
     private val repository: TrainingRepository
 
@@ -25,24 +26,29 @@ class TrainingSetResultViewModel(application: Application) : AndroidViewModel(ap
 
     data class DialogData(val exercisesList: List<ExerciseEntity>, val currentExercise: SetExercise?)
 
-    private var exercises: List<ExerciseEntity>? = null
-    val mediatorLiveData = MediatorLiveData<DialogData>()
+    data class TrainingSetData(val setNumber: Int, val setExercises: List<SetExercise>)
 
+    val showAddExerciseDialog = MediatorLiveData<DialogData>()
 
-    private val _setExercises = MutableLiveData<List<SetExercise>>()
-    val setExercises = _setExercises as LiveData<List<SetExercise>>
+    private lateinit var exercises: List<ExerciseEntity>
+    private lateinit var setExercises: List<SetExercise>
+    private var setNumber by Delegates.notNull<Int>()
 
-    private val _setNumber = MutableLiveData<Int>()
-    val setNumber = _setNumber as LiveData<Int>
+    private val _setData = liveData {
+        setNumber = repository.getSetById(setId).number
+        setExercises = getSetExercises()
+        emit(
+            TrainingSetData(setNumber, setExercises)
+        )
+    } as MutableLiveData
+    val setData = _setData as LiveData<TrainingSetData>
 
     private val _deleteTrigger = MutableLiveData<Unit>()
     val deleteTrigger = _deleteTrigger as LiveData<Unit>
 
-    var setId: Long? = null
-
     fun exerciseUpdated(updatedExercise: SetExercise) {
-        val oldExercise = _setExercises.value?.find { it.id == updatedExercise.id }
-        val exerciseEntityId = exercises?.firstOrNull { it.name == updatedExercise.name }?.id
+        val oldExercise = setExercises.find { it.id == updatedExercise.id }
+        val exerciseEntityId = exercises.firstOrNull { it.name == updatedExercise.name }?.id
         val setExerciseEntity = SetExerciseEntity.fromSetExercise(
             updatedExercise, requireNotNull(exerciseEntityId)
         )
@@ -56,42 +62,15 @@ class TrainingSetResultViewModel(application: Application) : AndroidViewModel(ap
         }
     }
 
-    private suspend fun updateSetExercises() {
-        val setExercises = repository.getSetExercisesBySetId(requireNotNull(setId)).map {
-            SetExercise(
-                name = repository.getExerciseById(it.exerciseId).name,
-                repeats = it.repeats,
-                weight = it.weight,
-                id = it.id,
-                setId = it.setId
-            )
-        }
-        _setExercises.value = setExercises
-    }
-
     fun prepareNewExerciseDialog(exercise: SetExercise?) {
-        mediatorLiveData.addSource(repository.getAllExercises()) {
-            mediatorLiveData.value = DialogData(
-                it,
-                exercise
-            )
+        showAddExerciseDialog.addSource(repository.getAllExercises()) {
+            showAddExerciseDialog.value = DialogData(it, exercise)
             exercises = it
         }
     }
 
-    fun loadSetExercises(setId: Long, isNewSet: Boolean) {
-        viewModelScope.launch {
-            this@TrainingSetResultViewModel.setId = setId
-            _setNumber.value = repository.getSetById(setId).number
-            updateSetExercises()
-        }
-        if (isNewSet) {
-            prepareNewExerciseDialog(null)
-        }
-    }
-
-    fun deleteSetExercise(exercise: SetExercise) {
-        val exerciseEntityId = exercises?.firstOrNull { it.name == exercise.name }?.id
+    fun deleteSetExerciseRequested(exercise: SetExercise) {
+        val exerciseEntityId = exercises.firstOrNull { it.name == exercise.name }?.id
         val setExerciseEntity = SetExerciseEntity.fromSetExercise(
             exercise, requireNotNull(exerciseEntityId)
         )
@@ -104,4 +83,28 @@ class TrainingSetResultViewModel(application: Application) : AndroidViewModel(ap
         }
     }
 
+    private suspend fun getSetExercises(): List<SetExercise> {
+        return repository.getSetExercisesBySetId(setId).map {
+            SetExercise(
+                name = repository.getExerciseById(it.exerciseId).name,
+                repeats = it.repeats,
+                weight = it.weight,
+                id = it.id,
+                setId = it.setId
+            )
+        }
+    }
+
+    private suspend fun updateSetExercises() {
+        setExercises = repository.getSetExercisesBySetId(setId).map {
+            SetExercise(
+                name = repository.getExerciseById(it.exerciseId).name,
+                repeats = it.repeats,
+                weight = it.weight,
+                id = it.id,
+                setId = it.setId
+            )
+        }
+        _setData.value = TrainingSetData(setNumber, setExercises)
+    }
 }
