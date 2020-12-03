@@ -10,6 +10,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
@@ -69,9 +70,7 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
             startTrainingService()
         }
         stop_counter_button.setOnClickListener {
-            trainingService?.stopService()
-            viewModel.timerStopped()
-            viewModel.addSet()
+            stopTrainingDialog()
         }
 
         receiver = TrainingStatusReceiver(this)
@@ -83,8 +82,7 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
                 is State.Update -> {
                     trainingService?.unpause()
                     updateTimer(it.time)
-                    sets_counter.text = it.sets.toString()
-                    total_sets.text = it.sets.toString()
+                    current_set_text.text = getString(R.string.rtt_current_set, it.sets)
                     viewAdapter.setData(it.trainingSets)
                     viewAdapter.notifyDataSetChanged()
                     showTimer()
@@ -99,7 +97,7 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
                 }
                 is State.Finished -> {
                     updateTimer(it.totalTime)
-                    total_sets.text = it.setsCounter.toString()
+                    total_sets_done.text = getString(R.string.rtt_sets_done, it.setsCounter)
                     real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_FINISHED
                 }
             }
@@ -107,6 +105,17 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
         viewModel.viewCreated()
         connectToService()
     }
+
+    private fun stopTrainingDialog() =
+        AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.rtt_stop_training_dialog))
+                .setPositiveButton(android.R.string.yes) { _, _ ->
+                    trainingService?.stopService()
+                    viewModel.timerStopped()
+                    viewModel.addSet()
+                }
+                .setNegativeButton(android.R.string.no, null)
+                .show();
 
     override fun onDestroy() {
         super.onDestroy()
@@ -141,7 +150,7 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
     private fun updateTimer(currentTime: Long) {
         val formatted = getFormattedTimeFromSeconds(currentTime)
         total_time_counter.text = formatted
-        total_time.text = formatted
+        total_time.text = resources.getString(R.string.rtt_total_time, formatted)
     }
 
     private fun showTimer() {
