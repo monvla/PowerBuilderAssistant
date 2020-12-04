@@ -26,6 +26,9 @@
         <action
             android:id="@+id/action_screenTrainingDairy_to_exercisesListFragment"
             app:destination="@id/exercisesListFragment" />
+        <action
+            android:id="@+id/action_screenTrainingDairy_to_exerciseStatisticsFragment"
+            app:destination="@id/exerciseStatisticsFragment" />
 
     </fragment>
     <fragment
@@ -96,4 +99,8 @@
             app:argType="boolean"
             android:defaultValue="false" />
     </fragment>
+    <fragment
+        android:id="@+id/exerciseStatisticsFragment"
+        android:name="com.monvla.powerbuilderassistant.statistics.ui.ExerciseStatisticsFragment"
+        android:label="ExerciseStatisticsFragment" />
 </navigation>

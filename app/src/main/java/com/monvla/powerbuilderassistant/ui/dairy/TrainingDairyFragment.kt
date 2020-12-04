@@ -68,6 +68,11 @@ class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
                 this.findNavController().navigate(action)
                 true
             }
+            R.id.statistics -> {
+                val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToExerciseStatisticsFragment()
+                this.findNavController().navigate(action)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
 
