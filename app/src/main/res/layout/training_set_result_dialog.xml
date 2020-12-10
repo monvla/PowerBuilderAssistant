@@ -4,10 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingStart="@dimen/padding_small"
     android:paddingEnd="@dimen/padding_small"
-    android:paddingTop="@dimen/padding_normal"
-    >
+    android:paddingStart="@dimen/padding_small"
+    android:paddingTop="@dimen/padding_normal">
 
     <Spinner
         android:id="@+id/exercisesSpinner"
@@ -15,7 +14,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/exerciseRepeats"
@@ -30,7 +29,8 @@
             android:id="@+id/exerciseRepeatsText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/repeats" />
+            android:hint="@string/repeats"
+            android:inputType="number" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -47,6 +47,7 @@
             android:id="@+id/exerciseWeightText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/weight" />
+            android:hint="@string/weight"
+            android:inputType="numberDecimal" />
     </com.google.android.material.textfield.TextInputLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
