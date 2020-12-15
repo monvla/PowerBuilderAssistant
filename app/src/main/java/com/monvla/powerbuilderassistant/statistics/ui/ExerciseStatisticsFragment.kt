@@ -36,28 +36,17 @@ class ExerciseStatisticsFragment() : Screen(), SeekBar.OnSeekBarChangeListener, 
         screenLayout = R.layout.screen_exercise_statistics
     }
 
-    private lateinit var chart: LineChart
-    private lateinit var seekBarX: SeekBar
-    private lateinit var seekBarY:SeekBar
-    private lateinit var tvY:TextView
-    private lateinit var tvX:TextView
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        tvX = tvXMax
-        tvY = tvYMax
 
-        seekBarX = seekBar1
         seekBarX!!.setOnSeekBarChangeListener(this)
 
-        seekBarY = seekBar2
         seekBarY!!.setOnSeekBarChangeListener(this)
 
-        chart = chart1
         chart!!.setOnChartValueSelectedListener(this)
 
         // no description text
@@ -88,8 +77,8 @@ class ExerciseStatisticsFragment() : Screen(), SeekBar.OnSeekBarChangeListener, 
         // set an alternative background color
 
         // set an alternative background color
-        chart!!.setBackgroundColor(Color.LTGRAY)
-
+        chart!!.setBackgroundColor(Color.WHITE)
+        chart.xAxis.isEnabled
         // add data
 
         // add data
@@ -109,7 +98,7 @@ class ExerciseStatisticsFragment() : Screen(), SeekBar.OnSeekBarChangeListener, 
         l.form = LegendForm.LINE
 //        l.typeface = tfLight
         l.textSize = 11f
-        l.textColor = Color.WHITE
+        l.textColor = Color.BLACK
         l.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
         l.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
         l.orientation = Legend.LegendOrientation.HORIZONTAL
@@ -120,7 +109,7 @@ class ExerciseStatisticsFragment() : Screen(), SeekBar.OnSeekBarChangeListener, 
         val xAxis = chart!!.xAxis
 //        xAxis.typeface = tfLight
         xAxis.textSize = 11f
-        xAxis.textColor = Color.WHITE
+        xAxis.textColor = Color.BLACK
         xAxis.setDrawGridLines(false)
         xAxis.setDrawAxisLine(false)
 
@@ -135,8 +124,8 @@ class ExerciseStatisticsFragment() : Screen(), SeekBar.OnSeekBarChangeListener, 
         val rightAxis = chart!!.axisRight
 //        rightAxis.typeface = tfLight
         rightAxis.textColor = Color.RED
-        rightAxis.axisMaximum = 900f
-        rightAxis.axisMinimum = -200f
+        rightAxis.axisMaximum = 200f
+        rightAxis.axisMinimum = 0f
         rightAxis.setDrawGridLines(false)
         rightAxis.setDrawZeroLine(false)
         rightAxis.isGranularityEnabled = false
@@ -151,28 +140,10 @@ class ExerciseStatisticsFragment() : Screen(), SeekBar.OnSeekBarChangeListener, 
             values1.add(Entry(i.toFloat(), temp.toFloat()))
         }
 
-        val values2 = ArrayList<Entry>();
-
-        for (i in 0..count) {
-            val temp = (Math.random() * range) + 450;
-            values2.add(Entry(i.toFloat(), temp.toFloat()))
-        }
-
-        val values3 = ArrayList<Entry>();
-
-        for (i in 0..count) {
-            val temp = (Math.random() * range) + 500;
-            values3.add(Entry(i.toFloat(), temp.toFloat()))
-        }
-
         if (chart.getData() != null &&
             chart.getData().getDataSetCount() > 0) {
             val set1 = chart.getData().getDataSetByIndex(0) as LineDataSet
-            val set2 = chart.getData().getDataSetByIndex(1) as LineDataSet
-            val set3 = chart.getData().getDataSetByIndex(2) as LineDataSet
             set1.setValues(values1);
-            set2.setValues(values2);
-            set3.setValues(values3);
             chart.getData().notifyDataChanged();
             chart.notifyDataSetChanged();
         } else {
@@ -181,7 +152,8 @@ class ExerciseStatisticsFragment() : Screen(), SeekBar.OnSeekBarChangeListener, 
 
             set1.setAxisDependency(YAxis.AxisDependency.LEFT);
             set1.setColor(ColorTemplate.getHoloBlue());
-            set1.setCircleColor(Color.WHITE);
+            set1.setCircleColor(ColorTemplate.getHoloBlue());
+            set1.setDrawFilled(true);
             set1.setLineWidth(2f);
             set1.setCircleRadius(3f);
             set1.setFillAlpha(65);
@@ -193,32 +165,8 @@ class ExerciseStatisticsFragment() : Screen(), SeekBar.OnSeekBarChangeListener, 
             //set1.setVisible(false);
             //set1.setCircleHoleColor(Color.WHITE);
 
-            // create a dataset and give it a type
-            val set2 = LineDataSet(values2, "DataSet 2");
-            set2.setAxisDependency(YAxis.AxisDependency.RIGHT);
-            set2.setColor(Color.RED);
-            set2.setCircleColor(Color.WHITE);
-            set2.setLineWidth(2f);
-            set2.setCircleRadius(3f);
-            set2.setFillAlpha(65);
-            set2.setFillColor(Color.RED);
-            set2.setDrawCircleHole(false);
-            set2.setHighLightColor(Color.rgb(244, 117, 117));
-            //set2.setFillFormatter(new MyFillFormatter(900f));
-
-            val set3 = LineDataSet(values3, "DataSet 3");
-            set3.setAxisDependency(YAxis.AxisDependency.RIGHT);
-            set3.setColor(Color.YELLOW);
-            set3.setCircleColor(Color.WHITE);
-            set3.setLineWidth(2f);
-            set3.setCircleRadius(3f);
-            set3.setFillAlpha(65);
-            set3.setFillColor(ColorTemplate.colorWithAlpha(Color.YELLOW, 200));
-            set3.setDrawCircleHole(false);
-            set3.setHighLightColor(Color.rgb(244, 117, 117));
-
             // create a data object with the data sets
-            val data = LineData(set1, set2, set3);
+            val data = LineData(set1);
             data.setValueTextColor(Color.WHITE);
             data.setValueTextSize(9f);
 
@@ -326,20 +274,11 @@ class ExerciseStatisticsFragment() : Screen(), SeekBar.OnSeekBarChangeListener, 
             R.id.animateXY -> {
                 chart.animateXY(2000, 2000);
             }
-            R.id.actionSave -> {
-//                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-//                    saveToGallery();
-//                } else {
-//                    requestStoragePermission(chart);
-//                }
-            }
         }
         return true
     }
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-        tvX.setText(seekBarX.getProgress().toString())
-        tvY.setText(seekBarY.getProgress().toString())
 
         setData(seekBarX.getProgress(), seekBarY.getProgress().toFloat());
 
