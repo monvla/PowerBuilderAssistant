@@ -67,6 +67,7 @@ class ExerciseStatisticsFragment() : Screen() {
 
         val viewport = Viewport(chart.getMaximumViewport())
         viewport.top = 130f
+        viewport.bottom = 0f
         chart.maximumViewport = viewport
         chart.currentViewport = viewport
     }
