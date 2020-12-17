@@ -10,3 +10,11 @@ data class ExerciseEntity(
     val name: String,
     @ColumnInfo(name = "default_weight") val defaultWeight: Float
 )
+
+data class Lupa(
+    val set_id: Long,
+    val repeats: Int,
+    val training_record_id: Long,
+    val length: Long
+
+)

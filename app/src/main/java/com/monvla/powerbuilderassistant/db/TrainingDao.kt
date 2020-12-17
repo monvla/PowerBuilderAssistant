@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
+import com.monvla.powerbuilderassistant.vo.Lupa
 import com.monvla.powerbuilderassistant.vo.SetEntity
 import com.monvla.powerbuilderassistant.vo.SetExerciseEntity
 import com.monvla.powerbuilderassistant.vo.TrainingRecordEntity
@@ -16,7 +17,11 @@ interface TrainingDao {
 
     @Query("SELECT * FROM exercise")
     fun getAllExercises(): LiveData<List<ExerciseEntity>>
-
+ 
+    @Query("""SELECT set_id, repeats, set_table.training_record_id, training.length FROM set_exercise
+            INNER JOIN set_table ON set_table.id = set_exercise.set_id AND exercise_id = 1
+            INNER JOIN training ON training.id = set_table.training_record_id""")
+    fun getLupa(): LiveData<List<Lupa>>
 
 
     @Query("SELECT * FROM training ORDER BY id DESC")

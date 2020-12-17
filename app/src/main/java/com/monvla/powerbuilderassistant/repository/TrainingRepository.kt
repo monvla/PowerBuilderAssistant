@@ -9,6 +9,7 @@ import com.monvla.powerbuilderassistant.vo.TrainingRecordEntity
 class TrainingRepository(private val trainingDao: TrainingDao) {
 
     fun getAllExercises() = trainingDao.getAllExercises()
+    fun getLupa() = trainingDao.getLupa()
 
     suspend fun getAllTraining() = trainingDao.getAllTraining()
     suspend fun getAllSetExercises() = trainingDao.getAllSetExercises()

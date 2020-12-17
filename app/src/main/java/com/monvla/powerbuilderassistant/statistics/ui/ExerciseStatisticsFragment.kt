@@ -1,8 +1,15 @@
 package com.monvla.powerbuilderassistant.statistics.ui
 
+import android.app.Application
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.observe
+import androidx.navigation.fragment.navArgs
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.ui.Screen
 import kotlinx.android.synthetic.main.screen_exercise_statistics.*
@@ -21,12 +28,24 @@ class ExerciseStatisticsFragment() : Screen() {
         screenLayout = R.layout.screen_exercise_statistics
     }
 
+    private val args: ExerciseStatisticsFragmentArgs by navArgs()
+
+    private val viewModel: ExerciseStatisticsViewModel by viewModels {
+        ExerciseStatisticsViewModelFactory(requireActivity().application, args.exerciseId)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        viewModel.data.observe(viewLifecycleOwner) {
+            Log.d("LUPA","Data: $it")
+        }
+    }
+
+    private fun createStatistics() {
         val axisData = arrayOf(
             "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept",
             "Oct", "Nov", "Dec"
@@ -70,5 +89,11 @@ class ExerciseStatisticsFragment() : Screen() {
         viewport.bottom = 0f
         chart.maximumViewport = viewport
         chart.currentViewport = viewport
+    }
+}
+
+class ExerciseStatisticsViewModelFactory(val application: Application, val exerciseId: Long) : ViewModelProvider.Factory {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        return ExerciseStatisticsViewModel(application, exerciseId) as T
     }
 }
