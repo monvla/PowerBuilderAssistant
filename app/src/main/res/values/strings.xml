@@ -23,6 +23,7 @@
     <string name="rtt_stop_training_dialog">Завершить тренировку?</string>
     <string name="statistics">Статистика</string>
     <string name="add">Добавить</string>
+    <string name="statistics_repeats">Повторы</string>
     <string-array name="exercises_array">
         <item>Приседания</item>
         <item>Сгибания/разгибания ног в тренажере</item>

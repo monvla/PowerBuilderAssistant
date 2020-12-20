@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import com.monvla.powerbuilderassistant.R
+import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.ui.Screen
 import kotlinx.android.synthetic.main.screen_exercise_statistics.*
 import lecho.lib.hellocharts.model.Axis
@@ -40,18 +41,19 @@ class ExerciseStatisticsFragment() : Screen() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.data.observe(viewLifecycleOwner) {
+        viewModel.statisticsData.observe(viewLifecycleOwner) {
             Log.d("LUPA","Data: $it")
+            val axisData = mutableListOf<String>()
+            val yAxisData = mutableListOf<Int>()
+            it.forEach { data ->
+                axisData.add(Utils.getFormattedDate(data.date))
+                yAxisData.add(data.repeats)
+            }
+            createStatistics(axisData, yAxisData)
         }
     }
 
-    private fun createStatistics() {
-        val axisData = arrayOf(
-            "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept",
-            "Oct", "Nov", "Dec"
-        )
-        val yAxisData = intArrayOf(50, 20, 15, 30, 20, 60, 15, 40, 45, 10, 90, 18)
-
+    private fun createStatistics(axisData: List<String>, yAxisData: List<Int>) {
         val yAxisValues = ArrayList<PointValue>()
         val axisValues = ArrayList<AxisValue>()
         val line = Line(yAxisValues)
@@ -68,23 +70,23 @@ class ExerciseStatisticsFragment() : Screen() {
         data.lines = lines
 
         val axis = Axis()
-        axis.setValues(axisValues)
+        axis.values = axisValues
         data.axisXBottom = axis
 
         val yAxis = Axis()
         data.axisYLeft = yAxis
 
-        line.setColor(Color.parseColor("#9C27B0"))
-        axis.setTextSize(16);
+        line.color = Color.parseColor("#9C27B0")
+        axis.textSize = 16;
 
-        axis.setTextColor(Color.parseColor("#03A9F4"));
-        yAxis.setTextColor(Color.parseColor("#03A9F4"));
-        yAxis.setTextSize(16);
-        yAxis.setName("Sales in millions");
+        axis.textColor = Color.parseColor("#03A9F4");
+        yAxis.textColor = Color.parseColor("#03A9F4");
+        yAxis.textSize = 16;
+        yAxis.name = getString(R.string.statistics_repeats);
 
         chart.lineChartData = data
 
-        val viewport = Viewport(chart.getMaximumViewport())
+        val viewport = Viewport(chart.maximumViewport)
         viewport.top = 130f
         viewport.bottom = 0f
         chart.maximumViewport = viewport

@@ -25,14 +25,21 @@ class Utils {
             val timestamp = TimeUnit.SECONDS.toMillis(time)
             val date = Date(timestamp);
             val formatter = SimpleDateFormat("HH:mm:ss");
-            formatter.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+            formatter.timeZone = TimeZone.getTimeZone("GMT+0");
             return formatter.format(date)
         }
 
         fun getFormattedDateTime(timestamp: Long): String {
             val date = Date(timestamp);
             val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm");
-            formatter.setTimeZone(TimeZone.getDefault());
+            formatter.timeZone = TimeZone.getDefault();
+            return formatter.format(date)
+        }
+
+        fun getFormattedDate(timestamp: Long): String {
+            val date = Date(timestamp);
+            val formatter = SimpleDateFormat("dd.MM.yyyy");
+            formatter.timeZone = TimeZone.getDefault();
             return formatter.format(date)
         }
 
