@@ -20,6 +20,10 @@ class ExerciseStatisticsViewModel(application: Application, val exerciseId: Long
 
     data class StatisticsData(val date: Long, val repeats: Int)
 
+    val exerciseName = liveData {
+        emit(repository.getExerciseById(exerciseId).name)
+    }
+
     val statisticsData: LiveData<List<StatisticsData>> = repository.getExerciseStatistics(exerciseId).switchMap { exerciseStatisticsList ->
         liveData {
             if (exerciseStatisticsList.isEmpty()) {

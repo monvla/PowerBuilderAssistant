@@ -36,9 +36,9 @@ class Utils {
             return formatter.format(date)
         }
 
-        fun getFormattedDate(timestamp: Long): String {
+        fun getFormattedMonth(timestamp: Long): String {
             val date = Date(timestamp);
-            val formatter = SimpleDateFormat("dd.MM.yyyy");
+            val formatter = SimpleDateFormat("MM.yyyy");
             formatter.timeZone = TimeZone.getDefault();
             return formatter.format(date)
         }

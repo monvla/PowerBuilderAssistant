@@ -15,6 +15,14 @@ open class Screen : Fragment() {
         (requireContext() as MainActivity).supportActionBar?.title = getString(stringId)
     }
 
+    fun setTitle(string: String) {
+        (requireContext() as MainActivity).supportActionBar?.title = string
+    }
+
+    fun clearTitle() {
+        (requireContext() as MainActivity).supportActionBar?.title = null
+    }
+
     fun setUpButtonEnabled(state: Boolean) {
         (requireContext() as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(state);
         (requireContext() as MainActivity).supportActionBar?.setDisplayShowHomeEnabled(state);
