@@ -69,6 +69,13 @@
         <action
             android:id="@+id/action_exercisesListFragment_to_exerciseEditFragment"
             app:destination="@id/exerciseEditFragment" />
+        <action
+            android:id="@+id/action_exercisesListFragment_to_exerciseStatisticsFragment"
+            app:destination="@id/exerciseStatisticsFragment" />
+        <argument
+            android:name="destination"
+            app:argType="integer"
+            android:defaultValue="1" />
     </fragment>
     <fragment
         android:id="@+id/exerciseEditFragment"
@@ -95,5 +102,13 @@
             android:name="isNewSet"
             app:argType="boolean"
             android:defaultValue="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/exerciseStatisticsFragment"
+        android:name="com.monvla.powerbuilderassistant.statistics.ui.ExerciseStatisticsFragment"
+        android:label="ExerciseStatisticsFragment" >
+        <argument
+            android:name="exerciseId"
+            app:argType="long" />
     </fragment>
 </navigation>

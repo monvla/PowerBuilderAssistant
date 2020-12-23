@@ -10,3 +10,10 @@ data class ExerciseEntity(
     val name: String,
     @ColumnInfo(name = "default_weight") val defaultWeight: Float
 )
+
+data class ExerciseStatistics(
+    val date: Long,
+    val repeats: Int,
+    val training_record_id: Long,
+    val length: Long
+)

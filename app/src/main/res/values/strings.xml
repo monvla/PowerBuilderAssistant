@@ -21,6 +21,11 @@
     <string name="rtt_sets_done">Подходов выполнено: %1$d</string>
     <string name="rtt_total_time">Общее время: %1$s</string>
     <string name="rtt_stop_training_dialog">Завершить тренировку?</string>
+    <string name="statistics">Статистика</string>
+    <string name="add">Добавить</string>
+    <string name="statistics_repeats">Повторы</string>
+    <string name="statistics_no_data">Нет данных</string>
+    <string name="statistics_date_axis">Дата</string>
     <string-array name="exercises_array">
         <item>Приседания</item>
         <item>Сгибания/разгибания ног в тренажере</item>
@@ -35,4 +40,8 @@
         <item>Жим гантелей под углом</item>
         <item>Жим штанги из-за головы</item>
     </string-array>
+
+
+
+
 </resources>

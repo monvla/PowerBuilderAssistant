@@ -17,6 +17,11 @@ import kotlinx.android.synthetic.main.screen_training_dairy.*
 
 class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
 
+    companion object {
+        const val DESTINATION_EXERCISE_EDIT = 1
+        const val DESTINATION_EXERCISE_STATISTICS = 2
+    }
+
     private val viewModel: TrainingViewModel by activityViewModels()
     private lateinit var adapter: DairyRecordAdapter
 
@@ -64,7 +69,14 @@ class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId) {
             R.id.settings -> {
-                val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToExercisesListFragment()
+                val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToExercisesListFragment(DESTINATION_EXERCISE_EDIT)
+                this.findNavController().navigate(action)
+                true
+            }
+            R.id.statistics -> {
+                val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToExercisesListFragment(
+                    DESTINATION_EXERCISE_STATISTICS
+                )
                 this.findNavController().navigate(action)
                 true
             }
