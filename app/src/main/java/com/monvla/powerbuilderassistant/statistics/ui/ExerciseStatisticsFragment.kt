@@ -117,7 +117,7 @@ class ExerciseStatisticsFragment : Screen() {
         val viewport = Viewport(chart.maximumViewport).apply {
             val maxListValue = requireNotNull(valuesList.maxBy{it.y}).y
             top = maxOf(
-                    (maxListValue * 2),
+                (maxListValue * 2),
                 getTopValue()
             )
             bottom = 0f
@@ -136,7 +136,7 @@ class ExerciseStatisticsFragment : Screen() {
     }
 
     private fun getTopValue(): Float = run {
-        var topValue = if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 20 else 11
+        var topValue = if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 20 else 10
         if (resources.getBoolean(R.bool.isTablet)) topValue *= 2
         return topValue.toFloat()
     }
