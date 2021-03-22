@@ -18,7 +18,6 @@
 
         <item name="android:fontFamily">@font/roboto_font_family</item>
         <item name="android:textColor">@color/colorTextDark</item>
-        <item name="android:textColorHighlight">@color/colorOnPrimary</item>
         <item name="android:textColorHint">@color/colorHintDark</item>
 
         <item name="textInputStyle">@style/Widget.PowerBuilderAssistant.TextInputLayout</item>
