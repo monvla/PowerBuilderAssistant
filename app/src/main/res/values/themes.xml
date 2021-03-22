@@ -1,0 +1,28 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSecondaryVariant">@color/colorSecondaryVariant</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
+
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorTextDark</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
+
+        <item name="android:fontFamily">@font/roboto_font_family</item>
+        <item name="android:textColor">@color/colorTextDark</item>
+        <item name="android:textColorHighlight">@color/colorOnPrimary</item>
+        <item name="android:textColorHint">@color/colorHintDark</item>
+
+        <item name="textInputStyle">@style/Widget.PowerBuilderAssistant.TextInputLayout</item>
+
+    </style>
+
+</resources>

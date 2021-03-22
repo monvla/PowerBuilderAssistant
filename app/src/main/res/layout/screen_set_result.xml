@@ -29,5 +29,5 @@
         android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/add_exercise_24dp" />
+        app:srcCompat="@drawable/add_fab_24dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
