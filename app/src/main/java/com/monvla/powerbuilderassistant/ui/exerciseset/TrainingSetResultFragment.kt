@@ -38,7 +38,7 @@ class TrainingSetResultFragment : Screen(), TrainingSetResultDialog.TrainingSetD
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        if (args.isNewSet) {
+        if (args.newSetRequired) {
             setUpButtonEnabled(false)
         }
     }
@@ -59,14 +59,14 @@ class TrainingSetResultFragment : Screen(), TrainingSetResultDialog.TrainingSetD
         fabAddTrainingSet.setOnClickListener {
             viewModel.prepareNewExerciseDialog(null)
         }
-        if (args.isNewSet) {
+        if (args.newSetRequired) {
             viewModel.prepareNewExerciseDialog(null)
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.new_set_exercises_menu, menu)
-        if (args.isNewSet) {
+        if (args.newSetRequired) {
             menu.findItem(R.id.apply).isVisible = true
         }
     }
@@ -85,7 +85,7 @@ class TrainingSetResultFragment : Screen(), TrainingSetResultDialog.TrainingSetD
     private fun applyMenu(exercise: SetExercise, view: View) {
         val menu = PopupMenu(requireContext(), view)
         menu.apply {
-            inflate(R.menu.exercise_menu)
+            inflate(R.menu.changeable_item_menu)
             setOnMenuItemClickListener {
                 AlertDialog.Builder(requireContext())
                         .setTitle(getString(R.string.dialog_delete_exercise, exercise.name))

@@ -8,13 +8,13 @@ import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.adapters.ExercisesAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
-import com.monvla.powerbuilderassistant.ui.record.TrainingViewModel
+import com.monvla.powerbuilderassistant.ui.record.TrainingDetailsViewModel
 import kotlinx.android.synthetic.main.screen_dairy_select_exercise.*
 
 
 class SelectExerciseFragment : Screen(), ExercisesAdapter.ItemClick {
 
-    private val viewModel: TrainingViewModel by activityViewModels()
+    private val viewModel: TrainingDetailsViewModel by activityViewModels()
 
     init {
         screenLayout = R.layout.screen_dairy_select_exercise

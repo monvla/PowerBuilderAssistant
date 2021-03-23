@@ -91,7 +91,7 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
                     val action = RealTimeTrainingFragmentDirections.actionScreenRealTimeTrainingToExerciseSetResultFragment(
                         trainingId = it.trainingId,
                         setId = it.setId,
-                        isNewSet = true
+                        newSetRequired = true
                     )
                     this.findNavController().navigate(action)
                 }

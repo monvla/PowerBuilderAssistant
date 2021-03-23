@@ -99,7 +99,7 @@
             app:argType="long"
             android:defaultValue="-1L" />
         <argument
-            android:name="isNewSet"
+            android:name="newSetRequired"
             app:argType="boolean"
             android:defaultValue="false" />
     </fragment>

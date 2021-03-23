@@ -1,15 +1,19 @@
 package com.monvla.powerbuilderassistant.ui.record
 
+import android.app.Application
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -20,8 +24,6 @@ import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.adapters.TrainingDetailsAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
-import com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragmentDirections
-import com.monvla.powerbuilderassistant.ui.realtimetraining.SetResultDialogFragment
 import kotlinx.android.synthetic.main.screen_dairy_record_details.*
 
 
@@ -31,10 +33,12 @@ class TrainingDetailsFragment: Screen(), TrainingSetClickListener {
         private const val CREATE_NEW_RECORD = -1L
     }
 
-    private lateinit var trainingDetailsAdapter: RecyclerView.Adapter<*>
+    private lateinit var trainingDetailsAdapter: TrainingDetailsAdapter
     private lateinit var viewManager: RecyclerView.LayoutManager
 
-    private val viewModel: TrainingViewModel by activityViewModels()
+    private val viewModel: TrainingDetailsViewModel by viewModels {
+        TrainingDetailsViewModelFactory(requireActivity().application, args.trainingId)
+    }
 
     val args: TrainingDetailsFragmentArgs by navArgs()
 
@@ -44,18 +48,37 @@ class TrainingDetailsFragment: Screen(), TrainingSetClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupViews()
-        viewModel.training.observe(viewLifecycleOwner) {
-            setupTrainingView(it)
+
+        trainingDetailsAdapter = TrainingDetailsAdapter(emptyList(), this)
+        recyclerTrainingInfo.apply {
+            setHasFixedSize(true)
+            layoutManager = viewManager
+            adapter = trainingDetailsAdapter
         }
-        viewModel.recordDeleted.subscribeChanges(viewLifecycleOwner) {
+
+        viewModel.trainingInfo.subscribeChanges(viewLifecycleOwner) { trainingInfo ->
+            trainingDetailsAdapter.setTrainingSets(trainingInfo.trainingSets)
+            trainingLength.text = "Длительность тренировки: ${Utils.getFormattedTimeFromSeconds(trainingInfo.length)}"
+            trainingSetAverageLength.text = "Среднее время на подход: ${Utils.getFormattedTimeFromSeconds(trainingInfo.getAverageSetLength())}"
+            trainingTotalWeight.text = "Общий поднятый вес: ${if (trainingInfo.getTotalWeight() > 0) trainingInfo.getTotalWeight() else "нет"}"
+            addRecordFab.setOnClickListener {
+                viewModel.addSetRequested(args.trainingId, trainingInfo.trainingSets.size + 1)
+            }
+        }
+        viewModel.addSetTrigger.subscribeChanges(viewLifecycleOwner) {
+            val action = TrainingDetailsFragmentDirections.actionScreenDairyRecordDetailsToExerciseSetResultFragment(
+                setId = it.newSetId,
+                trainingId = args.trainingId
+            )
+            this.findNavController().navigate(action)
+        }
+        viewModel.dataUpdatedTrigger.subscribeChanges(viewLifecycleOwner) {
+            trainingDetailsAdapter.notifyDataSetChanged()
+        }
+        viewModel.recordDeletedTrigger.subscribeChanges(viewLifecycleOwner) {
             Toast.makeText(context, "Тренировка удалена", Toast.LENGTH_SHORT).show()
             requireActivity().onBackPressed()
         }
-        viewModel.getTrainingData(args.trainingId)
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,16 +86,9 @@ class TrainingDetailsFragment: Screen(), TrainingSetClickListener {
         setHasOptionsMenu(true)
     }
 
-    fun setupTrainingView(training: TrainingViewModel.Training) {
-        trainingLength.text = "Длительность тренировки: ${Utils.getFormattedTimeFromSeconds(training.length)}"
-        trainingSetAverageLength.text = "Среднее время на подход: ${Utils.getFormattedTimeFromSeconds(training.getAverageSetLength())}"
-        trainingTotalWeight.text = "Общий поднятый вес: ${if (training.getTotalWeight() > 0) training.getTotalWeight() else "нет"}"
-        trainingDetailsAdapter = TrainingDetailsAdapter(training.trainingSets, this)
-        recyclerTrainingInfo.apply {
-            setHasFixedSize(true)
-            layoutManager = viewManager
-            adapter = trainingDetailsAdapter
-        }
+    override fun onResume() {
+        super.onResume()
+        viewModel.resumed()
     }
 
     fun setupViews() {
@@ -101,7 +117,7 @@ class TrainingDetailsFragment: Screen(), TrainingSetClickListener {
     private fun showDeleteDialog() = context?.let { AlertDialog.Builder(it).apply {
             setTitle("Удалить тренировку?")
             setPositiveButton(R.string.delete) { _, _ ->
-                viewModel.deleteRecord(args.trainingId)
+                viewModel.deleteRecord()
             }
             setNegativeButton(android.R.string.cancel, null)
         }.show()
@@ -112,15 +128,32 @@ class TrainingDetailsFragment: Screen(), TrainingSetClickListener {
         this.findNavController().navigate(action)
     }
 
-//    private fun showSetExercisesDialog() {
-//        activity?.let {
-//            val fragment = SetResultDialogFragment(viewModel.getLoadedExercises())
-//            fragment.listener = this
-//            fragment.show(it.supportFragmentManager, fragment.javaClass.simpleName)
-//        }
-//    }
+    override fun onLongSetClick(setId: Long, setViewGroup: ViewGroup) {
+        applyMenu(setId, setViewGroup)
+    }
 
-//    override fun onDialogPositiveClick(dialog: DialogFragment, data: MutableList<SetResultDialogFragment.SetExercise>) {
-//        Log.d("LUPA", "dialog positive")
-//    }
+    private fun applyMenu(setNumber: Long, setViewGroup: ViewGroup) {
+        val menu = PopupMenu(requireContext(), setViewGroup)
+        menu.apply {
+            inflate(R.menu.changeable_item_menu)
+            setOnMenuItemClickListener {
+                AlertDialog.Builder(requireContext())
+                        .setTitle(getString(R.string.dialog_delete_set))
+                        .setPositiveButton(android.R.string.yes) { _, _ ->
+                            viewModel.deleteSet(setNumber)
+                        }
+                        .setNegativeButton(android.R.string.no, null)
+                        .show();
+                true
+            }
+            show()
+        }
+    }
+
+    class TrainingDetailsViewModelFactory(val application: Application, val trainingId: Long) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return TrainingDetailsViewModel(application, trainingId) as T
+        }
+    }
+
 }

@@ -13,6 +13,7 @@
     <string name="menu_delete">Удалить</string>
     <string name="menu_apply">Сохранить</string>
     <string name="dialog_delete_exercise">Удалить упражнение %1$s из тренировки?</string>
+    <string name="dialog_delete_set">Удалить подход из тренировки?</string>
     <string name="exercise_deleted">Упражнение удалено</string>
     <string name="rtt_new_set">Новый подход</string>
     <string name="rtt_stop_training">ЗАВЕРШИТЬ</string>
