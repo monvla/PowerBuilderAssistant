@@ -86,6 +86,10 @@ class TrainingDetailsAdapter (var setsList: List<TrainingDetailsViewModel.Traini
                 holder.viewGroup.setOnClickListener {
                     callback.onSetClick(setNumber, setId)
                 }
+                holder.viewGroup.setOnLongClickListener {
+                    callback.onLongSetClick(setId, holder.viewGroup)
+                    true
+                }
             }
 
             override fun getItemCount() = exercisesList.size
