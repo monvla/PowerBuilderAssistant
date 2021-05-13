@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingService" />
+        <service android:name="com.monvla.powerbuilderassistant.service.RealTimeTrainingService" />
 
     </application>
 

@@ -33,6 +33,7 @@ class TrainingRepository(private val trainingDao: TrainingDao) {
 
     suspend fun deleteExercise(exercise: ExerciseEntity) = trainingDao.deleteExercise(exercise)
     suspend fun deleteSetExercise(exercise: SetExerciseEntity): Int = trainingDao.deleteSetExercise(exercise)
+    suspend fun deleteSetExerciseById(setExerciseId: Long): Int = trainingDao.deleteSetExerciseById(setExerciseId)
     suspend fun deleteSet(set: SetEntity) = trainingDao.deleteSet(set)
     suspend fun deleteExerciseSetsByExerciseId(exerciseId: Long) = trainingDao.deleteExerciseSetsByExerciseId(exerciseId)
 

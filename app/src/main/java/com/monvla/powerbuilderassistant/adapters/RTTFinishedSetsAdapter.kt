@@ -6,19 +6,17 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
-import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingFragment
-import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingViewModel
+import com.monvla.powerbuilderassistant.vo.ServiceTrainingSet
 import kotlinx.android.synthetic.main.time_item.view.*
 
-class RTTFinishedSetsAdapter(private val context: RealTimeTrainingFragment) :
-    RecyclerView.Adapter<RTTFinishedSetsAdapter.RTTFinishedSetsHolder>() {
+class RTTFinishedSetsAdapter : RecyclerView.Adapter<RTTFinishedSetsAdapter.RTTFinishedSetsHolder>() {
 
-    var myDataset = mutableListOf<RealTimeTrainingViewModel.TrainingSet>()
+    private var trainingSets = mutableListOf<ServiceTrainingSet>()
 
     class RTTFinishedSetsHolder(val layout: ConstraintLayout) : RecyclerView.ViewHolder(layout)
 
-    fun setData(data: MutableList<RealTimeTrainingViewModel.TrainingSet>) {
-        myDataset = data
+    fun setData(data: MutableList<ServiceTrainingSet>) {
+        trainingSets = data
     }
 
     override fun onCreateViewHolder(
@@ -31,9 +29,9 @@ class RTTFinishedSetsAdapter(private val context: RealTimeTrainingFragment) :
     }
 
     override fun onBindViewHolder(holder: RTTFinishedSetsHolder, position: Int) {
-        holder.layout.set_num.text = myDataset[position]?.number.toString()
-        holder.layout.set_time.text = Utils.getFormattedTimeFromSeconds(myDataset[position].time)
+        holder.layout.set_num.text = (position + 1).toString()
+        holder.layout.set_time.text = Utils.getFormattedTimeFromSeconds(trainingSets[position].time)
     }
 
-    override fun getItemCount() = myDataset.size
+    override fun getItemCount() = trainingSets.size
 }

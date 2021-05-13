@@ -1,11 +1,16 @@
 package com.monvla.powerbuilderassistant.ui.exerciseset
 
-import android.app.Application
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.monvla.powerbuilderassistant.vo.SetExercisesList
 
-class TrainingSetResultViewModelFactory(val application: Application, val setId: Long) : ViewModelProvider.Factory {
+class TrainingSetResultViewModelFactory(
+    private val context: Context,
+    private val setId: Long,
+    private val setNumber: Int,
+    private val setExercisesList: SetExercisesList) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return TrainingSetResultViewModel(application, setId) as T
+        return TrainingSetResultViewModel(context, setId, setNumber, setExercisesList) as T
     }
 }

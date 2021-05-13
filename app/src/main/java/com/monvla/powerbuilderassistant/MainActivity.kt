@@ -7,6 +7,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragmentDirections
 import kotlinx.android.synthetic.main.activity_main.*
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,6 +18,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Timber.plant(Timber.DebugTree())
+
         setContentView(R.layout.activity_main)
         setSupportActionBar(select_exercise_toolbar)
         val navController = findNavController(R.id.nav_host_fragment)

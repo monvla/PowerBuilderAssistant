@@ -35,7 +35,7 @@ interface TrainingDao {
     suspend fun getAllSets(): List<SetEntity>
 
     @Query("SELECT * FROM training WHERE id = :id")
-    suspend fun getTrainingById(id: Long): TrainingRecordEntity?
+    suspend fun getTrainingById(id: Long): TrainingRecordEntity
 
     @Query("SELECT * FROM set_table WHERE training_record_id = :id")
     suspend fun getSetsByTrainingId(id: Long): List<SetEntity>
@@ -65,7 +65,7 @@ interface TrainingDao {
     suspend fun insertSet(setEntity: SetEntity): Long
 
     @Insert
-    suspend fun insertSetExercise(setExerciseEntity: SetExerciseEntity)
+    suspend fun insertSetExercise(setExerciseEntity: SetExerciseEntity): Long
 
     @Update
     suspend fun updateSetExercise(setExerciseEntity: SetExerciseEntity): Int
@@ -84,6 +84,9 @@ interface TrainingDao {
 
     @Delete
     suspend fun deleteSetExercise(exercise: SetExerciseEntity): Int
+
+    @Query("DELETE FROM set_exercise WHERE id = :setExerciseId")
+    suspend fun deleteSetExerciseById(setExerciseId: Long): Int
 
     @Delete
     suspend fun deleteSet(setEntity: SetEntity)

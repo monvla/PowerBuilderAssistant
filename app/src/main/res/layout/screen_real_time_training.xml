@@ -21,7 +21,7 @@
         android:padding="@dimen/margin_small">
 
         <Button
-            android:id="@+id/increase_counter_button"
+            android:id="@+id/add_set_button"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_marginEnd="@dimen/margin_large"
@@ -74,7 +74,7 @@
             app:layout_constraintBottom_toTopOf="@+id/stop_counter_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/increase_counter_button" />
+            app:layout_constraintTop_toBottomOf="@id/add_set_button" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

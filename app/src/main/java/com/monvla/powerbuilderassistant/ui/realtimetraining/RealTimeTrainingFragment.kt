@@ -5,30 +5,35 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.ServiceConnection
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.tmurakami.aackt.lifecycle.subscribeChanges
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils.Companion.getFormattedTimeFromSeconds
 import com.monvla.powerbuilderassistant.adapters.RTTFinishedSetsAdapter
+import com.monvla.powerbuilderassistant.service.RealTimeTrainingService
+import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.Companion.TRAINING_STATUS
+import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.LocalBinder
+import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.ServiceConnection
+import com.monvla.powerbuilderassistant.service.TrainingService
 import com.monvla.powerbuilderassistant.ui.Screen
-import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingService.Companion.TRAINING_STATUS
+import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.Companion.FRAGMENT_RESULT_KEY
+import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.FragmentResult
 import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingViewModel.State
 import kotlinx.android.synthetic.main.screen_real_time_training.*
+import timber.log.Timber
 
-
-class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
+class RealTimeTrainingFragment : Screen() {
 
     companion object {
-        const val NOTIFICATION_ID = 1337
         const val CHANNEL_ID = "channel"
 
         const val DISPLAYED_CHILD_FINISHED = 2
@@ -36,64 +41,57 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
         const val DISPLAYED_CHILD_READY = 0
     }
 
-    private val viewModel: RealTimeTrainingViewModel by activityViewModels()
-    var trainingService: RealTimeTrainingService? = null
-    lateinit var receiver: TrainingStatusReceiver
+    private val viewModel: RealTimeTrainingViewModel by viewModels()
+
+    var trainingService: TrainingService? = null
+    private var receiver: TrainingStatusReceiver? = null
+    private var serviceConnection: ServiceConnection? = null
 
     init {
         screenLayout = R.layout.screen_real_time_training
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        showTimer()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewAdapter = RTTFinishedSetsAdapter(this)
+        connectToService()
+        val viewAdapter = RTTFinishedSetsAdapter()
 
         recyclerSets.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
             adapter = viewAdapter
         }
-        increase_counter_button.setOnClickListener {
-            viewModel.addSet()
-            trainingService?.pause()
+        add_set_button.setOnClickListener {
+            viewModel.newSetClicked()
         }
         button_start.setOnClickListener {
-            showTimer()
-            viewModel.start()
-            trainingService?.unpause()
+            displayTimer()
+            viewModel.trainingStarted()
             startTrainingService()
         }
         stop_counter_button.setOnClickListener {
             stopTrainingDialog()
         }
 
-        receiver = TrainingStatusReceiver(this)
-        context?.registerReceiver(receiver, IntentFilter(TRAINING_STATUS))
+        viewModel.navigateToSetResultFragment.subscribeChanges(viewLifecycleOwner) {
+            val action = RealTimeTrainingFragmentDirections.actionScreenRealTimeTrainingToExerciseSetResultFragment(
+                -1L,
+                it.currentSetNumber,
+                it.setExercisesList
+            )
+            findNavController().navigate(action)
+        }
         viewModel.state.observe(viewLifecycleOwner) {
             when(it) {
-                is State.Ready -> initialize()
-                is State.InProgress -> showTimer()
+                is State.Ready -> real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_READY
                 is State.Update -> {
-                    trainingService?.unpause()
                     updateTimer(it.time)
                     current_set_text.text = getString(R.string.rtt_current_set, it.sets)
                     viewAdapter.setData(it.trainingSets)
                     viewAdapter.notifyDataSetChanged()
-                    showTimer()
-                }
-                is State.FillSet -> {
-                    val action = RealTimeTrainingFragmentDirections.actionScreenRealTimeTrainingToExerciseSetResultFragment(
-                        trainingId = it.trainingId,
-                        setId = it.setId,
-                        newSetRequired = true
-                    )
-                    this.findNavController().navigate(action)
+                    displayTimer()
+                    trainingService?.setCachedTrainingSets(it.trainingSets)
                 }
                 is State.Finished -> {
                     updateTimer(it.totalTime)
@@ -102,49 +100,77 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
                 }
             }
         }
-        viewModel.viewCreated()
-        connectToService()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+        savedStateHandle?.getLiveData<FragmentResult>(FRAGMENT_RESULT_KEY)?.observe(viewLifecycleOwner) { result ->
+            viewModel.addSet(result.setExercisesList)
+        }
+        receiver = TrainingStatusReceiver {
+            viewModel.timerTick(it)
+        }
+        requireContext().registerReceiver(receiver, IntentFilter(TRAINING_STATUS))
+    }
+
+    override fun onStop() {
+        super.onStop()
+        receiver?.let {
+            Timber.d("unregisterReceiver")
+            requireContext().unregisterReceiver(receiver)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceConnection?.let {
+            Timber.d("unbindService")
+            requireActivity().unbindService(it)
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        displayTimer()
     }
 
     private fun stopTrainingDialog() =
         AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.rtt_stop_training_dialog))
                 .setPositiveButton(android.R.string.yes) { _, _ ->
-                    trainingService?.stopService()
-                    viewModel.timerStopped()
-                    viewModel.addSet()
+                    trainingService?.stop()
+                    viewModel.trainingFinished()
                 }
                 .setNegativeButton(android.R.string.no, null)
                 .show();
 
-    override fun onDestroy() {
-        super.onDestroy()
-        context?.unregisterReceiver(receiver)
-    }
-
-    override fun onTick(time: Long) {
-        viewModel.timerTick(time)
-    }
-
     private fun connectToService() {
-        val sConn = object : ServiceConnection {
-
-            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                val binder = service as RealTimeTrainingService.LocalBinder
-                trainingService = binder.getService()
-            }
-
-            override fun onServiceDisconnected(name: ComponentName?) {
+        Timber.d("connectToService")
+        serviceConnection = object : ServiceConnection() {
+            override fun onServiceConnected(name: ComponentName, service: IBinder) {
+                val binder = service as LocalBinder
+                trainingService = binder.getService().also {
+                    it.getCachedData().also { data ->
+                        if (data.cachedTrainingSets.isNotEmpty()) {
+                            viewModel.updateTrainingData(data.timeStarted, data.cachedTrainingSets)
+                        }
+                    }
+                }
             }
         }
 
-        val intent = Intent(context, RealTimeTrainingService::class.java)
-        requireActivity().bindService(intent, sConn, 0)
+        serviceConnection?.let { serviceConnection ->
+            Intent(context, RealTimeTrainingService::class.java).also { intent ->
+                requireActivity().bindService(intent, serviceConnection, 0)
+            }
+        }
     }
 
     private fun startTrainingService() {
-        val intent = Intent(context, RealTimeTrainingService::class.java)
-        ContextCompat.startForegroundService(requireContext(), intent)
+        Intent(context, RealTimeTrainingService::class.java).also {
+            ContextCompat.startForegroundService(requireContext(), it)
+        }
     }
 
     private fun updateTimer(currentTime: Long) {
@@ -153,21 +179,17 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
         total_time.text = resources.getString(R.string.rtt_total_time, formatted)
     }
 
-    private fun showTimer() {
+    private fun displayTimer() {
         if (real_timer_training_flipper.displayedChild != DISPLAYED_CHILD_IN_PROGRESS) {
             real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_IN_PROGRESS
         }
     }
 
-    private fun initialize() {
-        real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_READY
-    }
-
-    class TrainingStatusReceiver(private val listener: TrainingServiceListener) : BroadcastReceiver() {
+    class TrainingStatusReceiver(private val onTick: (time: Long) -> Unit) : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             if (intent.action == TRAINING_STATUS) {
                 val time = intent.getLongExtra(RealTimeTrainingService.TIME_ARG, 0)
-                listener.onTick(time)
+                onTick(time)
             }
         }
     }

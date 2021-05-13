@@ -12,18 +12,4 @@ class SetExerciseEntity(
     @ColumnInfo(name = "exercise_id") var exerciseId: Long,
     @ColumnInfo(name = "weight") val weight: Float,
     @ColumnInfo(name = "repeats") val repeats: Int
-) {
-    companion object {
-
-        fun fromSetExercise(setExercise: SetExercise, exerciseId: Long) = SetExerciseEntity(
-                setId = requireNotNull(setExercise.setId),
-                exerciseId = exerciseId,
-                weight = setExercise.weight,
-                repeats = setExercise.repeats
-            ).apply {
-                setExercise.id?.let {
-                    id = it
-                }
-        }
-    }
-}
+)

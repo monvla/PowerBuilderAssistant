@@ -2,7 +2,6 @@ package com.monvla.powerbuilderassistant.ui.exerciseset
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
@@ -14,9 +13,9 @@ import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import com.monvla.powerbuilderassistant.vo.SetExercise
 import kotlinx.android.synthetic.main.training_set_result_dialog.view.*
 
-class TrainingSetResultDialog(
-    var exercise: SetExercise?,
-    var exercisesList: List<ExerciseEntity>?,
+class SetExerciseDialog(
+    var exercise: SetExercise,
+    var exercisesList: List<ExerciseEntity>,
     private val callback: TrainingSetDialogListener
 ) : DialogFragment() {
 
@@ -28,27 +27,23 @@ class TrainingSetResultDialog(
         fun onSaveSetExerciseClick(setExercise: SetExercise)
     }
 
-    var setId: Long? = null
-    var spinnerAdapter: ArrayAdapter<String>? = null
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(requireActivity())
         val inflater = requireActivity().layoutInflater;
         val layout = inflater.inflate(R.layout.training_set_result_dialog, null) as ConstraintLayout
 
-        exercisesList?.let { exercise ->
-            val values = exercise.map { it.name }
-            spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, values)
-            spinnerAdapter?.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val namesList = exercisesList.map { it.name }
+        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, namesList).apply {
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
-        layout.exercisesSpinner.apply {
-            adapter = spinnerAdapter
-        }
-
-        exercise?.let {
-            layout.exercisesSpinner.setSelectionByName(it.name)
-            layout.exerciseRepeatsText.setText(it.repeats.toString())
-            layout.exerciseWeightText.setText(it.weight.toString())
+        layout.apply {
+            exercisesSpinner.apply {
+                adapter = spinnerAdapter
+                setSelectionByName(exercise.exerciseName)
+            }
+            val repeatsString = if (exercise.repeats == 0) "" else exercise.repeats.toString()
+            exerciseRepeatsText.setText(repeatsString)
+            exerciseWeightText.setText(exercise.weight.toString())
         }
 
         builder.setView(layout)
@@ -63,36 +58,16 @@ class TrainingSetResultDialog(
                                 .show()
                         return@setOnClickListener
                     }
-                    val name = layout.exercisesSpinner.selectedItem.toString()
-                    val repeats = layout.exerciseRepeatsText.text.toString().toInt()
-                    val weight = with(layout.exerciseWeightText.text) {
-                        if (isNullOrBlank()) {
-                            0f
-                        } else {
-                            toString().toFloat()
-                        }
-                    }
-                    updateExerciseData(name, repeats, weight)
-                    callback.onSaveSetExerciseClick(requireNotNull(exercise))
+
+                    val nameValue = layout.exercisesSpinner.selectedItem.toString()
+                    val repeatsValue = layout.exerciseRepeatsText.text.toString().toInt()
+                    val weightText = layout.exerciseWeightText.text.toString()
+                    val weightValue = if (weightText.isBlank()) 0f else weightText.toFloat()
+                    exercise.update(nameValue, repeatsValue, weightValue)
+
+                    callback.onSaveSetExerciseClick(exercise)
                     dialogInterface.dismiss()
                 }
-            }
-        }
-    }
-
-    private fun updateExerciseData(name: String, repeats: Int, weight: Float) {
-        if (exercise == null) {
-            exercise = SetExercise(
-                setId = requireNotNull(setId),
-                name = name,
-                repeats = repeats,
-                weight = weight
-            )
-        } else {
-            requireNotNull(exercise).apply {
-                this.name = name
-                this.repeats = repeats
-                this.weight = weight
             }
         }
     }

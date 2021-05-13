@@ -89,19 +89,16 @@
     <fragment
         android:id="@+id/exerciseSetResultFragment"
         android:name="com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultFragment"
-        android:label="ExerciseSetResultFragment">
+        android:label="@string/set_result_fragment_name">
         <argument
             android:name="setId"
-            app:argType="long"
-            android:defaultValue="-1L" />
+            android:defaultValue="-1L"/>
         <argument
-            android:name="trainingId"
-            app:argType="long"
-            android:defaultValue="-1L" />
+            android:name="setNumber"
+            app:argType="integer"/>
         <argument
-            android:name="newSetRequired"
-            app:argType="boolean"
-            android:defaultValue="false" />
+            android:name="setExercises"
+            app:argType="com.monvla.powerbuilderassistant.vo.SetExercisesList"/>
     </fragment>
     <fragment
         android:id="@+id/exerciseStatisticsFragment"

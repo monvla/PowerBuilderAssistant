@@ -1,7 +1,6 @@
 package com.monvla.powerbuilderassistant.ui.record
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,7 +8,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
-import com.monvla.powerbuilderassistant.vo.SetEntity
+import com.monvla.powerbuilderassistant.vo.*
 import kotlinx.coroutines.launch
 
 class TrainingDetailsViewModel(application: Application, val trainingId: Long) : AndroidViewModel(application) {
@@ -21,7 +20,7 @@ class TrainingDetailsViewModel(application: Application, val trainingId: Long) :
         repository = TrainingRepository(exerciseDao)
     }
 
-    data class SetTrigger(val newSetId: Long)
+    data class AddSetTrigger(val setId: Long, val setNumber: Int)
 
     private val _recordDeletedTrigger = MutableLiveData(Unit)
     val recordDeletedTrigger = _recordDeletedTrigger as LiveData<Unit>
@@ -31,27 +30,24 @@ class TrainingDetailsViewModel(application: Application, val trainingId: Long) :
 
     val exercises = repository.getAllExercises()
 
-    private suspend fun getTrainingInfo(trainingId: Long) : TrainingInfo? {
+    private suspend fun getTrainingInfo(trainingId: Long) : TrainingInfo {
         val trainingEntity = repository.getTrainingById(trainingId)
-        trainingEntity?.let {
-            val trainingTemp = TrainingInfo(date = trainingEntity.date, length = trainingEntity.length)
-            val sets = repository.getSetsByTrainingId(trainingId)
-            sets.forEach {setEntity ->
-                val set = TrainingSet(setEntity.id, setEntity.number)
-                val exercises = repository.getSetExercisesBySetId(setEntity.id)
-                exercises.forEach {exerciseEntity ->
-                    val exerciseName = repository.getExerciseById(exerciseEntity.exerciseId).name
-                    val exercise = Exercise(exerciseName, exerciseEntity.repeats, exerciseEntity.weight)
-                    set.exercises.add(exercise)
-                }
-                trainingTemp.trainingSets.add(set)
+        val trainingTemp = TrainingInfo(date = trainingEntity.date, length = trainingEntity.length)
+        val sets = repository.getSetsByTrainingId(trainingId)
+        sets.forEach {setEntity ->
+            val set = TrainingSet(setEntity.id, setEntity.number)
+            val exercises = repository.getSetExercisesBySetId(setEntity.id)
+            exercises.forEach {exerciseEntity ->
+                val exerciseName = repository.getExerciseById(exerciseEntity.exerciseId).name
+                val exercise = Exercise(exerciseName, exerciseEntity.repeats, exerciseEntity.weight)
+                set.exercises.add(exercise)
             }
-            return trainingTemp
+            trainingTemp.trainingSets.add(set)
         }
-        return null
+        return trainingTemp
     }
 
-    val _trainingInfo = MutableLiveData<TrainingInfo>()
+    val _trainingInfo = liveData { emit(getTrainingInfo(trainingId)) } as MutableLiveData<TrainingInfo>
 //            liveData {
 //        val trainingEntity = repository.getTrainingById(trainingId)
 //        trainingEntity?.let{
@@ -60,13 +56,13 @@ class TrainingDetailsViewModel(application: Application, val trainingId: Long) :
 //    } as MutableLiveData
     val trainingInfo = _trainingInfo as LiveData<TrainingInfo>
 
-    private val _addSetTrigger = MutableLiveData<SetTrigger>()
-    val addSetTrigger = _addSetTrigger as LiveData<SetTrigger>
+    private val _addSetTrigger = MutableLiveData<AddSetTrigger>()
+    val addSetTrigger = _addSetTrigger as LiveData<AddSetTrigger>
 
     fun addSetRequested(trainingId: Long, setNumber: Int) {
         viewModelScope.launch {
             val newSetId = repository.insertSet(SetEntity(trainingRecordId = trainingId, number = setNumber))
-            _addSetTrigger.value = SetTrigger(newSetId)
+            _addSetTrigger.value = AddSetTrigger(newSetId, setNumber)
             _dataUpdatedTrigger.value = Unit
         }
     }
@@ -85,6 +81,24 @@ class TrainingDetailsViewModel(application: Application, val trainingId: Long) :
             }
             val set = repository.getSetById(setId)
             repository.deleteSet(set)
+            _trainingInfo.value = getTrainingInfo(trainingId)
+        }
+    }
+
+    fun setUpdated(setId: Long, setExercisesList: SetExercisesList) {
+        viewModelScope.launch {
+            repository.getSetExercisesBySetId(setId).forEach {
+                repository.deleteSetExercise(it)
+            }
+            setExercisesList.forEach {
+                val setExerciseEntity = if (it.dbId != UNDEFINED_ID) {
+                    SetExerciseEntity(it.dbId, it.setId, it.exerciseId, it.weight, it.repeats)
+                } else {
+                    val exercise = repository.getExerciseByName(it.exerciseName)
+                    SetExerciseEntity(setId = it.setId, exerciseId = exercise.id, weight = it.weight, repeats = it.repeats)
+                }
+                repository.insertSetExercise(setExerciseEntity)
+            }
             _trainingInfo.value = getTrainingInfo(trainingId)
         }
     }
@@ -121,17 +135,8 @@ class TrainingDetailsViewModel(application: Application, val trainingId: Long) :
         }
     }
 
-    data class TrainingSet(
-        val id: Long,
-        val number: Int,
-        val exercises: MutableList<Exercise> = mutableListOf()
-    )
 
-    data class Exercise(
-        val name: String,
-        val repeats: Int,
-        val weight: Float
-    )
+
 
 }
 

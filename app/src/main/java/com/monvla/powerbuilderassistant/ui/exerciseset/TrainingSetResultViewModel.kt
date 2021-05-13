@@ -1,65 +1,83 @@
 package com.monvla.powerbuilderassistant.ui.exerciseset
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
+import android.content.Context
+import android.os.Parcelable
+import androidx.lifecycle.*
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
-import com.monvla.powerbuilderassistant.vo.ExerciseEntity
-import com.monvla.powerbuilderassistant.vo.SetExercise
-import com.monvla.powerbuilderassistant.vo.SetExerciseEntity
+import com.monvla.powerbuilderassistant.vo.*
+import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.launch
-import kotlin.properties.Delegates
+import java.util.*
 
-class TrainingSetResultViewModel(application: Application, val setId: Long) : AndroidViewModel(application) {
+class TrainingSetResultViewModel(
+    context: Context,
+    private val setId: Long,
+    private val setNumber: Int,
+    var setExercisesList: SetExercisesList
+) : ViewModel() {
+
+    companion object {
+        const val FRAGMENT_RESULT_KEY = "fragment_result"
+    }
+
+    @Parcelize
+    data class FragmentResult(val setId: Long, val setExercisesList: SetExercisesList) : Parcelable
+
+    data class DialogData(val exercisesList: List<ExerciseEntity>, val setExercise: SetExercise?)
+
+    data class TrainingSetData(val setNumber: Int, val setExercises: List<SetExercise>)
 
     private val repository: TrainingRepository
 
     init {
-        val dao = TrainingRoomDb.getDatabase(application, viewModelScope).trainingDao()
+        val dao = TrainingRoomDb.getDatabase(context, viewModelScope).trainingDao()
         repository = TrainingRepository(dao)
     }
-
-    data class DialogData(val exercisesList: List<ExerciseEntity>, val currentExercise: SetExercise?)
-
-    data class TrainingSetData(val setNumber: Int, val setExercises: List<SetExercise>)
 
     val showAddExerciseDialog = MediatorLiveData<DialogData>()
 
     private lateinit var exercises: List<ExerciseEntity>
-    private lateinit var setExercises: List<SetExercise>
-    private var setNumber by Delegates.notNull<Int>()
 
     private val _setData = liveData {
-        setNumber = repository.getSetById(setId).number
-        setExercises = getSetExercises()
-        emit(
-            TrainingSetData(setNumber, setExercises)
-        )
+        if (isEditSetMode()) {
+            val setExercisesListTemp = SetExercisesList()
+            val setExerciseEntities = repository.getSetExercisesBySetId(setId)
+            setExerciseEntities.forEach {
+                val exercise = repository.getExerciseById(it.exerciseId)
+                setExercisesListTemp.add(SetExercise.getSetExerciseFromEntity(exercise, it))
+            }
+            setExercisesList = setExercisesListTemp
+        } else {
+            prepareNewExerciseDialog(null)
+        }
+        emit(TrainingSetData(setNumber, setExercisesList))
     } as MutableLiveData
     val setData = _setData as LiveData<TrainingSetData>
 
     private val _deleteTrigger = MutableLiveData<Unit>()
     val deleteTrigger = _deleteTrigger as LiveData<Unit>
 
-    fun exerciseUpdated(updatedExercise: SetExercise) {
-        val oldExercise = setExercises.find { it.id == updatedExercise.id }
-        val exerciseEntityId = exercises.firstOrNull { it.name == updatedExercise.name }?.id
-        val setExerciseEntity = SetExerciseEntity.fromSetExercise(
-            updatedExercise, requireNotNull(exerciseEntityId)
-        )
-        viewModelScope.launch {
-            if (oldExercise != null) {
-                repository.updateSetExercise(setExerciseEntity)
-            } else {
-                repository.insertSetExercise(setExerciseEntity)
+    fun exerciseUpdated(setExercise: SetExercise) {
+        var updated = false
+        setExercisesList.forEachIndexed { index, oldExercise ->
+            if (oldExercise.uuid == setExercise.uuid) {
+                setExercisesList[index] = setExercise
+                updated = true
             }
-            updateSetExercises()
         }
+        if (!updated) {
+            setExercisesList.add(setExercise)
+        }
+        if (isEditSetMode()) {
+            SetExerciseEntity(
+                setId = setExercise.setId,
+                exerciseId = setExercise.exerciseId,
+                weight = setExercise.weight,
+                repeats = setExercise.repeats
+            )
+        }
+        _setData.value = TrainingSetData(setNumber, setExercisesList)
     }
 
     fun prepareNewExerciseDialog(exercise: SetExercise?) {
@@ -70,41 +88,20 @@ class TrainingSetResultViewModel(application: Application, val setId: Long) : An
     }
 
     fun deleteSetExerciseRequested(exercise: SetExercise) {
-        val exerciseEntityId = exercises.firstOrNull { it.name == exercise.name }?.id
-        val setExerciseEntity = SetExerciseEntity.fromSetExercise(
-            exercise, requireNotNull(exerciseEntityId)
-        )
-        viewModelScope.launch {
-            val deletedRows = repository.deleteSetExercise(setExerciseEntity)
-            if (deletedRows != 0) {
-                _deleteTrigger.value = Unit
-                updateSetExercises()
+        var removeIndex: Int? = null
+        setExercisesList.forEachIndexed { index, oldExercise ->
+            if (oldExercise.uuid == exercise.uuid) {
+                removeIndex = index
+                return@forEachIndexed
             }
         }
-    }
-
-    private suspend fun getSetExercises(): List<SetExercise> {
-        return repository.getSetExercisesBySetId(setId).map {
-            SetExercise(
-                name = repository.getExerciseById(it.exerciseId).name,
-                repeats = it.repeats,
-                weight = it.weight,
-                id = it.id,
-                setId = it.setId
-            )
+        removeIndex?.let {
+            setExercisesList.removeAt(it)
+            _setData.value = TrainingSetData(setNumber, setExercisesList)
         }
     }
 
-    private suspend fun updateSetExercises() {
-        setExercises = repository.getSetExercisesBySetId(setId).map {
-            SetExercise(
-                name = repository.getExerciseById(it.exerciseId).name,
-                repeats = it.repeats,
-                weight = it.weight,
-                id = it.id,
-                setId = it.setId
-            )
-        }
-        _setData.value = TrainingSetData(setNumber, setExercises)
-    }
+    fun getSetExercises() = setExercisesList
+
+    private fun isEditSetMode() = setId != UNDEFINED_ID
 }

@@ -2,7 +2,6 @@ package com.monvla.powerbuilderassistant.ui.record
 
 import android.app.Application
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -18,67 +17,32 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.github.tmurakami.aackt.lifecycle.subscribeChanges
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.adapters.TrainingDetailsAdapter
 import com.monvla.powerbuilderassistant.ui.Screen
+import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel
+import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.Companion.FRAGMENT_RESULT_KEY
+import com.monvla.powerbuilderassistant.vo.SetExercisesList
 import kotlinx.android.synthetic.main.screen_dairy_record_details.*
 
-
-class TrainingDetailsFragment: Screen(), TrainingSetClickListener {
+class TrainingDetailsFragment : Screen(), TrainingSetClickListener {
 
     companion object {
         private const val CREATE_NEW_RECORD = -1L
     }
 
     private lateinit var trainingDetailsAdapter: TrainingDetailsAdapter
-    private lateinit var viewManager: RecyclerView.LayoutManager
 
     private val viewModel: TrainingDetailsViewModel by viewModels {
         TrainingDetailsViewModelFactory(requireActivity().application, args.trainingId)
     }
 
-    val args: TrainingDetailsFragmentArgs by navArgs()
+    private val args: TrainingDetailsFragmentArgs by navArgs()
 
     init {
         screenLayout = R.layout.screen_dairy_record_details
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setupViews()
-
-        trainingDetailsAdapter = TrainingDetailsAdapter(emptyList(), this)
-        recyclerTrainingInfo.apply {
-            setHasFixedSize(true)
-            layoutManager = viewManager
-            adapter = trainingDetailsAdapter
-        }
-
-        viewModel.trainingInfo.subscribeChanges(viewLifecycleOwner) { trainingInfo ->
-            trainingDetailsAdapter.setTrainingSets(trainingInfo.trainingSets)
-            trainingLength.text = "Длительность тренировки: ${Utils.getFormattedTimeFromSeconds(trainingInfo.length)}"
-            trainingSetAverageLength.text = "Среднее время на подход: ${Utils.getFormattedTimeFromSeconds(trainingInfo.getAverageSetLength())}"
-            trainingTotalWeight.text = "Общий поднятый вес: ${if (trainingInfo.getTotalWeight() > 0) trainingInfo.getTotalWeight() else "нет"}"
-            addRecordFab.setOnClickListener {
-                viewModel.addSetRequested(args.trainingId, trainingInfo.trainingSets.size + 1)
-            }
-        }
-        viewModel.addSetTrigger.subscribeChanges(viewLifecycleOwner) {
-            val action = TrainingDetailsFragmentDirections.actionScreenDairyRecordDetailsToExerciseSetResultFragment(
-                setId = it.newSetId,
-                trainingId = args.trainingId
-            )
-            this.findNavController().navigate(action)
-        }
-        viewModel.dataUpdatedTrigger.subscribeChanges(viewLifecycleOwner) {
-            trainingDetailsAdapter.notifyDataSetChanged()
-        }
-        viewModel.recordDeletedTrigger.subscribeChanges(viewLifecycleOwner) {
-            Toast.makeText(context, "Тренировка удалена", Toast.LENGTH_SHORT).show()
-            requireActivity().onBackPressed()
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,14 +50,54 @@ class TrainingDetailsFragment: Screen(), TrainingSetClickListener {
         setHasOptionsMenu(true)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        trainingDetailsAdapter = TrainingDetailsAdapter(resources, emptyList(), this)
+        setupViews()
+
+        viewModel.trainingInfo.subscribeChanges(viewLifecycleOwner) { trainingInfo ->
+            trainingDetailsAdapter.setTrainingSets(trainingInfo.trainingSets)
+            trainingLength.text = getString(
+                R.string.training_length, Utils.getFormattedTimeFromSeconds(trainingInfo.length)
+            )
+            trainingSetAverageLength.text = getString(
+                R.string.training_average_set_time,
+                Utils.getFormattedTimeFromSeconds(trainingInfo.getAverageSetLength())
+            )
+            trainingTotalWeight.text = getString(
+                R.string.training_total_weight,
+                if (trainingInfo.getTotalWeight() > 0) trainingInfo.getTotalWeight() else getString(R.string.set_empty_weight)
+            )
+            addRecordFab.setOnClickListener {
+                viewModel.addSetRequested(args.trainingId, trainingInfo.trainingSets.size + 1)
+            }
+        }
+        viewModel.addSetTrigger.subscribeChanges(viewLifecycleOwner) {
+            val action = TrainingDetailsFragmentDirections.actionScreenDairyRecordDetailsToExerciseSetResultFragment(
+                setId = it.setId,
+                setNumber = it.setNumber,
+                setExercises = SetExercisesList()
+            )
+            this.findNavController().navigate(action)
+        }
+        viewModel.dataUpdatedTrigger.subscribeChanges(viewLifecycleOwner) {
+            trainingDetailsAdapter.notifyDataSetChanged()
+        }
+        viewModel.recordDeletedTrigger.subscribeChanges(viewLifecycleOwner) {
+            Toast.makeText(context, getString(R.string.training_deleted), Toast.LENGTH_SHORT).show()
+            requireActivity().onBackPressed()
+        }
+        findNavController().currentBackStackEntry?.savedStateHandle?.let {
+            it.getLiveData<TrainingSetResultViewModel.FragmentResult>(FRAGMENT_RESULT_KEY).observe(
+                viewLifecycleOwner
+            ) { result ->
+                viewModel.setUpdated(result.setId, result.setExercisesList)
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         viewModel.resumed()
-    }
-
-    fun setupViews() {
-        setUpButtonEnabled(true)
-        viewManager = LinearLayoutManager(requireContext())
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -103,7 +107,7 @@ class TrainingDetailsFragment: Screen(), TrainingSetClickListener {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
+        when (item.itemId) {
             R.id.save -> {
                 requireActivity().onBackPressed()
             }
@@ -114,17 +118,12 @@ class TrainingDetailsFragment: Screen(), TrainingSetClickListener {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun showDeleteDialog() = context?.let { AlertDialog.Builder(it).apply {
-            setTitle("Удалить тренировку?")
-            setPositiveButton(R.string.delete) { _, _ ->
-                viewModel.deleteRecord()
-            }
-            setNegativeButton(android.R.string.cancel, null)
-        }.show()
-    }
-
     override fun onSetClick(setNumber: Int, setId: Long) {
-        val action = TrainingDetailsFragmentDirections.actionScreenDairyRecordDetailsToExerciseSetResultFragment(setId = setId)
+        val action = TrainingDetailsFragmentDirections.actionScreenDairyRecordDetailsToExerciseSetResultFragment(
+            setId = setId,
+            setNumber = setNumber,
+            setExercises = SetExercisesList()
+        )
         this.findNavController().navigate(action)
     }
 
@@ -150,10 +149,28 @@ class TrainingDetailsFragment: Screen(), TrainingSetClickListener {
         }
     }
 
-    class TrainingDetailsViewModelFactory(val application: Application, val trainingId: Long) : ViewModelProvider.Factory {
+    private fun setupViews() {
+        setUpButtonEnabled(true)
+
+        recyclerTrainingInfo.apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = trainingDetailsAdapter
+        }
+    }
+
+    private fun showDeleteDialog() = AlertDialog.Builder(requireContext()).apply {
+        setTitle(getString(R.string.delete_training_question))
+        setPositiveButton(R.string.delete) { _, _ ->
+            viewModel.deleteRecord()
+        }
+        setNegativeButton(android.R.string.cancel, null)
+    }.show()
+
+    class TrainingDetailsViewModelFactory(val application: Application, private val trainingId: Long) :
+        ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             return TrainingDetailsViewModel(application, trainingId) as T
         }
     }
-
 }

@@ -10,7 +10,7 @@ import com.monvla.powerbuilderassistant.vo.SetExercise
 import kotlinx.android.synthetic.main.item_set_result_exercise.view.*
 
 
-class TrainingSetResultAdapter (private val exercisesList: List<SetExercise>) :
+class TrainingSetResultAdapter(private val exercisesList: List<SetExercise>) :
     RecyclerView.Adapter<TrainingSetResultAdapter.TrainingSetResultViewHolder>() {
 
     var callback: (SetExercise) -> Unit = {}
@@ -29,7 +29,7 @@ class TrainingSetResultAdapter (private val exercisesList: List<SetExercise>) :
 
     override fun onBindViewHolder(holder: TrainingSetResultViewHolder, position: Int) {
         val exercise = exercisesList[position]
-        holder.viewGroup.setExerciseName.text = exercise.name
+        holder.viewGroup.setExerciseName.text = exercise.exerciseName
         holder.viewGroup.setExerciseRepeats.text = exercise.repeats.toString()
         if (exercise.weight != 0f) {
             holder.viewGroup.setExerciseWeight.text = exercise.weight.toString()
@@ -48,11 +48,11 @@ class TrainingSetResultAdapter (private val exercisesList: List<SetExercise>) :
 
     override fun getItemCount() = exercisesList.size
 
-    fun setOnExerciseClicked(callback: (SetExercise) -> Unit) {
+    fun onExerciseClicked(callback: (SetExercise) -> Unit) {
         this.callback = callback
     }
 
-    fun setOnLongExerciseClick(callback: (SetExercise, View) -> Unit) {
+    fun onLongExerciseClick(callback: (SetExercise, View) -> Unit) {
         this.longClickCallback = callback
     }
 }
