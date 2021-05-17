@@ -26,7 +26,10 @@ interface TrainingDao {
 
 
     @Query("SELECT * FROM training ORDER BY id DESC")
-    suspend fun getAllTraining(): List<TrainingRecordEntity>
+    fun getAllTraining(): LiveData<List<TrainingRecordEntity>>
+
+    @Query("SELECT * FROM training WHERE date > :startTimestamp AND date < :endTimestamp ORDER BY id DESC")
+    suspend fun getTrainingsForDateInterval(startTimestamp: Long, endTimestamp: Long): List<TrainingRecordEntity>
 
     @Query("SELECT * FROM set_exercise")
     suspend fun getAllSetExercises(): List<SetExerciseEntity>

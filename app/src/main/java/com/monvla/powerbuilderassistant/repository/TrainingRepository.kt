@@ -11,7 +11,8 @@ class TrainingRepository(private val trainingDao: TrainingDao) {
     fun getAllExercises() = trainingDao.getAllExercises()
     fun getExerciseStatistics(exerciseId: Long) = trainingDao.getExerciseStatistics(exerciseId)
 
-    suspend fun getAllTraining() = trainingDao.getAllTraining()
+    fun getAllTraining() = trainingDao.getAllTraining()
+    suspend fun getTrainingsForDateInterval(startTimestamp: Long, endTimestamp: Long) = trainingDao.getTrainingsForDateInterval(startTimestamp, endTimestamp)
     suspend fun getAllSetExercises() = trainingDao.getAllSetExercises()
     suspend fun getAllSets() = trainingDao.getAllSets()
 

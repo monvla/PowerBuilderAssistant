@@ -1,7 +1,6 @@
 package com.monvla.powerbuilderassistant
 
 import android.content.res.Resources
-import android.widget.Spinner
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.list
 import kotlinx.serialization.json.Json
@@ -11,7 +10,6 @@ import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
-
 
 class Utils {
     companion object {
@@ -44,6 +42,13 @@ class Utils {
         }
 
         fun currentTimeSeconds() = System.currentTimeMillis() / 1000
+
+        @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+        fun getDateOnlyTimestamp(timestamp: Long): Long {
+            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val parsedDate = sdf.parse(sdf.format(Date(timestamp)))
+            return checkNotNull(parsedDate).time
+        }
     }
 
     @Serializable
