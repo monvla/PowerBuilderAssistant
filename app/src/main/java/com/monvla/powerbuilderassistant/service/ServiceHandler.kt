@@ -21,6 +21,6 @@ class ServiceHandler(val service: WeakReference<TrainingService>) : Handler() {
 
     override fun handleMessage(msg: Message) {
         Timber.d("HANDLE MESSAGE: msg ${msg.arg1} ${msg.arg2}")
-        postDelayed(timerRunnable, 0);
+        postDelayed(timerRunnable, 0)
     }
 }

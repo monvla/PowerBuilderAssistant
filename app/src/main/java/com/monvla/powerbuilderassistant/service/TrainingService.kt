@@ -8,5 +8,11 @@ interface TrainingService {
     fun getCachedData(): RealTimeTrainingService.TrainingServiceData
     fun setCachedTrainingSets(trainingSets: List<ServiceTrainingSet>)
 
+    fun registerServiceListener(listener: TrainingServiceListener)
+
     fun stop()
+}
+
+interface TrainingServiceListener {
+    fun onStateRecieved(value: Boolean)
 }

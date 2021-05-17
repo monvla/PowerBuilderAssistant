@@ -1,5 +1,6 @@
 package com.monvla.powerbuilderassistant.ui.realtimetraining
 
+import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
@@ -20,10 +21,12 @@ import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils.Companion.getFormattedTimeFromSeconds
 import com.monvla.powerbuilderassistant.adapters.RTTFinishedSetsAdapter
 import com.monvla.powerbuilderassistant.service.RealTimeTrainingService
+import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.Companion.RTT_SERVICE_STARTED
 import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.Companion.TRAINING_STATUS
 import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.LocalBinder
 import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.ServiceConnection
 import com.monvla.powerbuilderassistant.service.TrainingService
+import com.monvla.powerbuilderassistant.service.TrainingServiceListener
 import com.monvla.powerbuilderassistant.ui.Screen
 import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.Companion.FRAGMENT_RESULT_KEY
 import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.FragmentResult
@@ -31,7 +34,7 @@ import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingView
 import kotlinx.android.synthetic.main.screen_real_time_training.*
 import timber.log.Timber
 
-class RealTimeTrainingFragment : Screen() {
+class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
 
     companion object {
         const val CHANNEL_ID = "channel"
@@ -135,6 +138,18 @@ class RealTimeTrainingFragment : Screen() {
         displayTimer()
     }
 
+    private fun setServiceRunningState(value: Boolean) {
+        val preferences = requireActivity().getPreferences(Service.MODE_PRIVATE)
+        with(preferences.edit()) {
+            putBoolean(RTT_SERVICE_STARTED, value)
+            apply()
+        }
+    }
+
+    override fun onStateRecieved(value: Boolean) {
+        setServiceRunningState(value)
+    }
+
     private fun stopTrainingDialog() =
         AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.rtt_stop_training_dialog))
@@ -156,6 +171,7 @@ class RealTimeTrainingFragment : Screen() {
                             viewModel.updateTrainingData(data.timeStarted, data.cachedTrainingSets)
                         }
                     }
+                    it.registerServiceListener(this@RealTimeTrainingFragment)
                 }
             }
         }
@@ -164,6 +180,7 @@ class RealTimeTrainingFragment : Screen() {
             Intent(context, RealTimeTrainingService::class.java).also { intent ->
                 requireActivity().bindService(intent, serviceConnection, 0)
             }
+            setServiceRunningState(true)
         }
     }
 

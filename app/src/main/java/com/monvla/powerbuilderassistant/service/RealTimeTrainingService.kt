@@ -16,6 +16,7 @@ class RealTimeTrainingService : Service(), TrainingService {
     companion object {
         const val TRAINING_STATUS = "GET_CURRENT_TIME"
         const val TIME_ARG = "TIME"
+        const val RTT_SERVICE_STARTED = "rtt_service_started"
     }
 
     data class TrainingServiceData(val timeStarted: Long, val cachedTrainingSets: List<ServiceTrainingSet>)
@@ -31,11 +32,10 @@ class RealTimeTrainingService : Service(), TrainingService {
     private var timeStarted = 0L
     private var cachedTrainingSets = listOf<ServiceTrainingSet>()
 
-
+    private var listener: TrainingServiceListener? = null
 
     override fun onCreate() {
         Timber.d("onCreate")
-
         serviceHandler = ServiceHandler(WeakReference(this))
         notification = TrainingNotification(applicationContext)
 
@@ -58,7 +58,8 @@ class RealTimeTrainingService : Service(), TrainingService {
 
     override fun onDestroy() {
         Timber.d("destroy service")
-        super.onDestroy()
+        listener?.onStateRecieved(false)
+        listener = null
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -82,6 +83,10 @@ class RealTimeTrainingService : Service(), TrainingService {
 
     override fun setCachedTrainingSets(trainingSets: List<ServiceTrainingSet>) {
         cachedTrainingSets = trainingSets
+    }
+
+    override fun registerServiceListener(listener: TrainingServiceListener) {
+        this.listener = listener
     }
 
     override fun stop() {
