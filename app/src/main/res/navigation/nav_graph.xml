@@ -2,49 +2,46 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/screenTrainingDairy">
+    app:startDestination="@id/trainingDairyFragment">
 
     <fragment
-        android:id="@+id/screenTrainingDairy"
+        android:id="@+id/trainingDairyFragment"
         android:name="com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragment"
-        android:label="ScreenTrainingList" >
+        android:label="TrainingDairyFragment" >
 
         <action
-            android:id="@+id/action_screenTrainingDairy_to_screenDairyRecordDetails"
-            app:destination="@id/screenDairyRecordDetails"
+            android:id="@+id/action_trainingDairyFragment_to_trainingDetailsFragment"
+            app:destination="@id/trainingDetailsFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_screenTrainingDairy_to_screenRealTimeTraining"
+            android:id="@+id/action_trainingDairyFragment_to_screenRealTimeTraining"
             app:destination="@id/screenRealTimeTraining"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"/>
-        <action
-            android:id="@+id/action_screenTrainingDairy_to_exercisesListFragment"
-            app:destination="@id/exercisesListFragment" />
 
     </fragment>
     <fragment
-        android:id="@+id/screenDairyRecordDetails"
+        android:id="@+id/trainingDetailsFragment"
         android:name="com.monvla.powerbuilderassistant.ui.record.TrainingDetailsFragment"
-        android:label="ScreenDairyRecordDetails" >
+        android:label="TrainingDetailsFragment" >
         <argument
             android:name="trainingId"
             app:argType="long"
             android:defaultValue="-1L" />
         <action
-            android:id="@+id/action_screenDairyRecordDetails_to_dairyRecordSelectExercise"
+            android:id="@+id/action_trainingDetailsFragment_to_dairyRecordSelectExercise"
             app:destination="@id/dairyRecordSelectExercise"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
         <action
-            android:id="@+id/action_screenDairyRecordDetails_to_exerciseSetResultFragment"
+            android:id="@+id/action_trainingDetailsFragment_to_exerciseSetResultFragment"
             app:destination="@id/exerciseSetResultFragment" />
     </fragment>
 
@@ -69,9 +66,6 @@
         <action
             android:id="@+id/action_exercisesListFragment_to_exerciseEditFragment"
             app:destination="@id/exerciseEditFragment" />
-        <action
-            android:id="@+id/action_exercisesListFragment_to_exerciseStatisticsFragment"
-            app:destination="@id/exerciseStatisticsFragment" />
         <argument
             android:name="destination"
             app:argType="integer"
@@ -104,8 +98,9 @@
         android:id="@+id/exerciseStatisticsFragment"
         android:name="com.monvla.powerbuilderassistant.statistics.ui.ExerciseStatisticsFragment"
         android:label="ExerciseStatisticsFragment" >
-        <argument
-            android:name="exerciseId"
-            app:argType="long" />
     </fragment>
+
+    <action android:id="@+id/action_global_exercisesListFragment" app:destination="@id/exercisesListFragment" />
+    <action android:id="@+id/action_global_exerciseStatisticsFragment" app:destination="@id/exerciseStatisticsFragment"/>
+    <action android:id="@+id/action_global_screenTrainingDairy" app:destination="@id/trainingDairyFragment"/>
 </navigation>

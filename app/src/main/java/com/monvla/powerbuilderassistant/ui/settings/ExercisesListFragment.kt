@@ -12,14 +12,14 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
-import com.monvla.powerbuilderassistant.ui.Screen
+import com.monvla.powerbuilderassistant.ui.BottomNavigationFragment
+import com.monvla.powerbuilderassistant.ui.SimpleFragment
 import com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragment.Companion.DESTINATION_EXERCISE_EDIT
-import com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragment.Companion.DESTINATION_EXERCISE_STATISTICS
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import kotlinx.android.synthetic.main.item_exercise_list.view.*
 import kotlinx.android.synthetic.main.screen_exercises_list.*
 
-class ExercisesListFragment : Screen(), ExerciseClickListener {
+class ExercisesListFragment : BottomNavigationFragment(), ExerciseClickListener {
 
     init {
         screenLayout = R.layout.screen_exercises_list
@@ -61,8 +61,10 @@ class ExercisesListFragment : Screen(), ExerciseClickListener {
         class ExercisesListViewHolder(val group: ViewGroup) : RecyclerView.ViewHolder(group)
 
 
-        override fun onCreateViewHolder(parent: ViewGroup,
-                                        viewType: Int): ExercisesListViewHolder {
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): ExercisesListViewHolder {
             val group = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_exercise_list, parent, false) as ViewGroup
             return ExercisesListViewHolder(group)
@@ -88,13 +90,14 @@ class ExercisesListFragment : Screen(), ExerciseClickListener {
     override fun onExerciseClicked(view: View, exerciseId: Long) {
         when (args.destination) {
             DESTINATION_EXERCISE_EDIT -> {
-                val action = ExercisesListFragmentDirections.actionExercisesListFragmentToExerciseEditFragment(exerciseId)
+                val action =
+                        ExercisesListFragmentDirections.actionExercisesListFragmentToExerciseEditFragment(exerciseId)
                 view.findNavController().navigate(action)
             }
-            DESTINATION_EXERCISE_STATISTICS -> {
-                val action = ExercisesListFragmentDirections.actionExercisesListFragmentToExerciseStatisticsFragment(exerciseId)
-                view.findNavController().navigate(action)
-            }
+//            DESTINATION_EXERCISE_STATISTICS -> {
+//                val action = ExercisesListFragmentDirections.actionExercisesListFragmentToExerciseStatisticsFragment(exerciseId)
+//                view.findNavController().navigate(action)
+//            }
         }
     }
 }

@@ -5,6 +5,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
@@ -12,15 +13,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.adapters.DairyRecordAdapter
-import com.monvla.powerbuilderassistant.ui.Screen
+import com.monvla.powerbuilderassistant.ui.BottomNavigationFragment
 import com.monvla.powerbuilderassistant.vo.TrainingRecordEntity
 import kotlinx.android.synthetic.main.screen_training_dairy.*
 import ru.cleverpumpkin.calendar.CalendarDate
 import ru.cleverpumpkin.calendar.CalendarView
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlinx.android.synthetic.main.activity_main.*
 
-class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
+class TrainingDairyFragment : BottomNavigationFragment(), DairyRecordAdapter.ItemClick {
 
     companion object {
         const val DESTINATION_EXERCISE_EDIT = 1
@@ -36,11 +38,6 @@ class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
 
     data class CalendarIndicator(override val color: Int, override val date: CalendarDate) : CalendarView.DateIndicator
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         adapter = DairyRecordAdapter(ArrayList())
         adapter.callback = this
@@ -55,7 +52,7 @@ class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
         training_records_list.layoutManager = LinearLayoutManager(requireContext())
 
         add_record_fab.setOnClickListener {
-            val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToScreenRealTimeTraining()
+            val action = TrainingDairyFragmentDirections.actionTrainingDairyFragmentToScreenRealTimeTraining()
             this.findNavController().navigate(action)
         }
     }
@@ -65,32 +62,8 @@ class TrainingDairyFragment : Screen(), DairyRecordAdapter.ItemClick {
         viewModel.dateSelected(Utils.getDateOnlyTimestamp(Date().time))
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId) {
-            R.id.settings -> {
-                val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToExercisesListFragment(
-                    DESTINATION_EXERCISE_EDIT
-                )
-                this.findNavController().navigate(action)
-                true
-            }
-            R.id.statistics -> {
-                val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToExercisesListFragment(
-                    DESTINATION_EXERCISE_STATISTICS
-                )
-                this.findNavController().navigate(action)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     override fun onItemClicked(exercise: TrainingRecordEntity) {
-        val action = TrainingDairyFragmentDirections.actionScreenTrainingDairyToScreenDairyRecordDetails(exercise.id)
+        val action = TrainingDairyFragmentDirections.actionTrainingDairyFragmentToTrainingDetailsFragment(exercise.id)
         this.findNavController().navigate(action)
     }
 

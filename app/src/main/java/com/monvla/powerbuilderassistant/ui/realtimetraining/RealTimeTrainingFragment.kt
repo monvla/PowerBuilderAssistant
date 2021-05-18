@@ -27,14 +27,15 @@ import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.LocalBin
 import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.ServiceConnection
 import com.monvla.powerbuilderassistant.service.TrainingService
 import com.monvla.powerbuilderassistant.service.TrainingServiceListener
-import com.monvla.powerbuilderassistant.ui.Screen
+import com.monvla.powerbuilderassistant.ui.SimpleFragment
 import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.Companion.FRAGMENT_RESULT_KEY
 import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.FragmentResult
 import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingViewModel.State
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.screen_real_time_training.*
 import timber.log.Timber
 
-class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
+class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
 
     companion object {
         const val CHANNEL_ID = "channel"
@@ -52,6 +53,11 @@ class RealTimeTrainingFragment : Screen(), TrainingServiceListener {
 
     init {
         screenLayout = R.layout.screen_real_time_training
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        navigationRoot.setBottomNavigationVisible(false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -21,13 +21,13 @@ import com.github.tmurakami.aackt.lifecycle.subscribeChanges
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.adapters.TrainingDetailsAdapter
-import com.monvla.powerbuilderassistant.ui.Screen
+import com.monvla.powerbuilderassistant.ui.BottomNavigationFragment
 import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel
 import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.Companion.FRAGMENT_RESULT_KEY
 import com.monvla.powerbuilderassistant.vo.SetExercisesList
 import kotlinx.android.synthetic.main.screen_dairy_record_details.*
 
-class TrainingDetailsFragment : Screen(), TrainingSetClickListener {
+class TrainingDetailsFragment : BottomNavigationFragment(), TrainingSetClickListener {
 
     companion object {
         private const val CREATE_NEW_RECORD = -1L
@@ -72,7 +72,7 @@ class TrainingDetailsFragment : Screen(), TrainingSetClickListener {
             }
         }
         viewModel.addSetTrigger.subscribeChanges(viewLifecycleOwner) {
-            val action = TrainingDetailsFragmentDirections.actionScreenDairyRecordDetailsToExerciseSetResultFragment(
+            val action = TrainingDetailsFragmentDirections.actionTrainingDetailsFragmentToExerciseSetResultFragment(
                 setId = it.setId,
                 setNumber = it.setNumber,
                 setExercises = SetExercisesList()
@@ -119,7 +119,7 @@ class TrainingDetailsFragment : Screen(), TrainingSetClickListener {
     }
 
     override fun onSetClick(setNumber: Int, setId: Long) {
-        val action = TrainingDetailsFragmentDirections.actionScreenDairyRecordDetailsToExerciseSetResultFragment(
+        val action = TrainingDetailsFragmentDirections.actionTrainingDetailsFragmentToExerciseSetResultFragment(
             setId = setId,
             setNumber = setNumber,
             setExercises = SetExercisesList()

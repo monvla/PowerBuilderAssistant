@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.tmurakami.aackt.lifecycle.subscribeChanges
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.adapters.TrainingSetResultAdapter
-import com.monvla.powerbuilderassistant.ui.Screen
+import com.monvla.powerbuilderassistant.ui.SimpleFragment
 import com.monvla.powerbuilderassistant.ui.exerciseset.SetExerciseDialog.Companion.DIALOG_TAG
 import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.Companion.FRAGMENT_RESULT_KEY
 import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.FragmentResult
@@ -25,7 +25,7 @@ import com.monvla.powerbuilderassistant.vo.SetExercise
 import com.monvla.powerbuilderassistant.vo.UNDEFINED_ID
 import kotlinx.android.synthetic.main.screen_set_result.*
 
-class TrainingSetResultFragment : Screen(), SetExerciseDialog.TrainingSetDialogListener {
+class TrainingSetResultFragment : SimpleFragment(), SetExerciseDialog.TrainingSetDialogListener {
 
     private val args: TrainingSetResultFragmentArgs by navArgs()
     private lateinit var viewModelFactory: TrainingSetResultViewModelFactory
@@ -49,6 +49,7 @@ class TrainingSetResultFragment : Screen(), SetExerciseDialog.TrainingSetDialogL
             args.setExercises
         )
         viewModel = ViewModelProvider(this, viewModelFactory).get(TrainingSetResultViewModel::class.java)
+        navigationRoot.setBottomNavigationVisible(false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

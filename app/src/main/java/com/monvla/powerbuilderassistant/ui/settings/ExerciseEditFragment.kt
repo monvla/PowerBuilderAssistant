@@ -12,11 +12,11 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import com.github.tmurakami.aackt.lifecycle.subscribeChanges
 import com.monvla.powerbuilderassistant.R
-import com.monvla.powerbuilderassistant.ui.Screen
+import com.monvla.powerbuilderassistant.ui.SimpleFragment
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import kotlinx.android.synthetic.main.screen_exercise_edit.*
 
-class ExerciseEditFragment : Screen() {
+class ExerciseEditFragment : SimpleFragment() {
 
     init {
         screenLayout = R.layout.screen_exercise_edit
@@ -60,10 +60,10 @@ class ExerciseEditFragment : Screen() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId) {
+        return when (item.itemId) {
             R.id.save -> {
                 if (exerciseNameField.editText?.text.isNullOrBlank()) {
-                    Toast.makeText(context, "Название упражнения пустое", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.exercise_edit_empty_exercise_name), Toast.LENGTH_SHORT).show()
                     return true
                 }
                 if (exercise == null) {
@@ -81,16 +81,18 @@ class ExerciseEditFragment : Screen() {
         }
     }
 
-    fun clearFields() {
+    private fun clearFields() {
         exerciseNameField.editText?.text = null
         defaultWeightField.editText?.setText("0.0")
     }
 
-    fun addExercise() {
-        viewModel.addExercise(ExerciseEntity(
-            name = exerciseNameField.editText?.text.toString(),
-            defaultWeight = getWeight()
-        ))
+    private fun addExercise() {
+        viewModel.addExercise(
+            ExerciseEntity(
+                name = exerciseNameField.editText?.text.toString(),
+                defaultWeight = getWeight()
+            )
+        )
     }
 
     private fun getWeight() = if (defaultWeightField.editText?.text.isNullOrBlank()) {
@@ -99,37 +101,42 @@ class ExerciseEditFragment : Screen() {
         defaultWeightField.editText?.text.toString().toFloat()
     }
 
-    fun changeExercise() {
+    private fun changeExercise() {
         val exerciseEntity = ExerciseEntity(
             args.exerciseId,
             exerciseNameField.editText?.text.toString(),
             getWeight()
         )
         viewModel.updateExercise(exerciseEntity)
-        Toast.makeText(context, "Изменения сохранены: ${exerciseEntity.name}", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            context,
+            getString(R.string.edit_exercise_changes_saved, exerciseEntity.name),
+            Toast.LENGTH_SHORT).show()
     }
 
-    fun deleteExercise() {
+    private fun deleteExercise() {
         exercise?.let {
             viewModel.deleteExercise(it)
-            Toast.makeText(context, "Упражнение ${it.name} удалено", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.exercise_edit_deleted_exercise, it.name), Toast.LENGTH_SHORT).show()
         }
     }
 
-    fun showDeleteDialog() = context?.let { AlertDialog.Builder(it).apply {
-            setTitle("Удаление")
-            setMessage("Удалить упражнение? Оно будет также удалено из истории тренировок.")
-            setPositiveButton(android.R.string.ok) { dialog, id ->
+    private fun showDeleteDialog() = context?.let {
+        AlertDialog.Builder(it).apply {
+            setTitle(getString(R.string.exercise_edit_delete_title))
+            setMessage(getString(R.string.exercise_edit_delete_body))
+            setPositiveButton(android.R.string.ok) { _, _ ->
                 deleteExercise()
             }
             setNegativeButton(android.R.string.cancel, null)
         }.show()
     }
 
-    fun showEditDialog() = context?.let { AlertDialog.Builder(it).apply {
-            setTitle("Изменение")
-            setMessage("Сохранить изменения?")
-            setPositiveButton(android.R.string.ok) { dialog, id ->
+    private fun showEditDialog() = context?.let {
+        AlertDialog.Builder(it).apply {
+            setTitle(getString(R.string.exercise_edit_change_title))
+            setMessage(getString(R.string.exercise_edit_change_body))
+            setPositiveButton(android.R.string.ok) { _, _ ->
                 changeExercise()
             }
             setNegativeButton(android.R.string.cancel, null)

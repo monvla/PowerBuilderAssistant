@@ -12,7 +12,7 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
-import com.monvla.powerbuilderassistant.ui.Screen
+import com.monvla.powerbuilderassistant.ui.SimpleFragment
 import kotlinx.android.synthetic.main.screen_exercise_statistics.*
 import lecho.lib.hellocharts.formatter.SimpleAxisValueFormatter
 import lecho.lib.hellocharts.gesture.ZoomType
@@ -25,7 +25,7 @@ import lecho.lib.hellocharts.model.Viewport
 import java.lang.Math.min
 import java.util.*
 
-class ExerciseStatisticsFragment : Screen() {
+class ExerciseStatisticsFragment : SimpleFragment() {
 
     companion object {
         const val PAGE_LOADING = 0
@@ -39,12 +39,13 @@ class ExerciseStatisticsFragment : Screen() {
 
     data class DateLabel(val position: Int, val label: String)
 
-    private val args: ExerciseStatisticsFragmentArgs by navArgs()
+//    private val args: ExerciseStatisticsFragmentArgs by navArgs()
     private val datesList = ArrayList<AxisValue>()
     private val valuesList = ArrayList<PointValue>()
 
     private val viewModel: ExerciseStatisticsViewModel by viewModels {
-        ExerciseStatisticsViewModelFactory(requireActivity().application, args.exerciseId)
+        //TODO: fix
+        ExerciseStatisticsViewModelFactory(requireActivity().application, -1)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

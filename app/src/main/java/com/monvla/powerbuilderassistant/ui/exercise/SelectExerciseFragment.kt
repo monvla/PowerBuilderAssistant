@@ -7,12 +7,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.adapters.ExercisesAdapter
-import com.monvla.powerbuilderassistant.ui.Screen
+import com.monvla.powerbuilderassistant.ui.SimpleFragment
 import com.monvla.powerbuilderassistant.ui.record.TrainingDetailsViewModel
 import kotlinx.android.synthetic.main.screen_dairy_select_exercise.*
 
 
-class SelectExerciseFragment : Screen(), ExercisesAdapter.ItemClick {
+class SelectExerciseFragment : SimpleFragment(), ExercisesAdapter.ItemClick {
 
     private val viewModel: TrainingDetailsViewModel by activityViewModels()
 
