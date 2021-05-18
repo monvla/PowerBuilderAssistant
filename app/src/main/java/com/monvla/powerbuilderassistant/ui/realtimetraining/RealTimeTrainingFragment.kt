@@ -55,11 +55,6 @@ class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
         screenLayout = R.layout.screen_real_time_training
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        navigationRoot.setBottomNavigationVisible(false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -145,11 +140,13 @@ class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
     }
 
     private fun setServiceRunningState(value: Boolean) {
+        Timber.d("set service running state: $value")
         val preferences = requireActivity().getPreferences(Service.MODE_PRIVATE)
         with(preferences.edit()) {
             putBoolean(RTT_SERVICE_STARTED, value)
             apply()
         }
+        Timber.d("set result: ${requireActivity().getPreferences(Context.MODE_PRIVATE).getBoolean(RTT_SERVICE_STARTED, false)}")
     }
 
     override fun onStateRecieved(value: Boolean) {
@@ -186,7 +183,6 @@ class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
             Intent(context, RealTimeTrainingService::class.java).also { intent ->
                 requireActivity().bindService(intent, serviceConnection, 0)
             }
-            setServiceRunningState(true)
         }
     }
 
@@ -194,6 +190,7 @@ class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
         Intent(context, RealTimeTrainingService::class.java).also {
             ContextCompat.startForegroundService(requireContext(), it)
         }
+        setServiceRunningState(true)
     }
 
     private fun updateTimer(currentTime: Long) {

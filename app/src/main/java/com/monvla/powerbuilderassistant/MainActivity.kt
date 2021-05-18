@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity(), NavigationRoot {
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         select_exercise_toolbar.setupWithNavController(navController, appBarConfiguration)
         val serviceStarted = getPreferences(Context.MODE_PRIVATE).getBoolean(RTT_SERVICE_STARTED, false)
+        Timber.d("serviceStarted: $serviceStarted")
         if (serviceStarted) {
             val action = TrainingDairyFragmentDirections.actionTrainingDairyFragmentToScreenRealTimeTraining()
             navController.navigate(action)

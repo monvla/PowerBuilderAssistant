@@ -58,8 +58,6 @@ class RealTimeTrainingService : Service(), TrainingService {
 
     override fun onDestroy() {
         Timber.d("destroy service")
-        listener?.onStateRecieved(false)
-        listener = null
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -93,6 +91,8 @@ class RealTimeTrainingService : Service(), TrainingService {
         isFinished = true
         stopSelf()
         notification.cancel()
+        listener?.onStateRecieved(false)
+        listener = null
     }
 
     private fun sendDataToActivity() {
