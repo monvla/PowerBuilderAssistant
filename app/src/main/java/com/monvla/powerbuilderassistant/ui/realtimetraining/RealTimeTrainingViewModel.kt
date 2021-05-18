@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
 import com.monvla.powerbuilderassistant.vo.*
+import java.util.*
 import kotlinx.coroutines.launch
 
 class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(application) {
@@ -38,6 +39,7 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
 
     private var isTrainingFinished = false
     private var trainingSets = mutableListOf<ServiceTrainingSet>()
+    private var addedExercisesUUID = mutableListOf<UUID>()
 
     fun timerTick(time: Long) {
         totalTime = time
@@ -54,6 +56,11 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
     }
 
     fun addSet(setExercisesList: SetExercisesList) {
+        if (isAlreadyAdded(setExercisesList)) return
+
+        setExercisesList.forEach {
+            addedExercisesUUID.add(it.uuid)
+        }
         trainingSets.add(ServiceTrainingSet(totalTime, setExercisesList as MutableList<SetExercise>))
         if (isTrainingFinished) {
             _state.value = State.Finished(trainingSets.size, totalTime)
@@ -79,6 +86,15 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
     }
 
     private fun getCurrentSetNumber() = trainingSets.size + 1
+
+    private fun isAlreadyAdded(setExercisesList: SetExercisesList): Boolean {
+        setExercisesList.forEach {
+            if (addedExercisesUUID.contains(it.uuid)) {
+                return true
+            }
+        }
+        return false
+    }
 
     private suspend fun writeTrainingToDb() {
         val trainingRecordId = repository.insertTrainingRecord(

@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/trainingDaity"
+        android:icon="@drawable/ic_training_dairy_24"
+        android:title="@string/menu_trainings"/>
     <item android:id="@+id/settings"
     android:icon="@drawable/ic_baseline_settings_24"
-    android:title="@string/settings"
-    app:showAsAction="ifRoom"/>
-
+    android:title="@string/menu_settings"/>
     <item android:id="@+id/statistics"
         android:icon="@drawable/ic_chart_24"
-        android:title="@string/statistics"
-        app:showAsAction="ifRoom"/>
-
+        android:title="@string/menu_statistics"/>
 </menu>
