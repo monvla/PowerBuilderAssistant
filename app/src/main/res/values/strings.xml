@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Power Builder Assistant</string>
 
-    <string name="screen_training_dairy_name">Дневник тренировок</string>
+    <string name="training_dairy_fragment_label">Дневник тренировок</string>
 
     <string name="add_record">Добавить запись</string>
     <string name="menu_settings">Настройки</string>
@@ -45,6 +45,10 @@
     <string name="exercise_edit_delete_body">Удалить упражнение? Оно будет также удалено из истории тренировок.</string>
     <string name="exercise_edit_change_title">Изменение</string>
     <string name="exercise_edit_change_body">Сохранить изменения?</string>
+    <string name="training_details_fragment_label">Детали тренировки</string>
+    <string name="exercises_list_fragment_label">Список упражнений</string>
+    <string name="screen_real_time_training_label">Новая тренировка</string>
+    <string name="exercise_edit_fragment_label">Редактирование упражнения</string>
     <string-array name="exercises_array">
         <item>Приседания</item>
         <item>Сгибания/разгибания ног в тренажере</item>

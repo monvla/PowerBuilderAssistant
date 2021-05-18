@@ -42,7 +42,7 @@ class TrainingDairyFragment : BottomNavigationFragment(), DairyRecordAdapter.Ite
         adapter = DairyRecordAdapter(ArrayList())
         adapter.callback = this
         training_records_list.adapter = adapter
-        setTitle(R.string.screen_training_dairy_name)
+        setTitle(R.string.training_dairy_fragment_label)
         viewModel.allTrainings.observe(viewLifecycleOwner) {
             setupCalendar(it)
         }

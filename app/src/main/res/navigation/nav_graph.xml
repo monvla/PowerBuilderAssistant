@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/trainingDairyFragment"
         android:name="com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragment"
-        android:label="TrainingDairyFragment" >
+        android:label="@string/training_dairy_fragment_label" >
 
         <action
             android:id="@+id/action_trainingDairyFragment_to_trainingDetailsFragment"
@@ -28,18 +28,11 @@
     <fragment
         android:id="@+id/trainingDetailsFragment"
         android:name="com.monvla.powerbuilderassistant.ui.record.TrainingDetailsFragment"
-        android:label="TrainingDetailsFragment" >
+        android:label="@string/training_details_fragment_label">
         <argument
             android:name="trainingId"
             app:argType="long"
             android:defaultValue="-1L" />
-        <action
-            android:id="@+id/action_trainingDetailsFragment_to_dairyRecordSelectExercise"
-            app:destination="@id/dairyRecordSelectExercise"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/action_trainingDetailsFragment_to_exerciseSetResultFragment"
             app:destination="@id/exerciseSetResultFragment" />
@@ -48,21 +41,16 @@
     <fragment
         android:id="@+id/screenRealTimeTraining"
         android:name="com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingFragment"
-        android:label="ScreenRealTimeTrainingFragment" >
+        android:label="@string/screen_real_time_training_label" >
         <action
             android:id="@+id/action_screenRealTimeTraining_to_exerciseSetResultFragment"
             app:destination="@id/exerciseSetResultFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/dairyRecordSelectExercise"
-        android:name="com.monvla.powerbuilderassistant.ui.exercise.SelectExerciseFragment"
-        android:label="DairyRecordSelectExercise" >
-    </fragment>
-    <fragment
         android:id="@+id/exercisesListFragment"
         android:name="com.monvla.powerbuilderassistant.ui.settings.ExercisesListFragment"
-        android:label="ExercisesListFragment" >
+        android:label="@string/exercises_list_fragment_label" >
         <action
             android:id="@+id/action_exercisesListFragment_to_exerciseEditFragment"
             app:destination="@id/exerciseEditFragment" />
@@ -74,7 +62,7 @@
     <fragment
         android:id="@+id/exerciseEditFragment"
         android:name="com.monvla.powerbuilderassistant.ui.settings.ExerciseEditFragment"
-        android:label="ExerciseEditFragment" >
+        android:label="@string/exercise_edit_fragment_label" >
         <argument
             android:name="exerciseId"
             app:argType="long"
