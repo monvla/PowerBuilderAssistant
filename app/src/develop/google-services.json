@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "777404105483",
+    "project_id": "powerbuilderassistant-sandbox",
+    "storage_bucket": "powerbuilderassistant-sandbox.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:777404105483:android:63cc43448cea06bb01980e",
+        "android_client_info": {
+          "package_name": "com.monvla.powerbuilderassistant.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "777404105483-ac05cu0o0e5jfvo2qes87sba1r710m9u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH4TlcODzMSAO6IkwLWYkJwPzafPH8fYg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "777404105483-ac05cu0o0e5jfvo2qes87sba1r710m9u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

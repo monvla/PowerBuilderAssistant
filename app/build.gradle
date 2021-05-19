@@ -15,6 +15,10 @@ apply plugin: 'com.google.gms.google-services'
 def applicationName = "PowerBuilderAssistant"
 
 android {
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
     compileSdkVersion 30
     buildToolsVersion "29.0.3"
     defaultConfig {
@@ -34,6 +38,19 @@ android {
             variant.outputs.all {
                 outputFileName = "${applicationName}_${variant.buildType.name}_${versionName}.apk"
             }
+        }
+    }
+    flavorDimensions("tier")
+    productFlavors {
+        create("production") {
+            dimension = "tier"
+        }
+
+        create("develop") {
+            dimension = "tier"
+            applicationIdSuffix = ".dev"
+
+            isDefault = true
         }
     }
     kotlinOptions {

@@ -11,6 +11,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.monvla.powerbuilderassistant.BuildConfig
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.ui.BottomNavigationFragment
 import com.monvla.powerbuilderassistant.ui.SimpleFragment
@@ -40,7 +41,7 @@ class ExercisesListFragment : BottomNavigationFragment(), ExerciseClickListener 
                 isVisible = true
             }
         }
-
+        version.text = "${BuildConfig.VERSION_NAME} ${BuildConfig.FLAVOR}"
         exercisesAdapter = ExercisesListAdapter(listOf(), this)
         recycler_exercises_list.apply {
             setHasFixedSize(true)
