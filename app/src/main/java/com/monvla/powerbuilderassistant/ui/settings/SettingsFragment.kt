@@ -1,7 +1,6 @@
 package com.monvla.powerbuilderassistant.ui.settings
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
@@ -14,7 +13,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     companion object {
         const val ABOUT_KEY = "about"
         const val EDIT_EXERCISES_KEY = "edit_exercises"
-
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
