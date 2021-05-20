@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity(), NavigationRoot {
         }
         bottom_navigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.settings -> navController.navigate(R.id.action_global_exercisesListFragment)
+                R.id.settings -> navController.navigate(R.id.action_global_settingsFragment)
                 R.id.statistics -> navController.navigate(R.id.action_global_exerciseStatisticsFragment)
                 R.id.training_dairy -> navController.navigate(R.id.action_global_screenTrainingDairy)
             }

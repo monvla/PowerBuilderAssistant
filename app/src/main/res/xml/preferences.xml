@@ -1,0 +1,14 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        app:key="about"
+        app:title="@string/settings_about_title"
+        app:summary="@string/settings_about_summary"/>
+
+    <Preference
+        app:key="edit_exercises"
+        app:title="@string/settings_exercises_list_title"
+        app:summary="@string/settings_exercises_list_summary"/>
+
+</PreferenceScreen>

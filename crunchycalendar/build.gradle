@@ -1,0 +1,96 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+//
+
+// Bintray publication data for uploading scripts that is placed in `bintray` directory
+ext {
+
+    // App info section
+    app = [
+            version_code       : 4,
+            version_name       : '2.2.0',
+            min_sdk_version    : 16,
+            target_sdk_version : 29,
+            compile_sdk_version: 29
+    ]
+
+    // 3-rd party libraries versions
+    libs = [
+            kotlin_version                  : '1.4.32',
+            appCompatX                      : '1.2.0',
+            recyclerViewX                   : '1.2.0',
+            viewBindingPropertyDelegate     : '1.4.5',
+
+            // libs for testing
+            junit_version      : '4.13.2',
+            mockito_version    : '1.10.19',
+            powermock_version  : '1.6.4'
+    ]
+    // Library package information.
+    groupId = 'ru.cleverpumpkin'            // The group ID you want to add in `implementation` line
+
+    artifactId = 'crunchycalendar'          // The artifact you want to add in `implementation` line
+                                            // it is also your module name in Android Studio project
+    libraryVersion = app.version_name
+
+    // Library name and description.
+    libraryName = 'CrunchyCalendar'
+    libraryDescription = 'Light, powerful and easy to use Calendar Widget with a number of features out of the box'
+
+    // Git information.
+    siteUrl = 'https://github.com/CleverPumpkin/CrunchyCalendar'
+    gitUrl = 'https://github.com/CleverPumpkin/CrunchyCalendar.git'
+
+    // Developer information provided in 'mavenCentral.gradle
+
+    // License information.
+    licenseName = 'MIT'
+    licenseUrl = 'https://opensource.org/licenses/MIT'
+    allLicenses = ["MIT"]
+}
+
+android {
+    compileSdkVersion app.compile_sdk_version
+
+    defaultConfig {
+        minSdkVersion app.min_sdk_version
+        targetSdkVersion app.target_sdk_version
+        versionCode app.version_code
+        versionName app.version_name
+
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+android {
+    // Use resource prefix to avoid collisions with resources from other modules.
+    resourcePrefix 'calendar_'
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Kotlin language standard lib
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$libs.kotlin_version"
+
+    // AndroidX.
+    implementation "androidx.recyclerview:recyclerview:$libs.recyclerViewX"
+
+    // Testing libs.
+    testImplementation "junit:junit:$libs.junit_version"
+    testImplementation "org.mockito:mockito-all:$libs.mockito_version"
+    testImplementation "org.powermock:powermock-api-mockito:$libs.powermock_version"
+    testImplementation "org.powermock:powermock-module-junit4:$libs.powermock_version"
+}
+
+tasks.withType(Javadoc).all {
+    enabled = false
+}

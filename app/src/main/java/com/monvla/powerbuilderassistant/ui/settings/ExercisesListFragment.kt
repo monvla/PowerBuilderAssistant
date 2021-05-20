@@ -41,7 +41,6 @@ class ExercisesListFragment : BottomNavigationFragment(), ExerciseClickListener 
                 isVisible = true
             }
         }
-        version.text = "${BuildConfig.VERSION_NAME} ${BuildConfig.FLAVOR}"
         exercisesAdapter = ExercisesListAdapter(listOf(), this)
         recycler_exercises_list.apply {
             setHasFixedSize(true)

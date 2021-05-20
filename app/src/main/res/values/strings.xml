@@ -49,6 +49,11 @@
     <string name="exercises_list_fragment_label">Список упражнений</string>
     <string name="screen_real_time_training_label">Новая тренировка</string>
     <string name="exercise_edit_fragment_label">Редактирование упражнения</string>
+    <string name="settings_about_title">О приложении</string>
+    <string name="settings_about_summary">Информация о приложении</string>
+    <string name="settings_exercises_list_title">Список упражнений</string>
+    <string name="settings_exercises_list_summary">Редактирование списка упражнений</string>
+    <string name="settings_fragment_label">Настройки</string>
     <string-array name="exercises_array">
         <item>Приседания</item>
         <item>Сгибания/разгибания ног в тренажере</item>

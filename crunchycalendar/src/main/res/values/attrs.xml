@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Default CalendarView style -->
+    <declare-styleable name="CalendarViewTheme">
+        <attr name="calendarViewStyle" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="CalendarView">
+        <attr name="calendar_grid_on_selected_dates" format="boolean" />
+        <attr name="calendar_grid_color" format="color" />
+        <attr name="calendar_day_bar_background" format="color" />
+        <attr name="calendar_day_bar_text_color" format="color" />
+        <attr name="calendar_day_bar_weekend_text_color" format="color" />
+        <attr name="calendar_year_selection_background" format="color" />
+        <attr name="calendar_year_selection_arrows_color" format="color" />
+        <attr name="calendar_year_selection_text_color" format="color" />
+        <attr name="calendar_month_text_color" format="color" />
+        <attr name="calendar_month_text_size" format="dimension" />
+        <attr name="calendar_month_text_style">
+            <enum name="normal" value="0" />
+            <enum name="bold" value="1" />
+        </attr>
+        <attr name="calendar_date_background" format="reference" />
+        <attr name="calendar_date_background_tint" format="reference"/>
+        <attr name="calendar_date_text_color" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="CalendarDateStates">
+        <attr name="calendar_state_today" format="boolean" />
+
+        <attr name="calendar_state_selected" format="boolean" />
+        <attr name="calendar_state_selected_single" format="boolean" />
+        <attr name="calendar_state_selected_start" format="boolean" />
+        <attr name="calendar_state_selected_end" format="boolean" />
+
+        <attr name="calendar_state_disabled" format="boolean" />
+        <attr name="calendar_state_weekend" format="boolean" />
+    </declare-styleable>
+
+</resources>
