@@ -88,7 +88,9 @@ class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
         }
         viewModel.state.observe(viewLifecycleOwner) {
             when(it) {
-                is State.Ready -> real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_READY
+                is State.Ready -> {
+                    real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_READY
+                }
                 is State.Update -> {
                     updateTimer(it.time)
                     current_set_text.text = getString(R.string.rtt_current_set, it.sets)

@@ -14,10 +14,6 @@ open class Screen : Fragment() {
     var screenLayout: Int = 0
     lateinit var navigationRoot: NavigationRoot
 
-    fun setTitle(stringId: Int) {
-        (requireContext() as MainActivity).supportActionBar?.title = getString(stringId)
-    }
-
     fun setTitle(string: String) {
         (requireContext() as MainActivity).supportActionBar?.title = string
     }

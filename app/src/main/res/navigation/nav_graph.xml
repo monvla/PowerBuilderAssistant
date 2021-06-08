@@ -104,5 +104,8 @@
     <action
         android:id="@+id/action_global_settingsFragment"
         app:destination="@id/settingsFragment" />
+    <action
+        android:id="@+id/action_global_screenRealTimeTraining"
+        app:destination="@id/screenRealTimeTraining" />
 
 </navigation>

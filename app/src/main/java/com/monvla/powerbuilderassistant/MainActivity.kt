@@ -2,14 +2,12 @@ package com.monvla.powerbuilderassistant
 
 import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import com.monvla.powerbuilderassistant.service.RealTimeTrainingService
 import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.Companion.RTT_SERVICE_STARTED
 import com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragmentDirections
 import kotlinx.android.synthetic.main.activity_main.*
@@ -22,20 +20,20 @@ class MainActivity : AppCompatActivity(), NavigationRoot {
         const val SERVICE = "RealTimeTrainingFragmentService"
     }
 
+    private lateinit var navController: NavController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        Timber.plant(Timber.DebugTree())
-
         setContentView(R.layout.activity_main)
         setSupportActionBar(select_exercise_toolbar)
-        val navController = findNavController(R.id.nav_host_fragment)
+        Timber.plant(Timber.DebugTree())
+
+        navController = findNavController(R.id.nav_host_fragment)
+
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         select_exercise_toolbar.setupWithNavController(navController, appBarConfiguration)
-        val serviceStarted = getPreferences(Context.MODE_PRIVATE).getBoolean(RTT_SERVICE_STARTED, false)
-        Timber.d("serviceStarted: $serviceStarted")
-        if (serviceStarted) {
-            val action = TrainingDairyFragmentDirections.actionTrainingDairyFragmentToScreenRealTimeTraining()
+        if (isServiceStarted()) {
+            val action = TrainingDairyFragmentDirections.actionGlobalScreenRealTimeTraining()
             navController.navigate(action)
         }
         bottom_navigation.setOnNavigationItemSelectedListener {
@@ -51,4 +49,6 @@ class MainActivity : AppCompatActivity(), NavigationRoot {
     override fun setBottomNavigationVisible(isVisible: Boolean) {
         bottom_navigation.isVisible = isVisible
     }
+
+    private fun isServiceStarted() = getPreferences(Context.MODE_PRIVATE).getBoolean(RTT_SERVICE_STARTED, false)
 }
