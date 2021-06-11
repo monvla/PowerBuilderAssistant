@@ -22,7 +22,7 @@ class TrainingSetResultViewModel(
     }
 
     @Parcelize
-    data class FragmentResult(val setId: Long, val setExercisesList: SetExercisesList) : Parcelable
+    data class FragmentResult(val setId: Long, val setNumber: Int, val setExercisesList: SetExercisesList) : Parcelable
 
     data class DialogData(val exercisesList: List<ExerciseEntity>, val setExercise: SetExercise?)
 

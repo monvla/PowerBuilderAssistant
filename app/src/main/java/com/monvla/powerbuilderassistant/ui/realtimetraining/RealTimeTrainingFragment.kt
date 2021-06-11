@@ -172,8 +172,11 @@ class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
                 val binder = service as LocalBinder
                 trainingService = binder.getService().also {
                     it.getCachedData().also { data ->
-                        if (data.cachedTrainingSets.isNotEmpty()) {
-                            viewModel.updateTrainingData(data.timeStarted, data.cachedTrainingSets)
+                        if (!data.cachedTrainingSets.isNullOrEmpty()) {
+                            viewModel.updateTrainingSets(data.cachedTrainingSets)
+                        }
+                        if (data.timeStarted != 0L) {
+                            viewModel.updateTrainingStartTimestamp(data.timeStarted)
                         }
                     }
                     it.registerServiceListener(this@RealTimeTrainingFragment)

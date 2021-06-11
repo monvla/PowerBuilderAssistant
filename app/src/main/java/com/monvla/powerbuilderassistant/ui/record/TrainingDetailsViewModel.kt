@@ -20,15 +20,13 @@ class TrainingDetailsViewModel(application: Application, val trainingId: Long) :
         repository = TrainingRepository(exerciseDao)
     }
 
-    data class AddSetTrigger(val setId: Long, val setNumber: Int)
+    data class AddSetTrigger(val setNumber: Int)
 
     private val _recordDeletedTrigger = MutableLiveData(Unit)
     val recordDeletedTrigger = _recordDeletedTrigger as LiveData<Unit>
 
     private val _dataUpdatedTrigger = MutableLiveData(Unit)
     val dataUpdatedTrigger = _dataUpdatedTrigger as LiveData<Unit>
-
-    val exercises = repository.getAllExercises()
 
     private suspend fun getTrainingInfo(trainingId: Long) : TrainingInfo {
         val trainingEntity = repository.getTrainingById(trainingId)
@@ -48,12 +46,6 @@ class TrainingDetailsViewModel(application: Application, val trainingId: Long) :
     }
 
     val _trainingInfo = liveData { emit(getTrainingInfo(trainingId)) } as MutableLiveData<TrainingInfo>
-//            liveData {
-//        val trainingEntity = repository.getTrainingById(trainingId)
-//        trainingEntity?.let{
-//            emit(getTrainingInfo(trainingId))
-//        }
-//    } as MutableLiveData
     val trainingInfo = _trainingInfo as LiveData<TrainingInfo>
 
     private val _addSetTrigger = MutableLiveData<AddSetTrigger>()
@@ -61,8 +53,7 @@ class TrainingDetailsViewModel(application: Application, val trainingId: Long) :
 
     fun addSetRequested(trainingId: Long, setNumber: Int) {
         viewModelScope.launch {
-            val newSetId = repository.insertSet(SetEntity(trainingRecordId = trainingId, number = setNumber))
-            _addSetTrigger.value = AddSetTrigger(newSetId, setNumber)
+            _addSetTrigger.value = AddSetTrigger(setNumber)
             _dataUpdatedTrigger.value = Unit
         }
     }
@@ -85,19 +76,12 @@ class TrainingDetailsViewModel(application: Application, val trainingId: Long) :
         }
     }
 
-    fun setUpdated(setId: Long, setExercisesList: SetExercisesList) {
+    fun setUpdated(setId: Long, setExercisesList: SetExercisesList, setNumber: Int) {
         viewModelScope.launch {
-            repository.getSetExercisesBySetId(setId).forEach {
-                repository.deleteSetExercise(it)
-            }
-            setExercisesList.forEach {
-                val setExerciseEntity = if (it.dbId != UNDEFINED_ID) {
-                    SetExerciseEntity(it.dbId, it.setId, it.exerciseId, it.weight, it.repeats)
-                } else {
-                    val exercise = repository.getExerciseByName(it.exerciseName)
-                    SetExerciseEntity(setId = it.setId, exerciseId = exercise.id, weight = it.weight, repeats = it.repeats)
-                }
-                repository.insertSetExercise(setExerciseEntity)
+            if (setId == -1L) {
+                addSet(setExercisesList, setNumber)
+            } else {
+                updateSetExercise(setId, setExercisesList)
             }
             _trainingInfo.value = getTrainingInfo(trainingId)
         }
@@ -118,6 +102,30 @@ class TrainingDetailsViewModel(application: Application, val trainingId: Long) :
         }
     }
 
+    private suspend fun updateSetExercise(setId: Long, setExercisesList: SetExercisesList) {
+        repository.getSetExercisesBySetId(setId).forEach {
+            repository.deleteSetExercise(it)
+        }
+        insertSetExercises(setId, setExercisesList)
+    }
+
+    private suspend fun insertSetExercises(setId: Long, setExercisesList: SetExercisesList) {
+        setExercisesList.forEach {
+            val setExerciseEntity = if (it.dbId != UNDEFINED_ID) {
+                SetExerciseEntity(it.dbId, setId, it.exerciseId, it.weight, it.repeats)
+            } else {
+                val exercise = repository.getExerciseByName(it.exerciseName)
+                SetExerciseEntity(setId = setId, exerciseId = exercise.id, weight = it.weight, repeats = it.repeats)
+            }
+            repository.insertSetExercise(setExerciseEntity)
+        }
+    }
+
+    private suspend fun addSet(setExercisesList: SetExercisesList, setNumber: Int) {
+        val newSetId = repository.insertSet(SetEntity(trainingRecordId = trainingId, number = setNumber))
+        insertSetExercises(newSetId, setExercisesList)
+    }
+
     data class TrainingInfo(
         val date: Long,
         val length: Long,
@@ -134,9 +142,4 @@ class TrainingDetailsViewModel(application: Application, val trainingId: Long) :
             return totalWeight
         }
     }
-
-
-
-
 }
-

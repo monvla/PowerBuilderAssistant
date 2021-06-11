@@ -73,7 +73,7 @@ class TrainingDetailsFragment : BottomNavigationFragment(), TrainingSetClickList
         }
         viewModel.addSetTrigger.subscribeChanges(viewLifecycleOwner) {
             val action = TrainingDetailsFragmentDirections.actionTrainingDetailsFragmentToExerciseSetResultFragment(
-                setId = it.setId,
+                setId = -1,
                 setNumber = it.setNumber,
                 setExercises = SetExercisesList()
             )
@@ -90,7 +90,10 @@ class TrainingDetailsFragment : BottomNavigationFragment(), TrainingSetClickList
             it.getLiveData<TrainingSetResultViewModel.FragmentResult>(FRAGMENT_RESULT_KEY).observe(
                 viewLifecycleOwner
             ) { result ->
-                viewModel.setUpdated(result.setId, result.setExercisesList)
+                if (result != null) {
+                    viewModel.setUpdated(result.setId, result.setExercisesList, result.setNumber)
+                    findNavController().currentBackStackEntry?.savedStateHandle?.set(FRAGMENT_RESULT_KEY, null)
+                }
             }
         }
     }

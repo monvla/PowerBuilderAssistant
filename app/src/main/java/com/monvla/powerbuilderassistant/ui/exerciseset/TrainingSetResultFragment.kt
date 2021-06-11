@@ -87,7 +87,7 @@ class TrainingSetResultFragment : SimpleFragment(), SetExerciseDialog.TrainingSe
         when (item.itemId) {
             R.id.apply -> {
                 findNavController().previousBackStackEntry?.savedStateHandle?.set(
-                    FRAGMENT_RESULT_KEY, FragmentResult(args.setId, viewModel.getSetExercises())
+                    FRAGMENT_RESULT_KEY, FragmentResult(args.setId, args.setNumber, viewModel.getSetExercises() )
                 )
                 requireActivity().onBackPressed()
             }

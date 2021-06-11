@@ -10,6 +10,7 @@ import com.monvla.powerbuilderassistant.repository.TrainingRepository
 import com.monvla.powerbuilderassistant.vo.*
 import java.util.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -71,8 +72,11 @@ class RealTimeTrainingViewModel(application: Application) : AndroidViewModel(app
         }
     }
 
-    fun updateTrainingData(startTimestamp: Long, trainingSets: List<ServiceTrainingSet>) {
+    fun updateTrainingStartTimestamp(startTimestamp: Long) {
         this.startTimestamp = startTimestamp
+    }
+
+    fun updateTrainingSets(trainingSets: List<ServiceTrainingSet>) {
         this.trainingSets = trainingSets as MutableList<ServiceTrainingSet>
     }
 

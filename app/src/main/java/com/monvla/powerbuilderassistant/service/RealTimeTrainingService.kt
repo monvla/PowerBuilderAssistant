@@ -19,7 +19,7 @@ class RealTimeTrainingService : Service(), TrainingService {
         const val RTT_SERVICE_STARTED = "rtt_service_started"
     }
 
-    data class TrainingServiceData(val timeStarted: Long, val cachedTrainingSets: List<ServiceTrainingSet>)
+    data class TrainingServiceData(val timeStarted: Long, val cachedTrainingSets: List<ServiceTrainingSet>?)
 
     private val binder = LocalBinder()
 
@@ -30,7 +30,7 @@ class RealTimeTrainingService : Service(), TrainingService {
 
     private var timePassed = 0L
     private var timeStarted = 0L
-    private var cachedTrainingSets = listOf<ServiceTrainingSet>()
+    private var cachedTrainingSets: List<ServiceTrainingSet>? = null
 
     private var listener: TrainingServiceListener? = null
 
