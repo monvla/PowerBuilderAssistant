@@ -10,36 +10,29 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.tmurakami.aackt.lifecycle.subscribeChanges
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.adapters.TrainingDetailsAdapter
 import com.monvla.powerbuilderassistant.ui.BottomNavigationFragment
-import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel
-import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.Companion.FRAGMENT_RESULT_KEY
+import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultFragment
 import com.monvla.powerbuilderassistant.vo.SetExercisesList
 import kotlinx.android.synthetic.main.screen_dairy_record_details.*
 
 class TrainingDetailsFragment : BottomNavigationFragment(), TrainingSetClickListener {
 
     companion object {
+        const val KEY_TRAINING_ID = "trainingId"
         private const val CREATE_NEW_RECORD = -1L
     }
 
     private lateinit var trainingDetailsAdapter: TrainingDetailsAdapter
 
-    private val viewModel: TrainingDetailsViewModel by viewModels {
-        TrainingDetailsViewModelFactory(requireActivity().application, args.trainingId)
-    }
-
-    private val args: TrainingDetailsFragmentArgs by navArgs()
+    private lateinit var viewModel: TrainingDetailsViewModel
 
     init {
         screenLayout = R.layout.screen_dairy_record_details
@@ -48,6 +41,9 @@ class TrainingDetailsFragment : BottomNavigationFragment(), TrainingSetClickList
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        val trainingId = checkNotNull(arguments?.getLong(TrainingSetResultFragment.KEY_TRAINING_ID))
+        viewModel = TrainingDetailsViewModelFactory(requireActivity().application, trainingId)
+                .create(TrainingDetailsViewModel::class.java)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,16 +64,16 @@ class TrainingDetailsFragment : BottomNavigationFragment(), TrainingSetClickList
                 if (trainingInfo.getTotalWeight() > 0) trainingInfo.getTotalWeight() else getString(R.string.set_empty_weight)
             )
             addRecordFab.setOnClickListener {
-                viewModel.addSetRequested(args.trainingId, trainingInfo.trainingSets.size + 1)
+                viewModel.addSetRequested(trainingInfo.trainingId, trainingInfo.trainingSets.size + 1)
             }
         }
-        viewModel.addSetTrigger.subscribeChanges(viewLifecycleOwner) {
-            val action = TrainingDetailsFragmentDirections.actionTrainingDetailsFragmentToExerciseSetResultFragment(
-                setId = -1,
-                setNumber = it.setNumber,
-                setExercises = SetExercisesList()
-            )
-            this.findNavController().navigate(action)
+        viewModel.addSetTrigger.subscribeChanges(viewLifecycleOwner) { trigger ->
+            val args = Bundle().also {
+                it.putLong(TrainingSetResultFragment.KEY_SET_ID, -1)
+                it.putInt(TrainingSetResultFragment.KEY_SET_NUMBER, trigger.setNumber)
+                it.putParcelable(TrainingSetResultFragment.KEY_SET_EXERCISES, SetExercisesList())
+            }
+            navigationRoot.navigate(this.javaClass, TrainingSetResultFragment::class.java, args)
         }
         viewModel.dataUpdatedTrigger.subscribeChanges(viewLifecycleOwner) {
             trainingDetailsAdapter.notifyDataSetChanged()
@@ -86,15 +82,13 @@ class TrainingDetailsFragment : BottomNavigationFragment(), TrainingSetClickList
             Toast.makeText(context, getString(R.string.training_deleted), Toast.LENGTH_SHORT).show()
             requireActivity().onBackPressed()
         }
-        findNavController().currentBackStackEntry?.savedStateHandle?.let {
-            it.getLiveData<TrainingSetResultViewModel.FragmentResult>(FRAGMENT_RESULT_KEY).observe(
-                viewLifecycleOwner
-            ) { result ->
-                if (result != null) {
-                    viewModel.setUpdated(result.setId, result.setExercisesList, result.setNumber)
-                    findNavController().currentBackStackEntry?.savedStateHandle?.set(FRAGMENT_RESULT_KEY, null)
-                }
-            }
+        setFragmentResultListener(TrainingSetResultFragment.KEY_TRAINING_SET_RESULT) { _, bundle ->
+            val setId = checkNotNull(bundle.getLong(TrainingSetResultFragment.KEY_SET_ID))
+            val setNumber = checkNotNull(bundle.getInt(TrainingSetResultFragment.KEY_SET_NUMBER))
+            val setExercisesList = checkNotNull(
+                bundle.getParcelable<SetExercisesList>(TrainingSetResultFragment.KEY_SET_EXERCISES)
+            )
+            viewModel.setUpdated(setId, setExercisesList, setNumber)
         }
     }
 
@@ -105,8 +99,9 @@ class TrainingDetailsFragment : BottomNavigationFragment(), TrainingSetClickList
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.edit_content_menu, menu)
-        menu.findItem(R.id.save).isVisible = args.trainingId == CREATE_NEW_RECORD
-        menu.findItem(R.id.delete).isVisible = args.trainingId != CREATE_NEW_RECORD
+        val trainingId = checkNotNull(arguments?.getLong(TrainingSetResultFragment.KEY_TRAINING_ID))
+        menu.findItem(R.id.save).isVisible = trainingId == CREATE_NEW_RECORD
+        menu.findItem(R.id.delete).isVisible = trainingId != CREATE_NEW_RECORD
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -122,12 +117,12 @@ class TrainingDetailsFragment : BottomNavigationFragment(), TrainingSetClickList
     }
 
     override fun onSetClick(setNumber: Int, setId: Long) {
-        val action = TrainingDetailsFragmentDirections.actionTrainingDetailsFragmentToExerciseSetResultFragment(
-            setId = setId,
-            setNumber = setNumber,
-            setExercises = SetExercisesList()
-        )
-        this.findNavController().navigate(action)
+        val args = Bundle().also {
+            it.putLong(TrainingSetResultFragment.KEY_SET_ID, setId)
+            it.putInt(TrainingSetResultFragment.KEY_SET_NUMBER, setNumber)
+            it.putParcelable(TrainingSetResultFragment.KEY_SET_EXERCISES, SetExercisesList())
+        }
+        navigationRoot.navigate(this.javaClass, TrainingSetResultFragment::class.java, args)
     }
 
     override fun onLongSetClick(setId: Long, setViewGroup: ViewGroup) {

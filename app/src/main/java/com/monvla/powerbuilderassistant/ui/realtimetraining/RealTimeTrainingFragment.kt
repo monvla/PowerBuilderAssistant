@@ -12,9 +12,9 @@ import android.os.IBinder
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.tmurakami.aackt.lifecycle.subscribeChanges
 import com.monvla.powerbuilderassistant.R
@@ -28,9 +28,9 @@ import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.ServiceC
 import com.monvla.powerbuilderassistant.service.TrainingService
 import com.monvla.powerbuilderassistant.service.TrainingServiceListener
 import com.monvla.powerbuilderassistant.ui.SimpleFragment
-import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.Companion.FRAGMENT_RESULT_KEY
-import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.FragmentResult
+import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultFragment
 import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingViewModel.State
+import com.monvla.powerbuilderassistant.vo.SetExercisesList
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.screen_real_time_training.*
 import timber.log.Timber
@@ -78,13 +78,13 @@ class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
             stopTrainingDialog()
         }
 
-        viewModel.navigateToSetResultFragment.subscribeChanges(viewLifecycleOwner) {
-            val action = RealTimeTrainingFragmentDirections.actionScreenRealTimeTrainingToExerciseSetResultFragment(
-                -1L,
-                it.currentSetNumber,
-                it.setExercisesList
-            )
-            findNavController().navigate(action)
+        viewModel.navigateToSetResultFragment.subscribeChanges(viewLifecycleOwner) { navigationInfo ->
+            val args = Bundle().also {
+                it.putLong(TrainingSetResultFragment.KEY_SET_ID, -1)
+                it.putInt(TrainingSetResultFragment.KEY_SET_NUMBER, navigationInfo.currentSetNumber)
+                it.putParcelable(TrainingSetResultFragment.KEY_SET_EXERCISES, SetExercisesList())
+            }
+            navigationRoot.navigate(this.javaClass, TrainingSetResultFragment::class.java, args)
         }
         viewModel.state.observe(viewLifecycleOwner) {
             when(it) {
@@ -110,9 +110,9 @@ class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
 
     override fun onStart() {
         super.onStart()
-        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
-        savedStateHandle?.getLiveData<FragmentResult>(FRAGMENT_RESULT_KEY)?.observe(viewLifecycleOwner) { result ->
-            viewModel.addSet(result.setExercisesList)
+        setFragmentResultListener(TrainingSetResultFragment.KEY_TRAINING_SET_RESULT) { _, bundle ->
+            val setExercisesList = bundle.getParcelable<SetExercisesList>(TrainingSetResultFragment.KEY_SET_EXERCISES)
+            viewModel.addSet(checkNotNull(setExercisesList))
         }
         receiver = TrainingStatusReceiver {
             viewModel.timerTick(it)

@@ -1,33 +1,24 @@
 package com.monvla.powerbuilderassistant.ui.dairy
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
-import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.adapters.DairyRecordAdapter
 import com.monvla.powerbuilderassistant.ui.BottomNavigationFragment
+import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingFragment
+import com.monvla.powerbuilderassistant.ui.record.TrainingDetailsFragment
 import com.monvla.powerbuilderassistant.vo.TrainingRecordEntity
 import kotlinx.android.synthetic.main.screen_training_dairy.*
 import ru.cleverpumpkin.calendar.CalendarDate
 import ru.cleverpumpkin.calendar.CalendarView
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlinx.android.synthetic.main.activity_main.*
 
 class TrainingDairyFragment : BottomNavigationFragment(), DairyRecordAdapter.ItemClick {
-
-    companion object {
-        const val DESTINATION_EXERCISE_EDIT = 1
-        const val DESTINATION_EXERCISE_STATISTICS = 2
-    }
 
     private val viewModel: TrainingViewModel by activityViewModels()
     private lateinit var adapter: DairyRecordAdapter
@@ -51,8 +42,7 @@ class TrainingDairyFragment : BottomNavigationFragment(), DairyRecordAdapter.Ite
         training_records_list.layoutManager = LinearLayoutManager(requireContext())
 
         add_record_fab.setOnClickListener {
-            val action = TrainingDairyFragmentDirections.actionTrainingDairyFragmentToScreenRealTimeTraining()
-            this.findNavController().navigate(action)
+            navigationRoot.navigate(this.javaClass, RealTimeTrainingFragment::class.java)
         }
     }
 
@@ -61,9 +51,11 @@ class TrainingDairyFragment : BottomNavigationFragment(), DairyRecordAdapter.Ite
         viewModel.dateSelected(Utils.getDateOnlyTimestamp(Date().time))
     }
 
-    override fun onItemClicked(exercise: TrainingRecordEntity) {
-        val action = TrainingDairyFragmentDirections.actionTrainingDairyFragmentToTrainingDetailsFragment(exercise.id)
-        this.findNavController().navigate(action)
+    override fun onItemClicked(training: TrainingRecordEntity) {
+        val args = Bundle().also {
+            it.putLong(TrainingDetailsFragment.KEY_TRAINING_ID, training.id)
+        }
+        navigationRoot.navigate(this.javaClass, TrainingDetailsFragment::class.java, args)
     }
 
     private fun setupCalendar(trainingRecordsList: List<TrainingRecordEntity>) {

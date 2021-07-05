@@ -4,25 +4,30 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import kotlinx.coroutines.launch
 
-class ExerciseEditViewModel(application: Application) : AndroidViewModel(application) {
+class ExerciseEditViewModel(application: Application, exerciseId: Long?) : AndroidViewModel(application) {
 
     private val repository: TrainingRepository
-
 
     init {
         val dao = TrainingRoomDb.getDatabase(application, viewModelScope).trainingDao()
         repository = TrainingRepository(dao)
     }
 
-    val exercises = repository.getAllExercises()
+    private val _exercise = liveData {
+        if (exerciseId != null) {
+            emit(repository.getExerciseById(exerciseId))
+        } else {
+            emit(null)
+        }
+    } as MutableLiveData<ExerciseEntity?>
 
-    private val _exercise = MutableLiveData<ExerciseEntity?>()
     val exercise = _exercise as LiveData<ExerciseEntity?>
 
     private val _changed = MutableLiveData(Unit)
@@ -40,16 +45,6 @@ class ExerciseEditViewModel(application: Application) : AndroidViewModel(applica
             repository.updateExercise(exercise)
             _changed.value = Unit
         }
-    }
-
-    fun loadExercise(exerciseId: Long) {
-        viewModelScope.launch {
-            _exercise.value = repository.getExerciseById(exerciseId)
-        }
-    }
-
-    fun clearExercise() {
-        _exercise.value = null
     }
 
     fun deleteExercise(exercise: ExerciseEntity) {

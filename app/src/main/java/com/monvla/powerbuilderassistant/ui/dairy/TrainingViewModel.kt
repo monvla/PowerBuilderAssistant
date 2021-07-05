@@ -8,7 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
 import com.monvla.powerbuilderassistant.vo.TrainingRecordEntity
-import java.util.*
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZoneOffset
 import kotlinx.coroutines.launch
 
 class TrainingViewModel(application: Application) : AndroidViewModel(application) {
@@ -25,10 +27,8 @@ class TrainingViewModel(application: Application) : AndroidViewModel(application
     val allTrainings = repository.getAllTraining()
 
     fun dateSelected(timestamp: Long) {
-        val nextDayTimestamp = Calendar.getInstance().apply {
-            timeInMillis = timestamp
-            roll(Calendar.DAY_OF_MONTH, true)
-        }.timeInMillis
+        val localDate = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate();
+        val nextDayTimestamp = localDate.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
 
         viewModelScope.launch {
             _trainingRecords.value = repository.getTrainingsForDateInterval(timestamp, nextDayTimestamp)

@@ -30,7 +30,9 @@ class TrainingDetailsViewModel(application: Application, val trainingId: Long) :
 
     private suspend fun getTrainingInfo(trainingId: Long) : TrainingInfo {
         val trainingEntity = repository.getTrainingById(trainingId)
-        val trainingTemp = TrainingInfo(date = trainingEntity.date, length = trainingEntity.length)
+        val trainingTemp = TrainingInfo(
+            trainingId = trainingId, date = trainingEntity.date, length = trainingEntity.length
+        )
         val sets = repository.getSetsByTrainingId(trainingId)
         sets.forEach {setEntity ->
             val set = TrainingSet(setEntity.id, setEntity.number)
@@ -127,6 +129,7 @@ class TrainingDetailsViewModel(application: Application, val trainingId: Long) :
     }
 
     data class TrainingInfo(
+        val trainingId: Long,
         val date: Long,
         val length: Long,
         val trainingSets: MutableList<TrainingSet> = mutableListOf()

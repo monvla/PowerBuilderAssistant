@@ -8,28 +8,38 @@ import android.view.View
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.tmurakami.aackt.lifecycle.subscribeChanges
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.adapters.TrainingSetResultAdapter
 import com.monvla.powerbuilderassistant.ui.SimpleFragment
 import com.monvla.powerbuilderassistant.ui.exerciseset.SetExerciseDialog.Companion.DIALOG_TAG
-import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.Companion.FRAGMENT_RESULT_KEY
-import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultViewModel.FragmentResult
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import com.monvla.powerbuilderassistant.vo.SetExercise
+import com.monvla.powerbuilderassistant.vo.SetExercisesList
 import com.monvla.powerbuilderassistant.vo.UNDEFINED_ID
 import kotlinx.android.synthetic.main.screen_set_result.*
 
 class TrainingSetResultFragment : SimpleFragment(), SetExerciseDialog.TrainingSetDialogListener {
 
-    private val args: TrainingSetResultFragmentArgs by navArgs()
+    companion object {
+        const val KEY_TRAINING_SET_RESULT = "trainingSetResult"
+        const val KEY_TRAINING_ID = "trainingId"
+        const val KEY_SET_ID = "setId"
+        const val KEY_SET_NUMBER = "setNumber"
+        const val KEY_SET_EXERCISES = "setExercises"
+    }
+
     private lateinit var viewModelFactory: TrainingSetResultViewModelFactory
     private lateinit var viewModel: TrainingSetResultViewModel
+
+    private var setId: Long? = null
+    private var setNumber: Int? = null
+    private var setExercises: SetExercisesList? = null
 
     init {
         screenLayout = R.layout.screen_set_result
@@ -41,15 +51,21 @@ class TrainingSetResultFragment : SimpleFragment(), SetExerciseDialog.TrainingSe
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
+        with(requireArguments()) {
+            setId = getLong(KEY_SET_ID)
+            setNumber = getInt(KEY_SET_NUMBER)
+            setExercises = checkNotNull(getParcelable(KEY_SET_EXERCISES))
+        }
         viewModelFactory = TrainingSetResultViewModelFactory(
             requireContext(),
-            args.setId,
-            args.setNumber,
-            args.setExercises
+            checkNotNull(setId),
+            checkNotNull(setNumber),
+            checkNotNull(setExercises)
         )
+
         viewModel = ViewModelProvider(this, viewModelFactory).get(TrainingSetResultViewModel::class.java)
         navigationRoot.setBottomNavigationVisible(false)
+        setHasOptionsMenu(true)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -60,8 +76,8 @@ class TrainingSetResultFragment : SimpleFragment(), SetExerciseDialog.TrainingSe
         }
         viewModel.showAddExerciseDialog.subscribeChanges(viewLifecycleOwner) {
             val exercise = it.setExercise ?: SetExercise.createEmpty()
-            if (args.setId != UNDEFINED_ID) {
-                exercise.setId = args.setId
+            if (setId != UNDEFINED_ID) {
+                exercise.setId = checkNotNull(setId)
             }
             showDialog(exercise, it.exercisesList)
         }
@@ -86,8 +102,12 @@ class TrainingSetResultFragment : SimpleFragment(), SetExerciseDialog.TrainingSe
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.apply -> {
-                findNavController().previousBackStackEntry?.savedStateHandle?.set(
-                    FRAGMENT_RESULT_KEY, FragmentResult(args.setId, args.setNumber, viewModel.getSetExercises() )
+                setFragmentResult(
+                    KEY_TRAINING_SET_RESULT, bundleOf(
+                        KEY_SET_ID to setId,
+                        KEY_SET_NUMBER to setNumber,
+                        KEY_SET_EXERCISES to viewModel.getSetExercises()
+                    )
                 )
                 requireActivity().onBackPressed()
             }

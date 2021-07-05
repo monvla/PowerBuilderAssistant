@@ -1,5 +1,6 @@
 package com.monvla.powerbuilderassistant.ui.settings
 
+import android.app.Application
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -7,9 +8,9 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
-import androidx.navigation.fragment.navArgs
 import com.github.tmurakami.aackt.lifecycle.subscribeChanges
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.ui.SimpleFragment
@@ -18,26 +19,26 @@ import kotlinx.android.synthetic.main.screen_exercise_edit.*
 
 class ExerciseEditFragment : SimpleFragment() {
 
+    companion object {
+        const val KEY_EXERCISE_ID = "exerciseId"
+    }
+
     init {
         screenLayout = R.layout.screen_exercise_edit
     }
 
-    private val viewModel: ExerciseEditViewModel by activityViewModels()
-
-    val args: ExerciseEditFragmentArgs by navArgs()
+    private lateinit var viewModel: ExerciseEditViewModel
     var exercise: ExerciseEntity? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val exerciseId = arguments?.getLong(KEY_EXERCISE_ID)
+        viewModel = ExerciseEditViewModelFactory(requireActivity().application, exerciseId)
+                .create(ExerciseEditViewModel::class.java)
         setHasOptionsMenu(true)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        if (args.exerciseId != -1L) {
-            viewModel.loadExercise(args.exerciseId)
-        } else {
-            viewModel.clearExercise()
-        }
         viewModel.exercise.observe(viewLifecycleOwner) {
             exercise = it
             if (it == null) {
@@ -54,7 +55,8 @@ class ExerciseEditFragment : SimpleFragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.edit_content_menu, menu)
-        if (args.exerciseId == -1L) {
+        val exerciseId = arguments?.getLong(KEY_EXERCISE_ID)
+        if (exerciseId == -1L) {
             menu.findItem(R.id.delete).isVisible = false
         }
     }
@@ -102,8 +104,9 @@ class ExerciseEditFragment : SimpleFragment() {
     }
 
     private fun changeExercise() {
+        val exerciseId = checkNotNull(arguments?.getLong(KEY_EXERCISE_ID))
         val exerciseEntity = ExerciseEntity(
-            args.exerciseId,
+            exerciseId,
             exerciseNameField.editText?.text.toString(),
             getWeight()
         )
@@ -141,5 +144,12 @@ class ExerciseEditFragment : SimpleFragment() {
             }
             setNegativeButton(android.R.string.cancel, null)
         }.show()
+    }
+
+    class ExerciseEditViewModelFactory(val application: Application, private val exerciseId: Long?) :
+        ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return ExerciseEditViewModel(application, exerciseId) as T
+        }
     }
 }

@@ -7,15 +7,11 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.monvla.powerbuilderassistant.BuildConfig
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.ui.BottomNavigationFragment
-import com.monvla.powerbuilderassistant.ui.SimpleFragment
-import com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragment.Companion.DESTINATION_EXERCISE_EDIT
 import com.monvla.powerbuilderassistant.vo.ExerciseEntity
 import kotlinx.android.synthetic.main.item_exercise_list.view.*
 import kotlinx.android.synthetic.main.screen_exercises_list.*
@@ -32,14 +28,11 @@ class ExercisesListFragment : BottomNavigationFragment(), ExerciseClickListener 
     private lateinit var exercisesAdapter: ExercisesListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        if (args.destination == DESTINATION_EXERCISE_EDIT) {
-            button_add_exercise.apply {
-                setOnClickListener {
-                    val action = ExercisesListFragmentDirections.actionExercisesListFragmentToExerciseEditFragment(-1)
-                    it.findNavController().navigate(action)
-                }
-                isVisible = true
+        button_add_exercise.apply {
+            setOnClickListener {
+                navigationRoot.navigate(this@ExercisesListFragment.javaClass, ExerciseEditFragment::class.java)
             }
+            isVisible = true
         }
         exercisesAdapter = ExercisesListAdapter(listOf(), this)
         recycler_exercises_list.apply {
@@ -88,17 +81,10 @@ class ExercisesListFragment : BottomNavigationFragment(), ExerciseClickListener 
     }
 
     override fun onExerciseClicked(view: View, exerciseId: Long) {
-        when (args.destination) {
-            DESTINATION_EXERCISE_EDIT -> {
-                val action =
-                        ExercisesListFragmentDirections.actionExercisesListFragmentToExerciseEditFragment(exerciseId)
-                view.findNavController().navigate(action)
-            }
-//            DESTINATION_EXERCISE_STATISTICS -> {
-//                val action = ExercisesListFragmentDirections.actionExercisesListFragmentToExerciseStatisticsFragment(exerciseId)
-//                view.findNavController().navigate(action)
-//            }
+        val args = Bundle().also {
+            it.putLong(ExerciseEditFragment.KEY_EXERCISE_ID, exerciseId)
         }
+        navigationRoot.navigate(this.javaClass, ExerciseEditFragment::class.java, args)
     }
 }
 

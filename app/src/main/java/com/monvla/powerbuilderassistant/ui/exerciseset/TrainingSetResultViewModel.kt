@@ -6,9 +6,8 @@ import androidx.lifecycle.*
 import com.monvla.powerbuilderassistant.db.TrainingRoomDb
 import com.monvla.powerbuilderassistant.repository.TrainingRepository
 import com.monvla.powerbuilderassistant.vo.*
-import kotlinx.android.parcel.Parcelize
-import kotlinx.coroutines.launch
 import java.util.*
+import kotlinx.android.parcel.Parcelize
 
 class TrainingSetResultViewModel(
     context: Context,
@@ -18,7 +17,6 @@ class TrainingSetResultViewModel(
 ) : ViewModel() {
 
     companion object {
-        const val FRAGMENT_RESULT_KEY = "fragment_result"
     }
 
     @Parcelize
