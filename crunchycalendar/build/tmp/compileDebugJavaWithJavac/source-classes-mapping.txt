@@ -1,2 +1,0 @@
-ru/cleverpumpkin/calendar/BuildConfig.java
- ru.cleverpumpkin.calendar.BuildConfig

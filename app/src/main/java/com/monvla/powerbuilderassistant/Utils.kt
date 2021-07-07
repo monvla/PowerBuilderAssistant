@@ -1,22 +1,22 @@
 package com.monvla.powerbuilderassistant
 
 import android.content.res.Resources
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.list
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 class Utils {
     companion object {
         fun getDefaultExercisesList(resources: Resources): List<ExerciseJson> {
-            val json = Json(JsonConfiguration.Stable)
-            val exerciseJson = BufferedReader(InputStreamReader(resources.openRawResource(R.raw.exercise_list))).readText()
-            return json.parse(ExerciseJson.serializer().list, exerciseJson)
+            val exerciseJson = BufferedReader(
+                InputStreamReader(resources.openRawResource(R.raw.exercise_list))
+            ).readText()
+            return Json.decodeFromString(exerciseJson)
         }
 
         fun getFormattedTimeFromSeconds(time: Long): String {

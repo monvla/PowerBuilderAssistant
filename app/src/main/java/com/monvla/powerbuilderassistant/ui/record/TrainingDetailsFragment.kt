@@ -28,6 +28,8 @@ class TrainingDetailsFragment : BottomNavigationFragment(), TrainingSetClickList
     companion object {
         const val KEY_TRAINING_ID = "trainingId"
         private const val CREATE_NEW_RECORD = -1L
+
+        const val CHILD_DISPLAYED_DATA = 1
     }
 
     private lateinit var trainingDetailsAdapter: TrainingDetailsAdapter
@@ -66,6 +68,7 @@ class TrainingDetailsFragment : BottomNavigationFragment(), TrainingSetClickList
             addRecordFab.setOnClickListener {
                 viewModel.addSetRequested(trainingInfo.trainingId, trainingInfo.trainingSets.size + 1)
             }
+            record_flipper.displayedChild = CHILD_DISPLAYED_DATA
         }
         viewModel.addSetTrigger.subscribeChanges(viewLifecycleOwner) { trigger ->
             val args = Bundle().also {
@@ -148,8 +151,6 @@ class TrainingDetailsFragment : BottomNavigationFragment(), TrainingSetClickList
     }
 
     private fun setupViews() {
-        setUpButtonEnabled(true)
-
         recyclerTrainingInfo.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(requireContext())

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/settings"
+    app:startDestination="@id/settingsFragment">
+
+    <fragment
+        android:id="@+id/exercisesListFragment"
+        android:name="com.monvla.powerbuilderassistant.ui.settings.ExercisesListFragment"
+        android:label="@string/exercises_list_fragment_label">
+        <action
+            android:id="@+id/action_exercisesListFragment_to_exerciseEditFragment"
+            app:destination="@id/exerciseEditFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/exerciseEditFragment"
+        android:name="com.monvla.powerbuilderassistant.ui.settings.ExerciseEditFragment"
+        android:label="@string/exercise_edit_fragment_label">
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.monvla.powerbuilderassistant.ui.settings.SettingsFragment"
+        android:label="@string/settings_fragment_label" >
+        <action
+            android:id="@+id/action_settingsFragment_to_exercisesListFragment"
+            app:destination="@id/exercisesListFragment" />
+    </fragment>
+
+</navigation>

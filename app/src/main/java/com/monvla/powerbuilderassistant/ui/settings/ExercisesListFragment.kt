@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.monvla.powerbuilderassistant.R
@@ -21,8 +20,6 @@ class ExercisesListFragment : BottomNavigationFragment(), ExerciseClickListener 
     init {
         screenLayout = R.layout.screen_exercises_list
     }
-
-    val args: ExercisesListFragmentArgs by navArgs()
 
     private val viewModel: ExercisesListViewModel by activityViewModels()
     private lateinit var exercisesAdapter: ExercisesListAdapter

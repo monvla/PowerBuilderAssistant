@@ -3,9 +3,7 @@ package com.monvla.powerbuilderassistant
 import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.navigation.NavController
-import com.monvla.powerbuilderassistant.statistics.ui.ExerciseStatisticsFragment
 import com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragment
-import com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragmentDirections
 import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultFragment
 import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingFragment
 import com.monvla.powerbuilderassistant.ui.record.TrainingDetailsFragment
@@ -15,11 +13,8 @@ import com.monvla.powerbuilderassistant.ui.settings.SettingsFragment
 
 class NavigationContainer(private val navigationController: NavController) {
 
-    private val globalDestinations = mapOf(
-        RealTimeTrainingFragment::class.java to TrainingDairyFragmentDirections.actionGlobalScreenRealTimeTraining(),
-        SettingsFragment::class.java to TrainingDairyFragmentDirections.actionGlobalSettingsFragment(),
-        ExerciseStatisticsFragment::class.java to TrainingDairyFragmentDirections.actionGlobalExerciseStatisticsFragment(),
-        TrainingDairyFragment::class.java to TrainingDairyFragmentDirections.actionGlobalScreenTrainingDairy()
+    private val globalDestinations = mapOf<Class<*>, Int>(
+        RealTimeTrainingFragment::class.java to R.id.action_global_screenRealTimeTraining,
     )
 
     data class FragmentDestination(val fragmentFrom: Class<*>, val fragmentTo: Class<*>, @IdRes val action: Int)

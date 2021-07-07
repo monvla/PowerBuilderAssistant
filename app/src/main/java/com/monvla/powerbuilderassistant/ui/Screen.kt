@@ -22,19 +22,9 @@ open class Screen : Fragment() {
         (requireContext() as MainActivity).supportActionBar?.title = null
     }
 
-    fun setUpButtonEnabled(state: Boolean) {
-        (requireContext() as MainActivity).supportActionBar?.setDisplayHomeAsUpEnabled(state);
-        (requireContext() as MainActivity).supportActionBar?.setDisplayShowHomeEnabled(state);
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         navigationRoot = requireActivity() as NavigationRoot
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setUpButtonEnabled(true)
     }
 
     override fun onCreateView(

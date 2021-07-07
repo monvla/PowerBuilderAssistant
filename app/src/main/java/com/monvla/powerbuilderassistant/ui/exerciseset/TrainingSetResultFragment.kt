@@ -11,8 +11,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.github.tmurakami.aackt.lifecycle.subscribe
 import com.github.tmurakami.aackt.lifecycle.subscribeChanges
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.adapters.TrainingSetResultAdapter
@@ -69,7 +69,7 @@ class TrainingSetResultFragment : SimpleFragment(), SetExerciseDialog.TrainingSe
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.setData.observe(viewLifecycleOwner) {
+        viewModel.setData.subscribe(viewLifecycleOwner) {
             setResultsHeader.text = resources.getString(R.string.set_result_header, it.setNumber)
             setupRecyclerView(it.setExercises)
             trainingSetResultAdapter.notifyDataSetChanged()
@@ -100,7 +100,7 @@ class TrainingSetResultFragment : SimpleFragment(), SetExerciseDialog.TrainingSe
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.apply -> {
                 setFragmentResult(
                     KEY_TRAINING_SET_RESULT, bundleOf(
@@ -110,9 +110,10 @@ class TrainingSetResultFragment : SimpleFragment(), SetExerciseDialog.TrainingSe
                     )
                 )
                 requireActivity().onBackPressed()
+                true
             }
+            else -> super.onOptionsItemSelected(item)
         }
-        return true
     }
 
     override fun onSaveSetExerciseClick(setExercise: SetExercise) {

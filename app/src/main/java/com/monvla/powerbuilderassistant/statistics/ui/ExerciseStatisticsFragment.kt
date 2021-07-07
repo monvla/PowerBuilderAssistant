@@ -9,7 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
-import androidx.navigation.fragment.navArgs
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.ui.SimpleFragment
@@ -22,7 +21,6 @@ import lecho.lib.hellocharts.model.Line
 import lecho.lib.hellocharts.model.LineChartData
 import lecho.lib.hellocharts.model.PointValue
 import lecho.lib.hellocharts.model.Viewport
-import java.lang.Math.min
 import java.util.*
 
 class ExerciseStatisticsFragment : SimpleFragment() {
@@ -39,7 +37,6 @@ class ExerciseStatisticsFragment : SimpleFragment() {
 
     data class DateLabel(val position: Int, val label: String)
 
-//    private val args: ExerciseStatisticsFragmentArgs by navArgs()
     private val datesList = ArrayList<AxisValue>()
     private val valuesList = ArrayList<PointValue>()
 
@@ -116,7 +113,7 @@ class ExerciseStatisticsFragment : SimpleFragment() {
 
     private fun updateViewport() {
         val viewport = Viewport(chart.maximumViewport).apply {
-            val maxListValue = requireNotNull(valuesList.maxBy{it.y}).y
+            val maxListValue = requireNotNull(valuesList.maxByOrNull { it.y }).y
             top = maxOf(
                 (maxListValue * 2),
                 getTopValue()
@@ -127,7 +124,6 @@ class ExerciseStatisticsFragment : SimpleFragment() {
         chart.apply {
             maximumViewport = viewport
             currentViewport = viewport
-//            setCurrentViewportWithAnimation(viewport)
         }
     }
 
