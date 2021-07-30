@@ -66,6 +66,7 @@ class TrainingSetResultFragment : SimpleFragment(), SetExerciseDialog.TrainingSe
         viewModel = ViewModelProvider(this, viewModelFactory).get(TrainingSetResultViewModel::class.java)
         navigationRoot.setBottomNavigationVisible(false)
         setHasOptionsMenu(true)
+        navigationRoot.setHomeAsUpEnabled(!navigationRoot.isTrainingInProgress())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -95,6 +96,11 @@ class TrainingSetResultFragment : SimpleFragment(), SetExerciseDialog.TrainingSe
         dialog?.dismiss()
     }
 
+    override fun onStop() {
+        super.onStop()
+        navigationRoot.setHomeAsUpEnabled(navigationRoot.isTrainingInProgress())
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.new_set_exercises_menu, menu)
     }
@@ -109,7 +115,7 @@ class TrainingSetResultFragment : SimpleFragment(), SetExerciseDialog.TrainingSe
                         KEY_SET_EXERCISES to viewModel.getSetExercises()
                     )
                 )
-                requireActivity().onBackPressed()
+                navigationRoot.finishFragment()
                 true
             }
             else -> super.onOptionsItemSelected(item)

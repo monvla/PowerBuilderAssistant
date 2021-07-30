@@ -16,7 +16,6 @@ class RealTimeTrainingService : Service(), TrainingService {
     companion object {
         const val TRAINING_STATUS = "GET_CURRENT_TIME"
         const val TIME_ARG = "TIME"
-        const val RTT_SERVICE_STARTED = "rtt_service_started"
     }
 
     data class TrainingServiceData(val timeStarted: Long, val cachedTrainingSets: List<ServiceTrainingSet>?)

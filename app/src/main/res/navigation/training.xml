@@ -2,37 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/training"
-    app:startDestination="@id/trainingDairyFragment">
-
-    <fragment
-        android:id="@+id/trainingDairyFragment"
-        android:name="com.monvla.powerbuilderassistant.ui.dairy.TrainingDairyFragment"
-        android:label="@string/training_dairy_fragment_label">
-
-        <action
-            android:id="@+id/action_trainingDairyFragment_to_trainingDetailsFragment"
-            app:destination="@id/trainingDetailsFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-        <action
-            android:id="@+id/action_trainingDairyFragment_to_screenRealTimeTraining"
-            app:destination="@id/screenRealTimeTraining"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
-
-    </fragment>
-    <fragment
-        android:id="@+id/trainingDetailsFragment"
-        android:name="com.monvla.powerbuilderassistant.ui.record.TrainingDetailsFragment"
-        android:label="@string/training_details_fragment_label">
-        <action
-            android:id="@+id/action_trainingDetailsFragment_to_exerciseSetResultFragment"
-            app:destination="@id/exerciseSetResultFragment" />
-    </fragment>
+    app:startDestination="@id/screenRealTimeTraining">
 
     <fragment
         android:id="@+id/screenRealTimeTraining"
@@ -42,10 +12,11 @@
             android:id="@+id/action_screenRealTimeTraining_to_exerciseSetResultFragment"
             app:destination="@id/exerciseSetResultFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/exerciseSetResultFragment"
         android:name="com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultFragment"
         android:label="@string/set_result_fragment_name">
     </fragment>
-    <action android:id="@+id/action_global_screenRealTimeTraining" app:destination="@id/screenRealTimeTraining"/>
+
 </navigation>

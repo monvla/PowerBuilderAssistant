@@ -2,8 +2,9 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/training">
+    app:startDestination="@id/dairy">
 
+    <include app:graph="@navigation/dairy"/>
     <include app:graph="@navigation/training"/>
     <include app:graph="@navigation/settings"/>
 
@@ -11,5 +12,11 @@
         android:id="@+id/exerciseStatisticsFragment"
         android:name="com.monvla.powerbuilderassistant.statistics.ui.ExerciseStatisticsFragment"
         android:label="ExerciseStatisticsFragment" />
+    <action
+        android:id="@+id/action_global_screenRealTimeTraining"
+        app:destination="@id/training"
+        app:popUpTo="@+id/training"
+        app:popUpToInclusive="true"
+        />
 
 </navigation>

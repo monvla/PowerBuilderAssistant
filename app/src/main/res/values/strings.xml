@@ -37,7 +37,8 @@
     <string name="training_length">"Длительность тренировки: %1$s"</string>
     <string name="training_average_set_time">"Среднее время на подход: %1$s"</string>
     <string name="training_total_weight">"Общий поднятый вес: %1$s"</string>
-    <string name="menu_trainings">Тренировки</string>
+    <string name="menu_training">Тренировка</string>
+    <string name="menu_dairy">Дневник</string>
     <string name="exercise_edit_empty_exercise_name">Название упражнения пустое</string>
     <string name="edit_exercise_changes_saved">Изменения сохранены: %1$s</string>
     <string name="exercise_edit_deleted_exercise">Упражнение %1$s удалено</string>

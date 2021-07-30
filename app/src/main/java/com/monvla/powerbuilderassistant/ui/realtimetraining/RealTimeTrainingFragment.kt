@@ -14,20 +14,18 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.tmurakami.aackt.lifecycle.subscribeChanges
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils.Companion.getFormattedTimeFromSeconds
 import com.monvla.powerbuilderassistant.adapters.RTTFinishedSetsAdapter
 import com.monvla.powerbuilderassistant.service.RealTimeTrainingService
-import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.Companion.RTT_SERVICE_STARTED
 import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.Companion.TRAINING_STATUS
 import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.LocalBinder
 import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.ServiceConnection
 import com.monvla.powerbuilderassistant.service.TrainingService
 import com.monvla.powerbuilderassistant.service.TrainingServiceListener
-import com.monvla.powerbuilderassistant.ui.SimpleFragment
+import com.monvla.powerbuilderassistant.ui.BottomNavigationFragment
 import com.monvla.powerbuilderassistant.ui.exerciseset.TrainingSetResultFragment
 import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingViewModel.State
 import com.monvla.powerbuilderassistant.vo.SetExercisesList
@@ -35,10 +33,12 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.screen_real_time_training.*
 import timber.log.Timber
 
-class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
+class RealTimeTrainingFragment : BottomNavigationFragment(), TrainingServiceListener {
 
     companion object {
         const val CHANNEL_ID = "channel"
+
+        const val RTT_IN_PROGRESS = "rtt_in_progress"
 
         const val DISPLAYED_CHILD_FINISHED = 2
         const val DISPLAYED_CHILD_IN_PROGRESS = 1
@@ -73,6 +73,7 @@ class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
             displayTimer()
             viewModel.trainingStarted()
             startTrainingService()
+            setTrainingInProgressState(true)
         }
         stop_counter_button.setOnClickListener {
             stopTrainingDialog()
@@ -98,11 +99,14 @@ class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
                     viewAdapter.notifyDataSetChanged()
                     displayTimer()
                     trainingService?.setCachedTrainingSets(it.trainingSets)
+                    navigationRoot.setBottomNavigationVisible(false)
                 }
                 is State.Finished -> {
                     updateTimer(it.totalTime)
                     total_sets_done.text = getString(R.string.rtt_sets_done, it.setsCounter)
                     real_timer_training_flipper.displayedChild = DISPLAYED_CHILD_FINISHED
+                    navigationRoot.setBottomNavigationVisible(true)
+                    setTrainingInProgressState(false)
                 }
             }
         }
@@ -141,18 +145,16 @@ class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
         displayTimer()
     }
 
-    private fun setServiceRunningState(value: Boolean) {
-        Timber.d("set service running state: $value")
-        val preferences = requireActivity().getPreferences(Service.MODE_PRIVATE)
-        with(preferences.edit()) {
-            putBoolean(RTT_SERVICE_STARTED, value)
-            apply()
-        }
-        Timber.d("set result: ${requireActivity().getPreferences(Context.MODE_PRIVATE).getBoolean(RTT_SERVICE_STARTED, false)}")
+    override fun onStateRecieved(value: Boolean) {
     }
 
-    override fun onStateRecieved(value: Boolean) {
-        setServiceRunningState(value)
+    private fun setTrainingInProgressState(value: Boolean) {
+        Timber.d("set training in progress state: $value")
+        val preferences = requireActivity().getPreferences(Service.MODE_PRIVATE)
+        with(preferences.edit()) {
+            putBoolean(RTT_IN_PROGRESS, value)
+            apply()
+        }
     }
 
     private fun stopTrainingDialog() =
@@ -195,7 +197,6 @@ class RealTimeTrainingFragment : SimpleFragment(), TrainingServiceListener {
         Intent(context, RealTimeTrainingService::class.java).also {
             ContextCompat.startForegroundService(requireContext(), it)
         }
-        setServiceRunningState(true)
     }
 
     private fun updateTimer(currentTime: Long) {

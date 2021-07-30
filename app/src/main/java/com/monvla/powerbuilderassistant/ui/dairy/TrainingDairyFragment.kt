@@ -3,13 +3,11 @@ package com.monvla.powerbuilderassistant.ui.dairy
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.monvla.powerbuilderassistant.R
 import com.monvla.powerbuilderassistant.Utils
 import com.monvla.powerbuilderassistant.adapters.DairyRecordAdapter
 import com.monvla.powerbuilderassistant.ui.BottomNavigationFragment
-import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingFragment
 import com.monvla.powerbuilderassistant.ui.record.TrainingDetailsFragment
 import com.monvla.powerbuilderassistant.vo.TrainingRecordEntity
 import kotlinx.android.synthetic.main.screen_training_dairy.*
@@ -40,10 +38,6 @@ class TrainingDairyFragment : BottomNavigationFragment(), DairyRecordAdapter.Ite
             adapter.updateData(trainingsList)
         }
         training_records_list.layoutManager = LinearLayoutManager(requireContext())
-
-        add_record_fab.setOnClickListener {
-            navigationRoot.navigate(this.javaClass, RealTimeTrainingFragment::class.java)
-        }
     }
 
     override fun onResume() {

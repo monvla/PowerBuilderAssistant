@@ -10,9 +10,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.monvla.powerbuilderassistant.service.RealTimeTrainingService.Companion.RTT_SERVICE_STARTED
 import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingFragment
+import com.monvla.powerbuilderassistant.ui.realtimetraining.RealTimeTrainingFragment.Companion.RTT_IN_PROGRESS
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 
@@ -33,7 +32,7 @@ class MainActivity : AppCompatActivity(), NavigationRoot {
         setContentView(R.layout.activity_main)
         Timber.plant(Timber.DebugTree())
         prepareNavigation()
-        if (isServiceStarted()) {
+        if (isTrainingInProgress()) {
             navigationContainer.navigateGlobal(RealTimeTrainingFragment::class.java)
         }
     }
@@ -50,7 +49,23 @@ class MainActivity : AppCompatActivity(), NavigationRoot {
         navigationContainer.navigate(from, to, args)
     }
 
-    private fun isServiceStarted() = getPreferences(Context.MODE_PRIVATE).getBoolean(RTT_SERVICE_STARTED, false)
+    override fun onBackPressed() {
+        if (navigationContainer.isBackPressHandleNeeded()) {
+            navigationContainer.handleBackPress()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun isTrainingInProgress() = getPreferences(Context.MODE_PRIVATE).getBoolean(RTT_IN_PROGRESS, false)
+
+    override fun setHomeAsUpEnabled(enabled: Boolean) {
+        supportActionBar?.setDisplayHomeAsUpEnabled(enabled)
+    }
+
+    override fun finishFragment() {
+        super.onBackPressed()
+    }
 
     private fun prepareNavigation() {
         val navHostFragment = supportFragmentManager.findFragmentById(
@@ -58,12 +73,11 @@ class MainActivity : AppCompatActivity(), NavigationRoot {
         ) as NavHostFragment
         navController = navHostFragment.navController
 
-        navigationContainer = NavigationContainer(navController)
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        bottomNavigationView.setupWithNavController(navController)
+        navigationContainer = NavigationContainer(this, navController)
+        bottom_navigation.setupWithNavController(navController)
 
         appBarConfiguration = AppBarConfiguration(
-            setOf(R.id.trainingDairyFragment, R.id.settingsFragment)
+            setOf(R.id.screenRealTimeTraining, R.id.trainingDairyFragment, R.id.settingsFragment)
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
     }
