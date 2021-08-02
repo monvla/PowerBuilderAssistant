@@ -43,7 +43,8 @@ class SetExerciseDialog(
             }
             val repeatsString = if (exercise.repeats == 0) "" else exercise.repeats.toString()
             exerciseRepeatsText.setText(repeatsString)
-            exerciseWeightText.setText(exercise.weight.toString())
+            val weightString = if (exercise.weight == 0f) "" else exercise.weight.toString()
+            exerciseWeightText.setText(weightString)
         }
 
         builder.setView(layout)
