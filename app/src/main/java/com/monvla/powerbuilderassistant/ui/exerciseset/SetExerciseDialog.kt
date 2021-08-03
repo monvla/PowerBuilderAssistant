@@ -64,7 +64,8 @@ class SetExerciseDialog(
                     val repeatsValue = layout.exerciseRepeatsText.text.toString().toInt()
                     val weightText = layout.exerciseWeightText.text.toString()
                     val weightValue = if (weightText.isBlank()) 0f else weightText.toFloat()
-                    exercise.update(nameValue, repeatsValue, weightValue)
+                    val exerciseId = exercisesList.find { it.name == nameValue }!!.id
+                    exercise.update(nameValue, repeatsValue, weightValue, exerciseId)
 
                     callback.onSaveSetExerciseClick(exercise)
                     dialogInterface.dismiss()

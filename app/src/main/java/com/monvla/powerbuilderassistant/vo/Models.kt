@@ -39,10 +39,11 @@ data class SetExercise(
         }
     }
 
-    fun update(name: String, repeats: Int, weight: Float): SetExercise {
+    fun update(name: String, repeats: Int, weight: Float, exerciseId: Long): SetExercise {
         this.exerciseName = name
         this.repeats = repeats
         this.weight = weight
+        this.exerciseId = exerciseId
         return this
     }
 }
